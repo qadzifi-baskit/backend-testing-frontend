@@ -4,11 +4,11 @@
   import { FaFloppyDisk, FaTrashCan } from 'svelte-icons-pack/fa';
   import type { MouseEventHandler } from 'svelte/elements';
   import { writable } from 'svelte/store';
-  import Collapse from "./components/Collapse.svelte";
-  import Select from "./components/Select.svelte";
-  import Table from "./components/Table.svelte";
-  import Auth from "./components/molecules/Auth.svelte";
-  import type { Cart, PaymentType, Product } from './types';
+  import Collapse from "../../components/Collapse.svelte";
+  import Select from "../../components/Select.svelte";
+  import Table from "../../components/Table.svelte";
+  import Auth from "../../components/molecules/Auth.svelte";
+  import type { Cart, PaymentType, Product } from '../../types';
   const client = axios.create();
 
   let host = 'https://api-beta.baskit.app/v2';
@@ -167,20 +167,8 @@
     <button on:click={onGetBalance} class="btn bg-slate-600">Get Balance</button>
     <span>Balance: {balance}</span>
   </Collapse>
-  <div>
-    <button class="btn" on:click={onGetProduct}>Get Product</button>
-    <button class="btn" on:click={onGetCart}>Get Cart</button>
-  </div>
-  <div>
-    <select bind:value={selectedPaymentType} class="select select-bordered w-full max-w-xs">
-      <option value="" disabled selected>Payment Type</option>
-      {#each $paymentTypeList as paymentType}
-      <option value={paymentType.id}>{paymentType.name}</option>
-      {/each}
-    </select>
-    <button class="btn" on:click={onCreateOrder} disabled={selectedPaymentType === ''}>Create Order</button>
-  </div>
   <Collapse class="overflow-x-auto" onClick={onGetProduct} title="Product List">
+    <button class="btn" on:click={onGetProduct}>Get Product</button>
     {#if $productList.length > 0}
     <Table itemList={$productList}>
       <svelte:fragment slot="header">
@@ -209,6 +197,7 @@
     {/if}
   </Collapse>
   <Collapse class="overflow-x-auto" onClick={onGetCart} title="Order Summary">
+    <button class="btn" on:click={onGetCart}>Get Cart</button>
     {#if $cartList.length > 0}
     <Table itemList={$cartList}>
       <svelte:fragment slot="header">
@@ -249,6 +238,15 @@
       </svelte:fragment>
     </Table>
     {/if}
+    <div>
+      <select bind:value={selectedPaymentType} class="select select-bordered w-full max-w-xs">
+        <option value="" disabled selected>Payment Type</option>
+        {#each $paymentTypeList as paymentType}
+        <option value={paymentType.id}>{paymentType.name}</option>
+        {/each}
+      </select>
+      <button class="btn" on:click={onCreateOrder} disabled={selectedPaymentType === ''}>Create Order</button>
+    </div>
   </Collapse>
 </div>
 
