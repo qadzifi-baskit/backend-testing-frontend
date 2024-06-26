@@ -1,7 +1,7 @@
 import '@/app.css';
-import Buyer from '@/app/buyer';
+import Seller from '@/app/seller';
 
-const app = new Buyer({
+const app = new Seller({
   target: document.getElementById('app')!,
 });
 

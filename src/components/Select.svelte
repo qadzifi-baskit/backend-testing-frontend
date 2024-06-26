@@ -1,10 +1,12 @@
-<script lang="ts">
-  import { cn } from "@/lib/helper/tailwind";
+<script lang="ts" generics="T">
+  import { cn } from '@/lib/helper/tailwind';
+  // eslint-disable-next-line no-undef
+  type ValueType = T;
 
   export let title = '';
   export let showValue = false;
-  export let options: [string, string][] = [];
-  export let value:string;
+  export let options: [ValueType, string][] = [];
+  export let value:ValueType;
   let clazz = '';
   export { clazz as class };
 </script>
@@ -13,7 +15,7 @@
   <div class="label">
     <span class="label-text">{title}</span>
   </div>
-  <select bind:value class={cn("select select-bordered", clazz)}>
+  <select bind:value class={cn('select select-bordered', clazz)}>
     {#each options as [optionValue, optionLabel]}
     <option value={optionValue}>{optionLabel}</option>
     {/each}

@@ -1,35 +1,55 @@
-import { select } from '@inquirer/prompts';
+import { checkbox } from '@inquirer/prompts';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
+import fs from 'fs';
 import path from 'path';
+import { exit } from 'process';
 import { fileURLToPath } from 'url';
-import type { InlineConfig } from 'vite';
-import { build } from 'vite';
+import { InlineConfig, build } from 'vite';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const root = path.resolve(__dirname, '..');
+const distPath = path.resolve(root, 'dist');
 
 const AppType = {
   Buyer: 'Buyer',
   Seller: 'Seller',
 } as const;
 
-const appList = [
-  AppType.Buyer,
-  AppType.Seller,
-] as const;
+type AppTypeKey = keyof typeof AppType;
+type AppType = typeof AppType[AppTypeKey];
 
-type AppType = typeof appList[number];
+const AppEntry:Record<AppTypeKey, string> = {
+  Buyer: 'src/entry/buyer/index.html',
+  Seller: 'src/entry/seller/index.html',
+};
 
-const selectedApp: AppType = await select({
+const selectedApp: [AppTypeKey, string][] = await checkbox({
   message: 'Select app to build:',
-  choices: appList.map((value) => ({
+  choices: Object.entries(AppType).map(([
+    key, value,
+  ]) => ({
     name: value,
-    value,
+    value: [<AppTypeKey>key, AppEntry[key]],
   })),
 });
 
+if (selectedApp.length === 0) {
+  console.log('No app selected, exiting process...');
+  exit();
+}
+
+if (!fs.existsSync(distPath)) {
+  fs.mkdirSync(distPath);
+} else {
+  if (!fs.statSync(distPath).isDirectory()) {
+    fs.rmSync(distPath);
+    fs.mkdirSync(distPath);
+  }
+}
+
 const viteBaseConfig: InlineConfig = {
-  root: path.resolve(__dirname, '..'),
+  root,
   configFile: false,
   plugins: [svelte(), viteSingleFile()],
   resolve: {
@@ -38,21 +58,18 @@ const viteBaseConfig: InlineConfig = {
     },
   },
 };
-
-switch (selectedApp) {
-  case AppType.Buyer:
-    await build({
-      ...viteBaseConfig,
-      build: {
-        outDir: 'dist',
-        rollupOptions: {
-          input: {
-            buyer: 'src/entry/buyer/index.html',
-          },
+selectedApp.forEach(async ([key, entry]) => {
+  await build({
+    ...viteBaseConfig,
+    build: {
+      emptyOutDir: false,
+      outDir: 'dist',
+      rollupOptions: {
+        input: {
+          [key]: entry,
         },
       },
-    });
-    break;
-  default:
-    break;
-}
+    },
+  });
+});
+

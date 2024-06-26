@@ -2,8 +2,7 @@ import { select } from '@inquirer/prompts';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import type { InlineConfig, ViteDevServer } from 'vite';
-import { createServer } from 'vite';
+import { InlineConfig, ViteDevServer, createServer } from 'vite';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
@@ -39,31 +38,30 @@ const viteBaseConfig: InlineConfig = {
   },
 };
 let server: ViteDevServer|undefined = undefined;
+let entry = '';
 
 switch (selectedApp) {
   case AppType.Buyer: {
-    server = await createServer({
-      ...viteBaseConfig,
-      server: {
-        open: 'src/entry/buyer/index.html',
-      },
-      build: {
-        outDir: 'dist',
-        rollupOptions: {
-          input: {
-            buyer: 'src/entry/buyer/index.html',
-          },
-        },
-      },
-    });
+    entry = 'src/entry/buyer/index.html';
+    break;
+  }
+  case AppType.Seller: {
+    entry = 'src/entry/seller/index.html';
     break;
   }
   default:
     break;
 }
 
+server = await createServer({
+  ...viteBaseConfig,
+  server: {
+    open: entry,
+  },
+});
+
 if (server) {
   await server.listen();
-  await server.printUrls();
-  await server.bindCLIShortcuts({ print: true });
+  server.printUrls();
+  server.bindCLIShortcuts({ print: true });
 }

@@ -1,5 +1,7 @@
 <script lang="ts" generics="T extends Object">
+  // eslint-disable-next-line no-undef
   type Key = keyof T;
+  // eslint-disable-next-line no-undef
   export let itemList: T[] = [];
   export let headerList: string[] = [
     ...Object.keys(itemList[0] ?? {}),
@@ -7,12 +9,6 @@
   export let keyList:Key[] = [
     ...<Key[]>Object.keys(itemList[0] ?? {}),
   ];
-
-  console.log({
-    itemList,
-    headerList,
-    keyList,
-  });
 </script>
 
 <div class="overflow-x-auto">
