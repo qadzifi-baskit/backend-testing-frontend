@@ -1,3 +1,5 @@
+import type { OrderDetailStatusEnum } from '@/lib/enum';
+
 export type PriceTier = {
   id: string;
   margin: number;
@@ -45,4 +47,34 @@ export type Cart = {
   name: string;
   qty: number;
   warehouse: number;
+};
+
+export type Order = {
+  createdAt: string;
+  id: string;
+  orderStatus: string;
+  status: string;
+  orderCode: string;
+  paymentTerm: string;
+  paymentStatus: string;
+  total: number;
+  grandTotal: number;
+  product: Omit<Cart, 'warehouse'>,
+};
+
+export type OrderDetail = {
+  id: string,
+  qty: number,
+  sellingPrice: number,
+  margin: number,
+  marginValue: number,
+  fullName: string,
+  status: OrderDetailStatusEnum|null,
+  reason: string|null,
+  notes: string|null,
+};
+
+export type OrderReason = {
+  id: string,
+  name: string,
 };

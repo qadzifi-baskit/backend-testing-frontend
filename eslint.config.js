@@ -7,6 +7,7 @@ import svelteParser from 'svelte-eslint-parser';
 import tseslint from 'typescript-eslint';
 /**
  * @typedef {import('eslint/rules/stylistic-issues').StylisticIssues} StylisticIssues
+ * @typedef {import('eslint-plugin-svelte/lib/rule-types').RuleOptions} SvelteRulesOptions
  * @typedef {{ [K in keyof StylisticIssues as `@stylistic/${K}`]: StylisticIssues[K] }} StylisticRules
  * @typedef {import('eslint/rules/possible-errors').PossibleErrors} PossibleErrors
  * @typedef {import('eslint/rules/best-practices').BestPractices} BestPractices
@@ -18,11 +19,18 @@ const stylisticRules = {
   '@stylistic/comma-dangle': ['error', 'always-multiline'],
   '@stylistic/quotes': ['error', 'single'],
   '@stylistic/no-multiple-empty-lines': ['error'],
+  '@stylistic/indent': ['error', 2],
 };
 /** @type{PossibleErrors & BestPractices} */
 const jsRules = {
   'no-empty': ['error'],
   'no-empty-function': ['error'],
+};
+/** @type {SvelteRulesOptions} */
+const svelteRules = {
+  'svelte/indent': ['error', {
+    indent: 2,
+  }],
 };
 
 export default [
@@ -43,6 +51,7 @@ export default [
   },
   {
     files: ['**/*.svelte', '*.svelte'],
+    rules: svelteRules,
     languageOptions: {
       parser: svelteParser,
       parserOptions: {

@@ -17,12 +17,12 @@
   </div>
   <select bind:value class={cn('select select-bordered', clazz)}>
     {#each options as [optionValue, optionLabel]}
-    <option value={optionValue}>{optionLabel}</option>
+      <option value={optionValue}>{optionLabel}</option>
     {/each}
   </select>
   {#if showValue}
-  <div class="label">
-    <span class="label-text-alt">{value}</span>
-  </div>
+    <div class="label">
+      <span class="label-text-alt">{value}</span>
+    </div>
   {/if}
 </label>

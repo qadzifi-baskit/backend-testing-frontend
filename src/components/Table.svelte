@@ -17,20 +17,20 @@
       <tr>
         <slot name="header">
           {#each headerList as header}
-          <th>{header}</th>
+            <th>{header}</th>
           {/each}
         </slot>
       </tr>
     </thead>
     <tbody>
-      {#each itemList as item}
-      <tr>
-        <slot name="item" {item}>
-          {#each keyList as key}
-          <td> {item[key]} </td>
-          {/each}
-        </slot>
-      </tr>
+      {#each itemList as item, index}
+        <tr>
+          <slot name="item" {item} {index}>
+            {#each keyList as key}
+              <td> {item[key]} </td>
+            {/each}
+          </slot>
+        </tr>
       {/each}
     </tbody>
   </table>
