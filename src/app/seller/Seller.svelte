@@ -1,13 +1,13 @@
 <script lang="ts">
-  import Collapse from "@/components/Collapse.svelte";
-  import Auth from "@/components/molecules/Auth.svelte";
-  import Config from "@/components/molecules/Config.svelte";
-  import axios from "axios";
-  import { writable } from "svelte/store";
+  import Collapse from '@/components/Collapse.svelte';
+  import Auth from '@/components/molecules/Auth.svelte';
+  import Config from '@/components/molecules/Config.svelte';
+  import axios from 'axios';
+  import { writable } from 'svelte/store';
 
+  export let host = 'https://api-beta.baskit.app/v2';
   const client = axios.create();
-  let host = 'https://api-beta.baskit.app/v2';
-  let clientType = 'BASKIT_SHOP';
+  let clientType = 'WEB_CMS';
   let username = 'nagamas@testing.com';
   let password = '12345678';
   let balance = 0;
@@ -51,6 +51,7 @@
   <Config
     bind:host
     bind:clientType
+    showHost={false}
   />
   <Auth
     bind:username

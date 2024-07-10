@@ -1,13 +1,12 @@
-<script lang="ts">
-  import DatePicker from '@/components/DatePicker.svelte';
+<script lang="ts"> import DatePicker from '@/components/DatePicker.svelte';
   import Auth from '@/components/molecules/Auth.svelte';
   import Config from '@/components/molecules/Config.svelte';
   import OrderList from '@/components/molecules/OrderList.svelte';
   import axios from 'axios';
   import { writable } from 'svelte/store';
 
+  export let host = 'https://api-beta.baskit.app/v2';
   const userId = writable('');
-  let host = 'https://api-beta.baskit.app/v2';
   let clientType = 'WEB_CMS';
   let username = 'boa@baskit.app';
   let password = '12345678';
@@ -37,6 +36,7 @@
   <Config
     bind:host
     bind:clientType
+    showHost={false}
   />
   <div class="divider"></div>
   <Auth

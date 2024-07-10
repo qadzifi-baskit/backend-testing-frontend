@@ -1,9 +1,10 @@
 <script lang="ts">
-  import Collapse from "../Collapse.svelte";
+  import type { MouseEventHandler } from 'svelte/elements';
+  import Collapse from '../Collapse.svelte';
 
   export let username:string;
   export let password:string;
-  export let onAuth = () => {};
+  export let onAuth:MouseEventHandler<HTMLButtonElement> = () => undefined;
 </script>
 
 <Collapse title="Auth">

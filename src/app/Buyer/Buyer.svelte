@@ -12,8 +12,9 @@
   import type { Cart, PaymentType, Product, Warehouse, WarehouseDetail } from '../../types';
   import Select from '@/components/Select.svelte';
   import Order from '@/components/molecules/Order.svelte';
+  import Modal from '@/components/Modal.svelte';
 
-  let host = 'https://api-beta.baskit.app/v2';
+  export let host = 'https://api-beta.baskit.app/v2';
   const client = axios.create({ baseURL: host });
 
   const userId = writable('');
@@ -23,6 +24,7 @@
   const cartList = writable(<Cart[]>[]);
   const paymentTypeList = writable(<PaymentType[]>[]);
   const warehouseList = writable(<Warehouse[]>[]);
+  let walletId = '';
   let clientType = 'BASKIT_SHOP';
   let balance = 0;
   let username = 'eight.one@gmail.com';
@@ -150,6 +152,7 @@
   const onGetBalance = async () => {
     const response = await client.get(`/wallet/${$userId}`);
     if (response.status === 200) {
+      walletId = response.data.data.id;
       balance = response.data.data.balance;
     }
   };
@@ -166,7 +169,7 @@
     }
   };
 
-  const onAuth = async () => {
+  const onAuth:MouseEventHandler<HTMLButtonElement> = async () => {
     const response = await client.post('/auth', {
       username,
       password,
@@ -184,12 +187,54 @@
       onGetCart();
     }
   };
+  let topUpDialog:HTMLDialogElement;
+  let topUpAmount = 0;
+  const onTopUp = () => {
+    topUpDialog?.showModal();
+  };
+  let topUpPageURL = '';
+  const doTopUp = async () => {
+    const response = await client.post('/wallet/topup/request', {
+      id: walletId,
+      amount: topUpAmount,
+    });
+    if (response.status === 200) {
+      topUpPageURL = response?.data?.data?.invoiceUrl;
+    }
+  };
 </script>
 
+<Modal
+  bind:dialog={topUpDialog}
+>
+  <div
+    class="flex flex-col items-start w-full h-full"
+  >
+    <label class="form-control w-full max-w-xs">
+      <div class="label">
+        <span class="label-text">Amount</span>
+      </div>
+      <input type="number" placeholder="amount" bind:value={topUpAmount} class="input input-bordered w-full max-w-xs" />
+    </label>
+    <button
+      on:click={doTopUp}
+      class="btn bg-slate-600"
+    >
+      Top Up
+    </button>
+    <iframe
+      class="w-full grow"
+      src={topUpPageURL}
+      title="Top Up Page"
+      frameborder="0"
+    ></iframe>
+  </div>
+</Modal>
 <div id="root" class="p-6 bg-[#27303b]">
   <Config
     bind:host
     bind:clientType
+    showHost={false}
   />
   <div class="divider"></div>
   <Auth
@@ -201,6 +246,7 @@
   <Collapse title="Profile">
     <button on:click={onGetBalance} class="btn bg-slate-600">Get Balance</button>
     <span>Balance: {balance}</span>
+    <button on:click={onTopUp} class="btn bg-slate-600">Top Up</button>
   </Collapse>
   <div class="divider"></div>
   <div class="flex w-full rounded-box">

@@ -8,6 +8,7 @@
   import Table from '../Table.svelte';
   import UpdateStatus from './UpdateStatus.svelte';
   import OrderDetail from './OrderDetail.svelte';
+  import Modal from '../Modal.svelte';
 
   export let endpoint = 'list-order';
   export let client:AxiosInstance;
@@ -67,25 +68,25 @@
   };
 </script>
 
-<dialog bind:this={statusDialog}
-  class="p-4 z-50 fixed h-full w-full bg-slate-800 bg-opacity-85 rounded-xl"
-  on:close={onCloseModal}
+<Modal
+  bind:dialog={statusDialog}
+  onClose={onCloseModal}
 >
   <UpdateStatus
     bind:id={selectedId}
     {client}
     {onUpdateStatus}
   />
-</dialog>
-<dialog bind:this={detailDialog}
-  class="p-4 z-50 fixed h-full w-full bg-slate-800 bg-opacity-85 rounded-xl"
-  on:close={onCloseModal}
+</Modal>
+<Modal
+  bind:dialog={detailDialog}
+  onClose={onCloseModal}
 >
   <OrderDetail
     bind:id={selectedId}
     {client}
   />
-</dialog>
+</Modal>
 <Collapse title='Order' onClick={onGetOrderList}>
   <button class="btn" on:click={onGetOrderList}>Get Order</button>
   <select class="select w-full max-w-xs" bind:value={page}>
