@@ -1,4 +1,4 @@
-<script lang="ts"> import DatePicker from '@/components/DatePicker.svelte';
+<script lang="ts">
   import Auth from '@/components/molecules/Auth.svelte';
   import Config from '@/components/molecules/Config.svelte';
   import OrderList from '@/components/molecules/OrderList.svelte';
@@ -32,7 +32,6 @@
 </script>
 
 <div id="root" class="p-6 bg-[#27303b]">
-  <DatePicker/>
   <Config
     bind:host
     bind:clientType

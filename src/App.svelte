@@ -16,13 +16,13 @@
 />
 <div style="--amount:{amount}" role="tablist" class="tabs tabs-bordered w-full">
   <input checked={selected === 1} type="radio" name="my_tabs_1" role="tab" class="tab hidden" aria-label="Tab 1" />
-  <div role="tabpanel" class="tab-content"><BaskitAdmin bind:host/></div>
+  <div role="tabpanel" class="tab-content"><Buyer bind:host/></div>
 
   <input checked={selected === 2} type="radio" name="my_tabs_1" role="tab" class="tab hidden" aria-label="Tab 2" />
   <div role="tabpanel" class="tab-content"><Seller bind:host/></div>
 
   <input checked={selected === 3} type="radio" name="my_tabs_1" role="tab" class="tab hidden" aria-label="Tab 2" />
-  <div role="tabpanel" class="tab-content"><Buyer bind:host/></div>
+  <div role="tabpanel" class="tab-content"><BaskitAdmin bind:host/></div>
 </div>
 <div class="drawer">
   <input id="my-drawer" type="checkbox" class="drawer-toggle" />

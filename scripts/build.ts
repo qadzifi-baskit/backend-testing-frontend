@@ -6,23 +6,11 @@ import { exit } from 'process';
 import { fileURLToPath } from 'url';
 import { InlineConfig, build } from 'vite';
 import { viteSingleFile } from 'vite-plugin-singlefile';
+import { AppEntry, AppType, AppTypeKey } from './enum';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const root = path.resolve(__dirname, '..');
 const distPath = path.resolve(root, 'dist');
-
-const AppType = {
-  Buyer: 'Buyer',
-  Seller: 'Seller',
-} as const;
-
-type AppTypeKey = keyof typeof AppType;
-type AppType = typeof AppType[AppTypeKey];
-
-const AppEntry:Record<AppTypeKey, string> = {
-  Buyer: 'src/entry/buyer/index.html',
-  Seller: 'src/entry/seller/index.html',
-};
 
 const selectedApp: [AppTypeKey, string][] = await checkbox({
   message: 'Select app to build:',
@@ -39,14 +27,10 @@ if (selectedApp.length === 0) {
   exit();
 }
 
-if (!fs.existsSync(distPath)) {
-  fs.mkdirSync(distPath);
-} else {
-  if (!fs.statSync(distPath).isDirectory()) {
-    fs.rmSync(distPath);
-    fs.mkdirSync(distPath);
-  }
+if (fs.existsSync(distPath)) {
+  fs.rmSync(distPath, { recursive: true, force: true });
 }
+fs.mkdirSync(distPath);
 
 const viteBaseConfig: InlineConfig = {
   root,
@@ -58,6 +42,8 @@ const viteBaseConfig: InlineConfig = {
     },
   },
 };
+
+console.log('Building app...');
 selectedApp.forEach(async ([key, entry]) => {
   await build({
     ...viteBaseConfig,

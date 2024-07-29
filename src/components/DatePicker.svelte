@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
   import Select from './Select.svelte';
 
-  export let selectedDateValue = new Date();
+  export let open = false;
+  export let selectedDateValue:Date = new Date();
   export let current = new Date();
   export let selectedYear = current.getFullYear();
   export let selectedMonth = current.getMonth() + 1;
@@ -11,6 +13,8 @@
   let startDate = new Date(selectedYear, selectedMonth - 1, 1).getDay();
   let nextDate = new Date(selectedYear, selectedMonth, 0);
   let monthInDay = nextDate.getDate();
+
+  const dispatch = createEventDispatcher();
 
   const reselectMonth = () => {
     startDate = new Date(selectedYear, selectedMonth - 1, 1).getDay();
@@ -28,6 +32,7 @@
     selectedDateValue.setFullYear(selectedDateYear);
     selectedDateValue.setMonth(selectedDateMonth);
     selectedDateValue.setDate(selectedDate);
+    dispatch('select-date', selectedDateValue);
   }
 
   const onSelectDate = (date: number) => () => {
@@ -37,7 +42,7 @@
   };
 </script>
 
-<details class="dropdown">
+<details bind:open={open} class="dropdown">
   <summary class="btn m-1">Select Date</summary>
   <div class="menu dropdown-content bg-base-100 rounded-box z-20 w-fit p-2 shadow border border-slate-500">
     <div class="flex">

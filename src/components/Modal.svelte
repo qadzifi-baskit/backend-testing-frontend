@@ -3,7 +3,7 @@
   import { cn } from '@/lib/helper/tailwind';
 
   export let onClose:EventHandler<Event, HTMLDialogElement> = () => undefined;
-  export let dialog:HTMLDialogElement;
+  export let dialog:HTMLDialogElement|undefined;
   let clazz = '';
   export { clazz as class };
 </script>

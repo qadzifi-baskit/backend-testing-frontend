@@ -37,6 +37,22 @@ export type Product = {
   warehouse: number;
 };
 
+export type UserOffline = {
+  id: string;
+  status: string;
+  firstName: string;
+  phone: string;
+  email: string;
+  customerTypeId: string;
+  address: string;
+};
+
+export type Inventory = {
+  id: string;
+  stock: number;
+  fullName: string;
+};
+
 export type Cart = {
   id: string; // Cart ID
   inventoryId: string;
@@ -72,6 +88,10 @@ export type OrderDetail = {
   status: OrderDetailStatusEnum|null,
   reason: string|null,
   notes: string|null,
+};
+
+export type UpdateOrderDetailPayload = {
+  qty: number,
 };
 
 export type OrderReason = {

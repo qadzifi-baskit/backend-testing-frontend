@@ -13,6 +13,7 @@
   export let endpoint = 'list-order';
   export let client:AxiosInstance;
   export let userId:string|undefined = undefined;
+  export let orderType = 'SHOP';
 
   const orderList = writable(<Order[]>[]);
   let page = '1';
@@ -23,6 +24,7 @@
       $sort: 'DESC',
       $limit: '10',
       $page: page,
+      orderType,
     };
     if (userId) {
       query.userId = userId;

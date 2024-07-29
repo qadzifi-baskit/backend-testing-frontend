@@ -4,20 +4,15 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { InlineConfig, ViteDevServer, createServer } from 'vite';
 import { viteSingleFile } from 'vite-plugin-singlefile';
+import { AppType } from './enum';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
-
-const AppType = {
-  Buyer: 'Buyer',
-  Seller: 'Seller',
-} as const;
 
 const appList = [
   AppType.Buyer,
   AppType.Seller,
+  AppType.SellerInbound,
 ] as const;
-
-type AppType = typeof appList[number];
 
 const selectedApp: AppType = await select({
   message: 'Select app to build:',
@@ -47,6 +42,10 @@ switch (selectedApp) {
   }
   case AppType.Seller: {
     entry = 'src/entry/seller/index.html';
+    break;
+  }
+  case AppType.SellerInbound: {
+    entry = 'src/entry/seller/inbound/index.html';
     break;
   }
   default:

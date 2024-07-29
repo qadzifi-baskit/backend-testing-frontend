@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { OrderDetail, OrderReason } from '@/types';
+  import type { OrderDetail, OrderReason, UpdateOrderDetailPayload } from '@/types';
   import { type AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidTrash } from 'svelte-icons-pack/fa';
@@ -10,11 +10,18 @@
 
   const detailList = writable(<OrderDetail[]>[]);
   const reasonList = writable(<OrderReason[]>[]);
+  const updateDataMap:Record<string, UpdateOrderDetailPayload> = {};
 
   const getDetail = async (detailId: string) => {
     const detailResponse = await client.get(`/order/${detailId}`);
     if (detailResponse.status === 200) {
-      detailList.set(detailResponse?.data?.data?.orderDetail ?? []);
+      const newDetailList:OrderDetail[] = detailResponse?.data?.data?.orderDetail ?? [];
+      for (const { id, qty } of newDetailList) {
+        updateDataMap[id] = {
+          qty,
+        };
+      }
+      detailList.set(newDetailList);
     }
     const reasonResponse = await client.get('/order/reason?type=SKU');
     if (reasonResponse.status === 200) {
@@ -37,6 +44,19 @@
     ]);
     getDetail(id);
   };
+
+  const onUpdateOrder = async () => {
+    const updateData = Object.entries(updateDataMap).map(([detailId, detail]) => (
+      {
+        id: detailId,
+        qty: detail.qty,
+        reasonId: $reasonList[0].id,
+        notes: '',
+      }
+    ));
+    await client.patch(`/order/detail/bulk/${id}`, updateData);
+    getDetail(id);
+  };
 </script>
 
 <Table itemList={$detailList}>
@@ -48,7 +68,11 @@
   </svelte:fragment>
   <svelte:fragment slot="item" let:item>
     <td>{item.fullName}</td>
-    <td>{item.qty}</td>
+    <td>
+      <input type="number" placeholder="qty" bind:value={updateDataMap[item.id].qty} class="input input-bordered w-24 max-w-xs"
+        on:change={(e) => { updateDataMap[item.id].qty = Number(e.currentTarget.value) }}
+      />
+    </td>
     <td>{item.status}</td>
     <td>
       <button
@@ -62,3 +86,8 @@
     </td>
   </svelte:fragment>
 </Table>
+<button class="btn bg-slate-600"
+  on:click={onUpdateOrder}
+>
+  Update
+</button>
