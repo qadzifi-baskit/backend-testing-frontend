@@ -50,7 +50,11 @@
     }
   };
   const getSupplier = async () => {
-    const response = await client.get('/user-offline');
+    const params = new URLSearchParams();
+    params.append('customerType', 'SUPPLIER');
+    const response = await client.get('/user-offline', {
+      params,
+    });
     if (response.status === 200) {
       supllierList = response.data?.data ?? [];
     }
@@ -58,7 +62,6 @@
   $: if (userId) {
     getMe();
     getPaymentType();
-    getSupplier();
   }
 
   const onAuth = async () => {
@@ -83,6 +86,7 @@
   };
   $: if (companyId) {
     getInventory();
+    getSupplier();
   }
 
   let inboundDialog:HTMLDialogElement|undefined;
