@@ -14,6 +14,12 @@ export type PaymentType = {
   name: string;
 };
 
+export type CompanyType = {
+  id: string;
+  name: string;
+  type: string;
+};
+
 export type WarehouseDetail = {
   id: string;
   name: number;
@@ -90,8 +96,17 @@ export type OrderDetail = {
   notes: string|null,
 };
 
+export type UpdateOrderData = {
+  id: string,
+  qty: number,
+  price: number,
+  reasonId?: string,
+  notes?: string,
+};
+
 export type UpdateOrderDetailPayload = {
   qty: number,
+  price: number,
 };
 
 export type OrderReason = {

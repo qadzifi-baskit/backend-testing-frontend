@@ -5,7 +5,9 @@
   import Table from '@/components/Table.svelte';
   import Auth from '@/components/molecules/Auth.svelte';
   import Config from '@/components/molecules/Config.svelte';
-  import type { Inventory, Order, PaymentType, UserOffline } from '@/types';
+  import CreateOfflineUser from '@/components/molecules/CreateOfflineUser.svelte';
+  import OrderDetail from '@/components/molecules/OrderDetail.svelte';
+  import type { Inventory, Order, PaymentType, UpdateOrderData, UserOffline } from '@/types';
   import axios from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPencil } from 'svelte-icons-pack/fa';
@@ -52,6 +54,9 @@
   const getSupplier = async () => {
     const params = new URLSearchParams();
     params.append('customerType', 'SUPPLIER');
+    if (companyId) {
+      params.append('companyId', companyId);
+    }
     const response = await client.get('/user-offline', {
       params,
     });
@@ -141,19 +146,44 @@
     updateStatusDialog?.showModal();
   };
 
-  const onUpdateInbound = async () => {
+  const onUpdateInbound = async (data: UpdateOrderData[]) => {
     if (selectedInbound) {
       const response = await client.patch(
         `/order/inbound/status/${selectedInbound.id}`,
         {
           status: newStatus,
-          completePayload: [],
+          completePayload: data.map(({ id, qty, price }) => ({
+            id,
+            qty,
+            price,
+          })),
         },
       );
       if (response.status === 200) {
         updateStatusDialog?.close();
       }
     }
+  };
+
+  let createUserOfflineDialog:HTMLDialogElement|undefined;
+  const showCreateUserOffline = () => {
+    inboundDialog?.close();
+    createUserOfflineDialog?.showModal();
+  };
+  const onCloseCreateUserOffline = () => {
+    inboundDialog?.showModal();
+  };
+  $: if (createUserOfflineDialog) {
+    createUserOfflineDialog.addEventListener(
+      'close',
+      onCloseCreateUserOffline,
+    );
+  }
+
+  const onUserCreated = () => {
+    createUserOfflineDialog?.close();
+    inboundDialog?.showModal();
+    getSupplier();
   };
 </script>
 
@@ -173,6 +203,12 @@
       options={paymentTypeList.map((val) => [val.id, val.name])}
       bind:value={paymentTypeId}
     />
+    <button
+      class="btn bg-slate-600"
+      on:click={showCreateUserOffline}
+    >
+      Create Supplier
+    </button>
     <Select
       showValue
       options={supllierList.map((val) => [val.id, val.firstName])}
@@ -214,12 +250,21 @@
       ]}
     />
     <div class="divider"></div>
-    <button class="btn bg-slate-600"
-      on:click={onUpdateInbound}
-    >
-      Update
-    </button>
+    {#if selectedInbound}
+      <OrderDetail
+        onUpdateOrder={onUpdateInbound}
+        client={client}
+        bind:id={selectedInbound.id}
+      />
+    {/if}
   </div>
+</Modal>
+<Modal
+  bind:dialog={createUserOfflineDialog}
+>
+  {#if userId}
+    <CreateOfflineUser {onUserCreated} {client}/>
+  {/if}
 </Modal>
 <div class="p-6">
   <Auth

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { OrderDetail, OrderReason, UpdateOrderDetailPayload } from '@/types';
+  import type { OrderDetail, OrderReason, UpdateOrderData, UpdateOrderDetailPayload } from '@/types';
   import { type AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidTrash } from 'svelte-icons-pack/fa';
@@ -16,9 +16,10 @@
     const detailResponse = await client.get(`/order/${detailId}`);
     if (detailResponse.status === 200) {
       const newDetailList:OrderDetail[] = detailResponse?.data?.data?.orderDetail ?? [];
-      for (const { id, qty } of newDetailList) {
+      for (const { id, qty, sellingPrice: price } of newDetailList) {
         updateDataMap[id] = {
           qty,
+          price,
         };
       }
       detailList.set(newDetailList);
@@ -45,17 +46,22 @@
     getDetail(id);
   };
 
-  const onUpdateOrder = async () => {
-    const updateData = Object.entries(updateDataMap).map(([detailId, detail]) => (
+  export let onUpdateOrder:((data: UpdateOrderData[]) => unknown) = async (data) => {
+    await client.patch(`/order/detail/bulk/${id}`, data);
+    getDetail(id);
+  };
+
+  const processUpdate = () => {
+    const updateData:UpdateOrderData[] = Object.entries(updateDataMap).map(([detailId, detail]) => (
       {
         id: detailId,
         qty: detail.qty,
+        price: detail.price,
         reasonId: $reasonList[0].id,
         notes: '',
       }
     ));
-    await client.patch(`/order/detail/bulk/${id}`, updateData);
-    getDetail(id);
+    onUpdateOrder(updateData);
   };
 </script>
 
@@ -87,7 +93,7 @@
   </svelte:fragment>
 </Table>
 <button class="btn bg-slate-600"
-  on:click={onUpdateOrder}
+  on:click={processUpdate}
 >
   Update
 </button>
