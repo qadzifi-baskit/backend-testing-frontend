@@ -33,12 +33,13 @@ if (fs.existsSync(distPath)) {
 fs.mkdirSync(distPath);
 
 const viteBaseConfig: InlineConfig = {
-  root,
   configFile: false,
-  plugins: [svelte(), viteSingleFile()],
+  plugins: [svelte({
+    configFile: path.resolve(root, 'svelte.config.js'),
+  }), viteSingleFile()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, '..', 'src'),
+      '@': path.resolve(root, 'src'),
     },
   },
 };
@@ -47,9 +48,10 @@ console.log('Building app...');
 selectedApp.forEach(async ([key, entry]) => {
   await build({
     ...viteBaseConfig,
+    root: path.resolve(entry, '..'),
     build: {
       emptyOutDir: false,
-      outDir: 'dist',
+      outDir: path.resolve(distPath, key),
       rollupOptions: {
         input: {
           [key]: entry,
