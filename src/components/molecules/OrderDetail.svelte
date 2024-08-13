@@ -57,7 +57,7 @@
         id: detailId,
         qty: detail.qty,
         price: detail.price,
-        reasonId: $reasonList[0].id,
+        reasonId: $reasonList?.[0]?.id,
         notes: '',
       }
     ));

@@ -12,6 +12,7 @@
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPencil } from 'svelte-icons-pack/fa';
   let host = 'http://127.0.0.1';
+  // let host = 'https://api-beta.baskit.app/v2';
   let companyId:string|null = null;
   let inventory:Inventory[] = [];
   let paymentTypeList:PaymentType[] = [];
@@ -64,10 +65,6 @@
       supllierList = response.data?.data ?? [];
     }
   };
-  $: if (userId) {
-    getMe();
-    getPaymentType();
-  }
 
   const onAuth = async () => {
     const response = await client.post('/auth', {
@@ -80,6 +77,8 @@
         'X-ID': response.data?.data?.id,
         Authorization: response.data?.data?.accessToken,
       };
+      getMe();
+      getPaymentType();
     }
   };
 
@@ -130,6 +129,9 @@
       params.append('$limit', '10');
       params.append('$page', '1');
       params.append('orderType', 'INBOUND');
+      if (companyId) {
+        params.append('companyId', companyId);
+      }
       const response = await client.get('/order/list-order', {
         params,
       });
@@ -147,6 +149,7 @@
   };
 
   const onUpdateInbound = async (data: UpdateOrderData[]) => {
+    console.log({ data });
     if (selectedInbound) {
       const response = await client.patch(
         `/order/inbound/status/${selectedInbound.id}`,
@@ -214,6 +217,7 @@
       options={supllierList.map((val) => [val.id, val.firstName])}
       bind:value={supplierId}
     />
+    <button class="btn bg-slate-600" on:click={getSupplier}>Get Supplier</button>
     <div class="divider"></div>
     <label for="">Qty</label>
     <input bind:value={inboundQty} type="number" class="input input-bordered" placeholder="qty" min="1" step="1">
@@ -263,7 +267,7 @@
   bind:dialog={createUserOfflineDialog}
 >
   {#if userId}
-    <CreateOfflineUser {onUserCreated} {client}/>
+    <CreateOfflineUser {onUserCreated} {companyId} {client}/>
   {/if}
 </Modal>
 <div class="p-6">

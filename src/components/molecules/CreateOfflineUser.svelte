@@ -5,6 +5,7 @@
 
   export let client:AxiosInstance;
   export let onUserCreated:undefined|(() => void) = undefined;
+  export let companyId:string | null = null;
   let companyTypeList:CompanyType[] = [];
   let customerTypeId = '';
   let firstName = '';
@@ -24,6 +25,7 @@
       lastName,
       phone,
       customerTypeId,
+      companyId,
     });
     if (response.status === 200) {
       onUserCreated?.();
