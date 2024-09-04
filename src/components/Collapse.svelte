@@ -12,7 +12,7 @@
 <div class={cn('collapse bg-base-200', clazz)}>
   <input on:click={onClick} type="checkbox" bind:checked={show} />
   <div class="collapse-title text-xl font-medium">{title}</div>
-  <div class="collapse-content">
+  <div class="collapse-content overflow-x-auto">
     <slot/>
   </div>
 </div>

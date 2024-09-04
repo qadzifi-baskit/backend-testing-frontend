@@ -7,7 +7,7 @@
   import Config from './components/molecules/Config.svelte';
   const amount = 4;
   let selected = 1;
-  let host = 'http://127.0.0.1';
+  let host = import.meta.env.VITE_API_HOST;
 </script>
 
 <Config

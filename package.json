@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev:select": "tsx scripts/dev.ts",
-    "dev": "vite",
+    "start:select": "tsx scripts/dev.ts",
+    "start": "vite",
+    "start:beta": "vite --mode beta",
     "build:select": "tsx scripts/build.ts",
     "build": "vite build",
     "preview": "vite preview",

@@ -4,9 +4,12 @@
   import Config from '@/components/molecules/Config.svelte';
   import axios from 'axios';
   import { writable } from 'svelte/store';
+  import Inventory from './inventory/Inventory.svelte';
 
   export let host = 'https://api-beta.baskit.app/v2';
-  const client = axios.create();
+  const client = axios.create({
+    baseURL: host,
+  });
   let clientType = 'WEB_CMS';
   let username = 'nagamas@testing.com';
   let password = '12345678';
@@ -16,22 +19,26 @@
 
   const userId = writable('');
 
+  $: {
+    client.defaults.baseURL = host;
+  }
+
   const onGetBalance = async () => {
-    const response = await client.get(`${host}/wallet/${$userId}`);
+    const response = await client.get(`/wallet/${$userId}`);
     if (response.status === 200) {
       balance = response.data.data.balance;
     }
   };
 
   const onGetPendingBalance = async () => {
-    const response = await client.get(`${host}/company/wallet/${companyId}`);
+    const response = await client.get(`/company/wallet/${companyId}`);
     if (response.status === 200) {
       pendingBalance = response.data.data.pendingBalance;
     }
   };
 
   const onAuth = async () => {
-    const response = await client.post(`${host}/auth`, {
+    const response = await client.post('/auth', {
       username,
       password,
     });
@@ -72,4 +79,5 @@
       <span>Pending Balance: {pendingBalance}</span>
     </div>
   </Collapse>
+  <Inventory {client}/>
 </div>
