@@ -54,17 +54,19 @@
   };
 </script>
 
-<div class="p-6">
+<div class="p-6 bg-[#27303b]">
   <Config
     bind:host
     bind:clientType
     showHost={false}
   />
+  <div class="divider"></div>
   <Auth
     bind:username
     bind:password
     onAuth={onAuth}
   />
+  <div class="divider"></div>
   <Collapse title="Profile">
     <input type="text" bind:value={companyId}
       placeholder="company id"
@@ -79,5 +81,6 @@
       <span>Pending Balance: {pendingBalance}</span>
     </div>
   </Collapse>
+  <div class="divider"></div>
   <Inventory {client}/>
 </div>

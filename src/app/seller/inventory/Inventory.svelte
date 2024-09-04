@@ -1,5 +1,5 @@
 <script lang="ts">
-  import PaginationNavButton from '@/components/atoms/PaginationNavButton.svelte';
+  import PaginationFancyButton from '@/components/atoms/PaginationFancyButton.svelte';
   import Collapse from '@/components/Collapse.svelte';
   import Table from '@/components/Table.svelte';
   import { debounce } from '@/lib/helper/util';
@@ -31,6 +31,11 @@
   const debounceGetInventory = debounce(getInventoryList);
 
   $: {
+    search;
+    page = 1;
+  }
+
+  $: {
     page;
     search;
     debounceGetInventory();
@@ -41,7 +46,7 @@
   class="w-full"
   onClick={getInventoryList}
 >
-  <label class="input input-bordered flex items-center gap-2">
+  <label class="input input-bordered flex items-center gap-2 mb-12">
     <input type="text" class="grow" placeholder="Search" bind:value={search}/>
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -54,7 +59,7 @@
         clip-rule="evenodd" />
     </svg>
   </label>
-  <PaginationNavButton
+  <PaginationFancyButton
     bind:max
     bind:value={page}
   />
