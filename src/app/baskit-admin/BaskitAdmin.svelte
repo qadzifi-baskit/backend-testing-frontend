@@ -2,8 +2,10 @@
   import Auth from '@/components/molecules/Auth.svelte';
   import Config from '@/components/molecules/Config.svelte';
   import OrderList from '@/components/molecules/OrderList.svelte';
+  import ProductManagement from '@/components/molecules/ProductManagement.svelte';
   import axios from 'axios';
   import { writable } from 'svelte/store';
+  import Inventory from '../seller/inventory/Inventory.svelte';
 
   export let host = 'https://api-beta.baskit.app/v2';
   const userId = writable('');
@@ -45,4 +47,8 @@
   />
   <div class="divider"></div>
   <OrderList {client}/>
+  <div class="divider"></div>
+  <ProductManagement {client}/>
+  <div class="divider"></div>
+  <Inventory {client}/>
 </div>

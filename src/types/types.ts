@@ -43,6 +43,13 @@ export type Product = {
   warehouse: number;
 };
 
+export type ProductMaster = {
+  id: string;
+  name: string;
+  fullName: string;
+  image: string;
+};
+
 export type UserOffline = {
   id: string;
   status: string;

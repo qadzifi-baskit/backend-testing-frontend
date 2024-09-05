@@ -1,6 +1,7 @@
 <script lang="ts">
   import PaginationFancyButton from '@/components/atoms/PaginationFancyButton.svelte';
   import Collapse from '@/components/Collapse.svelte';
+  import AddInventoryModal from '@/components/molecules/AddInventoryModal.svelte';
   import Table from '@/components/Table.svelte';
   import { debounce } from '@/lib/helper/util';
   import type { AxiosInstance } from 'axios';
@@ -40,8 +41,17 @@
     search;
     debounceGetInventory();
   }
+
+  let addInventoryDialog:HTMLDialogElement|undefined;
+  const onShowAddInventory = () => {
+    addInventoryDialog?.showModal();
+  };
 </script>
 
+<AddInventoryModal
+  bind:dialog={addInventoryDialog}
+  {client}
+/>
 <Collapse title="Inventory"
   class="w-full"
   onClick={getInventoryList}
@@ -63,6 +73,11 @@
     bind:max
     bind:value={page}
   />
+  <button class="btn bordered input-bordered"
+    on:click={onShowAddInventory}
+  >
+    Add Inventory
+  </button>
   {#if inventoryList.length > 0}
     <Table itemList={inventoryList}/>
   {/if}
