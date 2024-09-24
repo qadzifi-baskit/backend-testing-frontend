@@ -5,6 +5,7 @@
   import axios from 'axios';
   import { writable } from 'svelte/store';
   import Inventory from './inventory/Inventory.svelte';
+  import SellerRegister from '@/components/molecules/SellerRegister.svelte';
 
   export let host = 'https://api-beta.baskit.app/v2';
   const client = axios.create({
@@ -59,6 +60,10 @@
     bind:host
     bind:clientType
     showHost={false}
+  />
+  <div class="divider"></div>
+  <SellerRegister
+    {client}
   />
   <div class="divider"></div>
   <Auth

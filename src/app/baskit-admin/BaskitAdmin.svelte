@@ -6,6 +6,7 @@
   import axios from 'axios';
   import { writable } from 'svelte/store';
   import Inventory from '../seller/inventory/Inventory.svelte';
+  import SellerList from '@/components/molecules/SellerList.svelte';
 
   export let host = 'https://api-beta.baskit.app/v2';
   const userId = writable('');
@@ -51,4 +52,6 @@
   <ProductManagement {client}/>
   <div class="divider"></div>
   <Inventory {client}/>
+  <div class="divider"></div>
+  <SellerList {client}/>
 </div>
