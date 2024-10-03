@@ -86,6 +86,7 @@ export type Order = {
   orderCode: string;
   paymentTerm: string;
   paymentStatus: string;
+  paymentLinkStatus?: string|null;
   total: number;
   grandTotal: number;
   product: Omit<Cart, 'warehouse'>,

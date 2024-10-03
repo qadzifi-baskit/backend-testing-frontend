@@ -25,7 +25,7 @@
         <tr>
           <slot name="item" {item} {index}>
             {#each keyList as key}
-              <td> {item[key]} </td>
+              <td> {JSON.stringify(item[key]).replace(/^"(.*)"$/, '$1')} </td>
             {/each}
           </slot>
         </tr>

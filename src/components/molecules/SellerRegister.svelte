@@ -22,7 +22,6 @@
 
 
 <Collapse title="Register Seller"
-  show
   class="overflow-visible"
 >
   <div slot="content" class="collapse-content">

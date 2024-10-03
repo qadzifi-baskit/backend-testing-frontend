@@ -100,16 +100,20 @@
   {#if $orderList.length > 0}
     <Table itemList={$orderList}>
       <svelte:fragment slot="header">
+        <th>Id</th>
         <th>Date</th>
         <th>Order Code</th>
         <th></th>
         <th></th>
-        <th>Payment</th>
         <th>Status</th>
+        <th>Payment</th>
+        <th>Payment Status</th>
+        <th>Payment Link Status</th>
         <th>Total</th>
       </svelte:fragment>
       <svelte:fragment slot="item" let:item={order}>
-        <td>{order.createdAt}</td>
+        <td><nobr>{order.id}</nobr></td>
+        <td><nobr>{order.createdAt}</nobr></td>
         <td>{order.orderCode}</td>
         <td>
           <button
@@ -127,8 +131,10 @@
             <Icon src={FaSolidList}/>
           </button>
         </td>
-        <td>{order.paymentTerm}</td>
         <td>{order.status}</td>
+        <td><nobr>{order.paymentTerm}</nobr></td>
+        <td><nobr>{order.paymentStatus}</nobr></td>
+        <td><nobr>{order.paymentLinkStatus}</nobr></td>
         <td>{order.grandTotal}</td>
       </svelte:fragment>
     </Table>
