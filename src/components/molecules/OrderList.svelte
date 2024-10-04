@@ -112,8 +112,8 @@
         <th>Total</th>
       </svelte:fragment>
       <svelte:fragment slot="item" let:item={order}>
-        <td><nobr>{order.id}</nobr></td>
-        <td><nobr>{order.createdAt}</nobr></td>
+        <td><span class="whitespace-nowrap">{order.id}</span></td>
+        <td><span class="whitespace-nowrap">{order.createdAt}</span></td>
         <td>{order.orderCode}</td>
         <td>
           <button
@@ -132,9 +132,9 @@
           </button>
         </td>
         <td>{order.status}</td>
-        <td><nobr>{order.paymentTerm}</nobr></td>
-        <td><nobr>{order.paymentStatus}</nobr></td>
-        <td><nobr>{order.paymentLinkStatus}</nobr></td>
+        <td><span class="whitespace-nowrap">{order.paymentTerm}</span></td>
+        <td><span class="whitespace-nowrap">{order.paymentStatus}</span></td>
+        <td><span class="whitespace-nowrap">{order.paymentLinkStatus}</span></td>
         <td>{order.grandTotal}</td>
       </svelte:fragment>
     </Table>

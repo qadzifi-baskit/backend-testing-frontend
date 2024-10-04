@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@andypf/json-viewer':
+        specifier: ^2.1.5
+        version: 2.1.5
       '@eslint/js':
         specifier: ^9.2.0
         version: 9.2.0
@@ -99,6 +102,9 @@ packages:
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
+
+  '@andypf/json-viewer@2.1.5':
+    resolution: {integrity: sha512-pe5mZSzxh1e54N6AZ6gQM2pGeL/I5jlf7N6a7a23IeZGi+KQTOh8PL+eQa8ElcCgpos78wd3WCxLjUt0KoZDsw==}
 
   '@babel/runtime@7.24.5':
     resolution: {integrity: sha512-Nms86NXrsaeU9vbBJKni6gXiEXZ4CVpYVzEjDH9Sb8vmZ3UljyA1GSOJl/6LGPO8EHLuSF9H+IxNXHPX8QHJ4g==}
@@ -1772,6 +1778,8 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
+
+  '@andypf/json-viewer@2.1.5': {}
 
   '@babel/runtime@7.24.5':
     dependencies:
