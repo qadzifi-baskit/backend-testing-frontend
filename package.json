@@ -22,7 +22,7 @@
     "@types/node": "^20.12.12",
     "@typescript-eslint/parser": "^7.10.0",
     "autoprefixer": "^10.4.19",
-    "axios": "^1.6.8",
+    "axios": ">=1.7.4",
     "clsx": "^2.1.1",
     "daisyui": "^4.11.1",
     "eslint": "^9.2.0",
