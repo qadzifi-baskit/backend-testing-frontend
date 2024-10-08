@@ -9,28 +9,26 @@
   import Collapse from '../../components/Collapse.svelte';
   import Table from '../../components/Table.svelte';
   import Auth from '../../components/molecules/Auth.svelte';
-  import type { Cart, PaymentType, Product, Warehouse, WarehouseDetail } from '../../types';
-  import Select from '@/components/Select.svelte';
+  import type { Cart, PaymentType, Warehouse, WarehouseDetail } from '../../types';
   import Order from '@/components/molecules/Order.svelte';
   import Modal from '@/components/Modal.svelte';
+  import ProductList from '@/components/molecules/ProductList.svelte';
 
   export let host = 'https://api-beta.baskit.app/v2';
   const client = axios.create({ baseURL: host });
 
-  const userId = writable('');
   const qtyMap:Record<string, number> = {};
   const cartQtyMap:Record<string, number> = {};
-  const productList = writable(<Product[]>[]);
   const cartList = writable(<Cart[]>[]);
   const paymentTypeList = writable(<PaymentType[]>[]);
   const warehouseList = writable(<Warehouse[]>[]);
+  let userId = '';
   let walletId = '';
   let clientType = 'BASKIT_SHOP';
   let balance = 0;
   let username = 'eight.one@gmail.com';
   let password = '12345678';
   let selectedPaymentType = '';
-  let companyId:string|undefined = undefined;
   let warehouseOptions = [<[string, string]>['', 'All']];
 
   $: {
@@ -53,61 +51,11 @@
     }
   };
 
-  productList.subscribe((value) => {
-    value.forEach(({ id }) => { qtyMap[id] = 0 });
-  });
-
   const onGetWarehouse = async () => {
     const response = await client.get('/warehouse');
     if (response.status === 200) {
       warehouseList.set(response.data.data);
     }
-  };
-
-  const onGetProduct = async () => {
-    const query:Record<string, string> = {};
-    if (companyId) {
-      query.id = companyId;
-    }
-    const params = new URLSearchParams(query);
-    const response = await client.get(`/product/search?${params.toString()}`);
-    if (response.status === 200) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      productList.set((response.data.data as any[]).reduce(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (prev, curr) => [...prev, ...(curr.product as any[]).map((value) => ({
-          ...value,
-          warehouse: curr.wareHouse.name,
-        }))],
-        [],
-      ));
-    }
-  };
-
-  $: {
-    companyId;
-    onGetProduct();
-  }
-
-  const onAddProduct = ({
-    productId,
-    companyId,
-    warehouse,
-    id: inventoryId,
-    priceTiers: [{ id: inventoryPriceTierId }],
-  }: Product): MouseEventHandler<HTMLButtonElement> => {
-    return async () => {
-      await client.post('/cart', {
-        qty: qtyMap[inventoryId],
-        productId,
-        userId: $userId,
-        companyId,
-        inventoryId,
-        inventoryPriceTierId,
-        wareHouse: warehouse,
-      });
-      onGetCart();
-    };
   };
 
   const onGetCart = async () => {
@@ -140,7 +88,7 @@
         price: value.sellingPrice,
         companyId: value.companyId,
       })),
-      userId: $userId,
+      userId,
     });
     if (response.status === 200) {
       for (const key in qtyMap) {
@@ -150,7 +98,7 @@
   };
 
   const onGetBalance = async () => {
-    const response = await client.get(`/wallet/${$userId}`);
+    const response = await client.get(`/wallet/${userId}`);
     if (response.status === 200) {
       walletId = response.data.data.id;
       balance = response.data.data.balance;
@@ -168,6 +116,7 @@
       onGetCart();
     }
   };
+  let auth:Record<string, string> = {};
 
   const onAuth:MouseEventHandler<HTMLButtonElement> = async () => {
     const response = await client.post('/auth', {
@@ -175,15 +124,15 @@
       password,
     });
     if (response.status === 200) {
-      userId.set(response.data?.data?.id);
-      client.defaults.headers.common = {
+      userId = response.data?.data?.id ?? '';
+      auth = {
         'X-ID': response.data?.data?.id,
         Authorization: response.data?.data?.accessToken,
       };
+      client.defaults.headers.common = auth;
       onGetBalance();
       onGetPaymentType();
       onGetWarehouse();
-      onGetProduct();
       onGetCart();
     }
   };
@@ -251,40 +200,11 @@
   <div class="divider"></div>
   <div class="flex w-full rounded-box">
     <div class="card bg-base-300 rounded-box grid flex-grow w-2/5 h-fit">
-      <Collapse class="overflow-x-auto" onClick={onGetProduct} title="Product List">
-        <Select
-          showValue
-          options={warehouseOptions}
-          bind:value={companyId}
-        />
-        <button class="btn" on:click={onGetProduct}>Get Product</button>
-        {#if $productList.length > 0}
-          <Table itemList={$productList}>
-            <svelte:fragment slot="header">
-              <th>Stock</th>
-              <th>Status</th>
-              <th>Price</th>
-              <th>Qty</th>
-              <th></th>
-              <th>Name</th>
-            </svelte:fragment>
-            <svelte:fragment slot="item" let:item>
-              <td>{item.stock}</td>
-              <td>{item.status}</td>
-              <td>{item.sellingPrice}</td>
-              <td>
-                <input type="number" placeholder="qty" value={qtyMap[item.id]} class="input input-bordered w-24 max-w-xs"
-                  on:change={(e) => { qtyMap[item.id] = Number(e.currentTarget.value) }}
-                />
-              </td>
-              <td>
-                <button class="btn bg-slate-600" on:click={onAddProduct(item)}>Add</button>
-              </td>
-              <td>{item.name}</td>
-            </svelte:fragment>
-          </Table>
-        {/if}
-      </Collapse>
+      <ProductList
+        {auth}
+        {userId}
+        {client}
+      />
     </div>
     <div class="divider divider-horizontal"></div>
     <div class="card bg-base-300 rounded-box grid flex-grow w-2/5 h-fit">
@@ -349,7 +269,7 @@
     </div>
   </div>
   <div class="divider"></div>
-  <Order {client} userId={$userId}/>
+  <Order {client} {userId}/>
   <div class="divider"></div>
 </div>
 
