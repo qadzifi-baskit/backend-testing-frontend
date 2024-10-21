@@ -129,3 +129,19 @@ export type APIItem = {
   endpoint: string,
   description: string|null,
 };
+
+export type ACLItem = {
+  id: string,
+  methodPost: boolean,
+  methodGet: boolean,
+  methodPatch: boolean,
+  methodDelete: boolean,
+  methodFind: boolean,
+  apiId: string,
+  roleId: string|null,
+  userId: string|null,
+};
+
+export type APIACLItem = APIItem & {
+  acls: ACLItem[],
+};

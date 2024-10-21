@@ -12,6 +12,7 @@
 
 <div class="overflow-x-auto">
   <table class="table">
+    <slot name="colgroup"/>
     <thead>
       <tr>
         <slot name="header">

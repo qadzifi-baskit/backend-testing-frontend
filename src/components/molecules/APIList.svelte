@@ -1,9 +1,11 @@
 <script lang="ts">
+  import { debounce } from '@/lib/helper/util';
   import type { APIItem } from '@/types';
-  import Collapse from '../Collapse.svelte';
-  import Table from '../Table.svelte';
   import type { AxiosInstance } from 'axios';
   import PaginationFancyButton from '../atoms/PaginationFancyButton.svelte';
+  import SearchField from '../atoms/SearchField.svelte';
+  import Collapse from '../Collapse.svelte';
+  import Table from '../Table.svelte';
 
   export let client:AxiosInstance;
 
@@ -27,10 +29,12 @@
     }
   };
 
+  const debounceGetAPIList = debounce(getAPIList);
+
   $: {
     page;
     search;
-    getAPIList();
+    debounceGetAPIList();
   }
 </script>
 
@@ -39,6 +43,9 @@
   class="w-full"
   onClick={getAPIList}
 >
+  <SearchField
+    bind:value={search}
+  />
   <PaginationFancyButton
     bind:max
     bind:value={page}

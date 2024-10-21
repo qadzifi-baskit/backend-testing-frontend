@@ -1,4 +1,5 @@
 <script lang="ts">
+  import AclList from '@/components/molecules/ACLList.svelte';
   import ApiList from '@/components/molecules/APIList.svelte';
   import Auth from '@/components/molecules/Auth.svelte';
   import Config from '@/components/molecules/Config.svelte';
@@ -40,6 +41,10 @@
   />
   <div class="divider"></div>
   <ApiList
+    {client}
+  />
+  <div class="divider"></div>
+  <AclList
     {client}
   />
 </div>
