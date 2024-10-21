@@ -1,16 +1,32 @@
 <script lang="ts">
   import type { OrderDetail, OrderReason, UpdateOrderData, UpdateOrderDetailPayload } from '@/types';
+  import type { HistoryEntity } from '@/types/history';
   import { type AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidTrash } from 'svelte-icons-pack/fa';
-  import { writable } from 'svelte/store';
   import Table from '../Table.svelte';
   export let id:string;
   export let client:AxiosInstance;
 
-  const detailList = writable(<OrderDetail[]>[]);
-  const reasonList = writable(<OrderReason[]>[]);
   const updateDataMap:Record<string, UpdateOrderDetailPayload> = {};
+
+  let detailList:OrderDetail[] = [];
+  let reasonList:OrderReason[] = [];
+  let historyList:HistoryEntity[] = [];
+
+  const getHistory = async (orderId: string) => {
+    const params = new URLSearchParams();
+    params.append('$order', 'createdAt');
+    params.append('refId', orderId);
+    const response = await client.get(
+      '/history',
+    );
+    if (response.status !== 200) {
+      return;
+    }
+
+    historyList = response.data?.data ?? [];
+  };
 
   const getDetail = async (detailId: string) => {
     const detailResponse = await client.get(`/order/${detailId}`);
@@ -22,16 +38,17 @@
           price,
         };
       }
-      detailList.set(newDetailList);
+      detailList = newDetailList;
     }
     const reasonResponse = await client.get('/order/reason?type=SKU');
     if (reasonResponse.status === 200) {
-      reasonList.set(reasonResponse?.data?.data ?? []);
+      reasonList = reasonResponse?.data?.data ?? [];
     }
   };
 
   $: if (id) {
     getDetail(id);
+    getHistory(id);
   }
 
   const onCancel = (detailId: string) => async () => {
@@ -39,7 +56,7 @@
       {
         id: detailId,
         qty: 0,
-        reasonId: $reasonList[0].id,
+        reasonId: reasonList[0].id,
         notes: '',
       },
     ]);
@@ -57,7 +74,7 @@
         id: detailId,
         qty: detail.qty,
         price: detail.price,
-        reasonId: $reasonList?.[0]?.id,
+        reasonId: reasonList?.[0]?.id,
         notes: '',
       }
     ));
@@ -65,7 +82,7 @@
   };
 </script>
 
-<Table itemList={$detailList}>
+<Table itemList={detailList}>
   <svelte:fragment slot="header">
     <th>Name</th>
     <th>Qty</th>
@@ -91,6 +108,8 @@
       </button>
     </td>
   </svelte:fragment>
+</Table>
+<Table itemList={historyList}>
 </Table>
 <button class="btn bg-slate-600"
   on:click={processUpdate}

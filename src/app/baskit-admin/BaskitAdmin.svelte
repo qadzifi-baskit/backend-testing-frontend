@@ -4,12 +4,10 @@
   import OrderList from '@/components/molecules/OrderList.svelte';
   import ProductManagement from '@/components/molecules/ProductManagement.svelte';
   import axios from 'axios';
-  import { writable } from 'svelte/store';
   import Inventory from '../seller/inventory/Inventory.svelte';
   import SellerList from '@/components/molecules/SellerList.svelte';
 
   export let host = 'https://api-beta.baskit.app/v2';
-  const userId = writable('');
   let clientType = 'WEB_CMS';
   let username = 'boa@baskit.app';
   let password = '12345678';
@@ -25,7 +23,6 @@
       password,
     });
     if (response.status === 200) {
-      userId.set(response.data?.data?.id);
       client.defaults.headers.common = {
         'X-ID': response.data?.data?.id,
         Authorization: response.data?.data?.accessToken,

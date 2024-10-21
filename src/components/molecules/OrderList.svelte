@@ -9,6 +9,7 @@
   import UpdateStatus from './UpdateStatus.svelte';
   import OrderDetail from './OrderDetail.svelte';
   import Modal from '../Modal.svelte';
+  import NoWrap from '../atoms/NoWrap.svelte';
 
   export let endpoint = 'list-order';
   export let client:AxiosInstance;
@@ -112,8 +113,9 @@
         <th>Total</th>
       </svelte:fragment>
       <svelte:fragment slot="item" let:item={order}>
-        <td><span class="whitespace-nowrap">{order.id}</span></td>
-        <td><span class="whitespace-nowrap">{order.createdAt}</span></td>
+        <td><NoWrap>{order.id}</NoWrap></td>
+        <td><NoWrap>{order.id}</NoWrap></td>
+        <td><NoWrap>{order.createdAt}</NoWrap></td>
         <td>{order.orderCode}</td>
         <td>
           <button
@@ -132,9 +134,9 @@
           </button>
         </td>
         <td>{order.status}</td>
-        <td><span class="whitespace-nowrap">{order.paymentTerm}</span></td>
-        <td><span class="whitespace-nowrap">{order.paymentStatus}</span></td>
-        <td><span class="whitespace-nowrap">{order.paymentLinkStatus}</span></td>
+        <td><NoWrap>{order.paymentTerm}</NoWrap></td>
+        <td><NoWrap>{order.paymentStatus}</NoWrap></td>
+        <td><NoWrap>{order.paymentLinkStatus}</NoWrap></td>
         <td>{order.grandTotal}</td>
       </svelte:fragment>
     </Table>

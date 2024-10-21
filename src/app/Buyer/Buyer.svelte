@@ -153,7 +153,7 @@
     </div>
   </div>
   <div class="divider"></div>
-  <Order {client} {userId}/>
+  <Order {client} userId={userId}/>
   <div class="divider"></div>
 </div>
 

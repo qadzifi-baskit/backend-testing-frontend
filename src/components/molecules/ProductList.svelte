@@ -5,6 +5,8 @@
   import type { MouseEventHandler } from 'svelte/elements';
   import type { Product } from '@/types';
   import Table from '../Table.svelte';
+  import { debounce } from '@/lib/helper/util';
+  import PaginationFancyButton from '../atoms/PaginationFancyButton.svelte';
 
   export let client:AxiosInstance;
   export let auth:Record<string, string>;
@@ -12,18 +14,25 @@
   export let onProductAdded:(() => unknown) = () => null;
   let companyId = '';
   let productList:Product[] = [];
+  let page = 1;
+  let max = 1;
 
   const qtyMap:Record<string, number> = {};
   let warehouseOptions = [<[string, string]>['', 'All']];
 
   export const onGetProduct = async () => {
-    const query:Record<string, string> = {};
+    const params = new URLSearchParams();
+    params.append('$page', `${page}`);
     if (companyId) {
-      query.id = companyId;
+      params.append('id', companyId);
     }
-    const params = new URLSearchParams(query);
-    const response = await client.get(`/product/search?${params.toString()}`);
+    const response = await client.get('/product/search',
+      {
+        params,
+      },
+    );
     if (response.status === 200) {
+      max = response.data?.totalPage ?? 1;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       productList = (response.data.data as any[]).reduce(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,9 +45,22 @@
     }
   };
 
+  const debounceGetProduct = debounce(onGetProduct);
+
   $: {
     auth;
     onGetProduct();
+  }
+
+  $: {
+    companyId;
+    page = 1;
+  }
+
+  $: {
+    companyId;
+    page;
+    debounceGetProduct();
   }
 
   const onAddProduct = ({
@@ -65,11 +87,6 @@
   $: {
     productList.forEach(({ id }) => { qtyMap[id] = 0 });
   }
-
-  $: {
-    companyId;
-    onGetProduct();
-  }
 </script>
 
 <Collapse class="overflow-x-auto" onClick={onGetProduct} title="Product List">
@@ -77,6 +94,10 @@
     showValue
     options={warehouseOptions}
     bind:value={companyId}
+  />
+  <PaginationFancyButton
+    bind:max
+    bind:value={page}
   />
   <button class="btn" on:click={onGetProduct}>Get Product</button>
   {#if productList.length > 0}

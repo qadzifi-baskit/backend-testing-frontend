@@ -5,6 +5,7 @@
   import Seller from './app/seller';
   import BaskitAdmin from './app/baskit-admin/BaskitAdmin.svelte';
   import Config from './components/molecules/Config.svelte';
+  import SuperAdmin from './app/super-admin/SuperAdmin.svelte';
   const amount = 4;
   let selected = 1;
   let host = import.meta.env.VITE_API_HOST;
@@ -21,8 +22,11 @@
   <input checked={selected === 2} type="radio" name="my_tabs_1" role="tab" class="tab hidden" aria-label="Tab 2" />
   <div role="tabpanel" class="tab-content"><Seller bind:host/></div>
 
-  <input checked={selected === 3} type="radio" name="my_tabs_1" role="tab" class="tab hidden" aria-label="Tab 2" />
+  <input checked={selected === 3} type="radio" name="my_tabs_1" role="tab" class="tab hidden" aria-label="Tab 4" />
   <div role="tabpanel" class="tab-content"><BaskitAdmin bind:host/></div>
+
+  <input checked={selected === 4} type="radio" name="my_tabs_1" role="tab" class="tab hidden" aria-label="Tab 4" />
+  <div role="tabpanel" class="tab-content"><SuperAdmin bind:host/></div>
 </div>
 <div class="drawer">
   <input id="my-drawer" type="checkbox" class="drawer-toggle" />
@@ -39,6 +43,7 @@
       <li><button class="btn" on:click={() => selected = 1}>Buyer</button></li>
       <li><button class="btn" on:click={() => selected = 2}>Seller</button></li>
       <li><button class="btn" on:click={() => selected = 3}>Baskit Admin</button></li>
+      <li><button class="btn" on:click={() => selected = 4}>Super Admin</button></li>
     </ul>
   </div>
 </div>

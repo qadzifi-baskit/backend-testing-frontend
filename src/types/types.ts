@@ -121,3 +121,11 @@ export type OrderReason = {
   id: string,
   name: string,
 };
+
+export type APIItem = {
+  id: string,
+  apiName: string,
+  apiGroup: string,
+  endpoint: string,
+  description: string|null,
+};
