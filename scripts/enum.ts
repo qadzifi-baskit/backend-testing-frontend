@@ -12,4 +12,3 @@ export const AppEntry:Record<AppTypeKey, string> = {
   Seller: 'src/entry/seller/index.html',
   SellerInbound: 'src/entry/seller/inbound/index.html',
 };
-

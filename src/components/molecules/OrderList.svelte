@@ -114,7 +114,6 @@
       </svelte:fragment>
       <svelte:fragment slot="item" let:item={order}>
         <td><NoWrap>{order.id}</NoWrap></td>
-        <td><NoWrap>{order.id}</NoWrap></td>
         <td><NoWrap>{order.createdAt}</NoWrap></td>
         <td>{order.orderCode}</td>
         <td>
@@ -133,6 +132,7 @@
             <Icon src={FaSolidList}/>
           </button>
         </td>
+        <td>{order.deliveryType}</td>
         <td>{order.status}</td>
         <td><NoWrap>{order.paymentTerm}</NoWrap></td>
         <td><NoWrap>{order.paymentStatus}</NoWrap></td>

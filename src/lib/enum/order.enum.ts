@@ -14,6 +14,7 @@ export type OrderStatusEnum =
 export const DeliveryTypeEnum = {
   BASKIT_DELIVERY: 'BASKIT_DELIVERY',
   SELLER_DELIVERY: 'SELLER_DELIVERY',
+  PICK_UP: 'PICK_UP',
 } as const;
 export type DeliveryTypeEnum =
   (typeof DeliveryTypeEnum)[keyof typeof DeliveryTypeEnum];

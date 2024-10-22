@@ -5,6 +5,7 @@
   import Table from '../Table.svelte';
   import type { AxiosInstance } from 'axios';
   import type { Cart, PaymentType, WarehouseDetail } from '@/types';
+  import { DeliveryTypeEnum } from '@/lib/enum';
 
   export let client:AxiosInstance;
   export let auth:Record<string,string>;
@@ -15,7 +16,8 @@
   const cartQtyMap:Record<string, number> = {};
   let paymentTypeList = <PaymentType[]>[];
   let cartList = <Cart[]>[];
-  let selectedPaymentType = '';
+  let paymentTypeId = '';
+  let deliveryType = DeliveryTypeEnum.SELLER_DELIVERY;
 
   const onGetPaymentType = async () => {
     const paymentResponse = await client.get('/payment-type', {
@@ -30,7 +32,8 @@
 
   const onCreateOrder = async () => {
     const response = await client.post('/order', {
-      paymentTypeId: selectedPaymentType,
+      paymentTypeId,
+      deliveryType,
       product: cartList.map((value) => ({
         cartId: value.id,
         inventoryId: value.inventoryId,
@@ -132,13 +135,23 @@
       </svelte:fragment>
     </Table>
   {/if}
+  <div class="label"></div>
   <div>
-    <select bind:value={selectedPaymentType} class="select select-bordered w-full max-w-xs">
+    <select bind:value={paymentTypeId} class="select select-bordered w-full max-w-xs">
       <option value="" disabled selected>Payment Type</option>
       {#each paymentTypeList as paymentType}
         <option value={paymentType.id}>{paymentType.name}</option>
       {/each}
     </select>
-    <button class="btn" on:click={onCreateOrder} disabled={selectedPaymentType === ''}>Create Order</button>
+  </div>
+  <div class="label"></div>
+  <div>
+    <select bind:value={deliveryType} class="select select-bordered w-full max-w-xs">
+      <option value="" disabled selected>Delivery Type</option>
+      {#each Object.entries(DeliveryTypeEnum) as [label, value] }
+        <option value={value}>{label}</option>
+      {/each}
+    </select>
+    <button class="btn" on:click={onCreateOrder} disabled={paymentTypeId === ''}>Create Order</button>
   </div>
 </Collapse>

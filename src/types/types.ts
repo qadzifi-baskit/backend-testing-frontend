@@ -81,6 +81,7 @@ export type Cart = {
 export type Order = {
   createdAt: string;
   id: string;
+  deliveryType: string;
   orderStatus: string;
   status: string;
   orderCode: string;
