@@ -8,6 +8,11 @@
     ...<Key[]>Object.keys(itemList[0] ?? {}),
   ];
   export let headerList: string[] = <string[]>keyList;
+
+  $: {
+    keyList = <Key[]>Object.keys(itemList[0] ?? {});
+    headerList = <string[]>keyList;
+  }
 </script>
 
 <div class="overflow-x-auto">

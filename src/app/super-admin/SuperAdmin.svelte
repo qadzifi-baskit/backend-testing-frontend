@@ -10,7 +10,7 @@
   const client = axios.create({ baseURL: host });
 
   let clientType = 'WEB_CMS';
-  let username = 'boa@baskit.app';
+  let username = 'super.admin@testing.com';
   let password = '12345678';
 
   const onAuth = async () => {

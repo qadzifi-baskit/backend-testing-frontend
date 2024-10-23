@@ -6,6 +6,9 @@
   import SearchField from '../atoms/SearchField.svelte';
   import Collapse from '../Collapse.svelte';
   import Table from '../Table.svelte';
+  import { Icon } from 'svelte-icons-pack';
+  import { FaSolidPlus } from 'svelte-icons-pack/fa';
+  import AddApiModal from './AddAPIModal.svelte';
 
   export let client:AxiosInstance;
 
@@ -36,8 +39,18 @@
     search;
     debounceGetAPIList();
   }
+
+  let addApiDialog:HTMLDialogElement|undefined;
+
+  const showAddAPI = () => {
+    addApiDialog?.showModal();
+  };
 </script>
 
+<AddApiModal
+  {client}
+  bind:dialog={addApiDialog}
+/>
 <Collapse
   title="API List"
   class="w-full"
@@ -50,6 +63,12 @@
     bind:max
     bind:value={page}
   />
+  <button
+    on:click={showAddAPI}
+    class="btn bg-slate-600"
+  >
+    <Icon src={FaSolidPlus}/>
+  </button>
   {#if apiList.length > 0}
     <Table itemList={apiList}>
     </Table>

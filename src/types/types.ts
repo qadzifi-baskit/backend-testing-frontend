@@ -118,12 +118,18 @@ export type UpdateOrderDetailPayload = {
   price: number,
 };
 
+export type Role = {
+  id: string,
+  roleName: string,
+};
+
 export type OrderReason = {
   id: string,
   name: string,
 };
 
 export type APIItem = {
+  createdAt: string;
   id: string,
   apiName: string,
   apiGroup: string,
@@ -132,6 +138,7 @@ export type APIItem = {
 };
 
 export type ACLItem = {
+  createdAt: string;
   id: string,
   methodPost: boolean,
   methodGet: boolean,
@@ -141,6 +148,7 @@ export type ACLItem = {
   apiId: string,
   roleId: string|null,
   userId: string|null,
+  role: Role,
 };
 
 export type APIACLItem = APIItem & {
