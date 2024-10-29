@@ -6,27 +6,28 @@
   import BaskitAdmin from './app/baskit-admin/BaskitAdmin.svelte';
   import Config from './components/molecules/Config.svelte';
   import SuperAdmin from './app/super-admin/SuperAdmin.svelte';
-  const amount = 4;
+  import BrandUser from './app/brand-user/BrandUser.svelte';
   let selected = 1;
   let host = import.meta.env.VITE_API_HOST;
+
+  const tabs = [
+    { label: 'Buyer', component: Buyer },
+    { label: 'Seller', component: Seller },
+    { label: 'Baskit Admin', component: BaskitAdmin },
+    { label: 'Brand User', component: BrandUser },
+    { label: 'Super Admin', component: SuperAdmin },
+  ];
 </script>
 
 <Config
   bind:host
   showClient={false}
 />
-<div style="--amount:{amount}" role="tablist" class="tabs tabs-bordered w-full">
-  <input checked={selected === 1} type="radio" name="my_tabs_1" role="tab" class="tab hidden" aria-label="Tab 1" />
-  <div role="tabpanel" class="tab-content"><Buyer bind:host/></div>
-
-  <input checked={selected === 2} type="radio" name="my_tabs_1" role="tab" class="tab hidden" aria-label="Tab 2" />
-  <div role="tabpanel" class="tab-content"><Seller bind:host/></div>
-
-  <input checked={selected === 3} type="radio" name="my_tabs_1" role="tab" class="tab hidden" aria-label="Tab 4" />
-  <div role="tabpanel" class="tab-content"><BaskitAdmin bind:host/></div>
-
-  <input checked={selected === 4} type="radio" name="my_tabs_1" role="tab" class="tab hidden" aria-label="Tab 4" />
-  <div role="tabpanel" class="tab-content"><SuperAdmin bind:host/></div>
+<div style="--amount:{tabs.length}" role="tablist" class="tabs tabs-bordered w-full">
+  {#each tabs as { component: Component }, index }
+    <input checked={selected === index + 1} type="radio" name="my_tabs_1" role="tab" class="tab hidden" aria-label={`Tab ${index + 1}`}/>
+    <div role="tabpanel" class="tab-content"><Component bind:host/></div>
+  {/each}
 </div>
 <div class="drawer">
   <input id="my-drawer" type="checkbox" class="drawer-toggle" />
@@ -40,10 +41,9 @@
     <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
     <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
       <!-- Sidebar content here -->
-      <li><button class="btn" on:click={() => selected = 1}>Buyer</button></li>
-      <li><button class="btn" on:click={() => selected = 2}>Seller</button></li>
-      <li><button class="btn" on:click={() => selected = 3}>Baskit Admin</button></li>
-      <li><button class="btn" on:click={() => selected = 4}>Super Admin</button></li>
+      {#each tabs as { label }, index }
+        <li><button class="btn" on:click={() => selected = index + 1}>{label}</button></li>
+      {/each}
     </ul>
   </div>
 </div>

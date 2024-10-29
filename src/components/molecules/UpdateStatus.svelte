@@ -4,7 +4,7 @@
   import DatePicker from '../DatePicker.svelte';
   import Select from '../Select.svelte';
   import type { OrderReason } from '@/types';
-  import { onDoAuthEvent } from '@/event';
+  import { listenDoAuth } from '@/event';
 
   export let onUpdateStatus:undefined|((status?: string) => void) = undefined;
   export let id:string;
@@ -26,7 +26,7 @@
     }
   };
 
-  addEventListener(onDoAuthEvent.type, () => {
+  listenDoAuth(() => {
     getCancelReason();
   });
 

@@ -6,6 +6,7 @@
   import { writable } from 'svelte/store';
   import Inventory from './inventory/Inventory.svelte';
   import SellerRegister from '@/components/molecules/SellerRegister.svelte';
+  import { listenAuthSuccess } from '@/event';
 
   export let host = 'https://api-beta.baskit.app/v2';
   const client = axios.create({
@@ -38,21 +39,10 @@
     }
   };
 
-  const onAuth = async () => {
-    const response = await client.post('/auth', {
-      username,
-      password,
-    });
-    if (response.status === 200) {
-      userId.set(response.data?.data?.id);
-      client.defaults.headers.common = {
-        'X-ID': response.data?.data?.id,
-        Authorization: response.data?.data?.accessToken,
-      };
-      onGetBalance();
-      onGetPendingBalance();
-    }
-  };
+  listenAuthSuccess(() => {
+    onGetBalance();
+    onGetPendingBalance();
+  });
 </script>
 
 <div class="p-6 bg-[#27303b]">
@@ -67,9 +57,9 @@
   />
   <div class="divider"></div>
   <Auth
+    {client}
     bind:username
     bind:password
-    onAuth={onAuth}
   />
   <div class="divider"></div>
   <Collapse title="Profile">

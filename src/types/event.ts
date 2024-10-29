@@ -5,3 +5,7 @@ export type BulkCreateInventoryMessage = {
   config: AxiosRequestConfig,
   params?: Entry[],
 };
+
+export type HTMLButtonEventHandler = MouseEvent & {
+  currentTarget: EventTarget & HTMLButtonElement;
+};

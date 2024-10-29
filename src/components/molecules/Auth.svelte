@@ -1,15 +1,53 @@
 <script lang="ts">
   import type { MouseEventHandler } from 'svelte/elements';
   import Collapse from '../Collapse.svelte';
-  import { onDoAuthEvent } from '@/event';
+  import { dispatchAuthSuccess, dispatchDoAuth } from '@/event';
+  import type { AxiosInstance } from 'axios';
+
+  const AuthStatusEnum = {
+    IDLE: 'IDLE',
+    SUCCESS: 'SUCCESS',
+    FAILED: 'FAILED',
+  } as const;
+  type AuthStatusEnum =
+    (typeof AuthStatusEnum)[keyof typeof AuthStatusEnum];
 
   export let username:string;
   export let password:string;
-  export let onAuth:MouseEventHandler<HTMLButtonElement> = () => undefined;
+  export let client:AxiosInstance;
 
-  const onDoAuth:MouseEventHandler<HTMLButtonElement> = (e) => {
-    dispatchEvent(onDoAuthEvent);
-    onAuth(e);
+  let authStatus:AuthStatusEnum = AuthStatusEnum.IDLE;
+  let authTimeout:ReturnType<typeof setTimeout>|undefined;
+
+  function showSuccess() {
+    authStatus = AuthStatusEnum.SUCCESS;
+    if (authTimeout) {
+      clearTimeout(authTimeout);
+    }
+    authTimeout = setTimeout(
+      () => authStatus = AuthStatusEnum.IDLE,
+      1500,
+    );
+  }
+
+  const doAuth:MouseEventHandler<HTMLButtonElement> = async () => {
+    authStatus = AuthStatusEnum.IDLE;
+    clearTimeout(authTimeout);
+    dispatchDoAuth();
+    const response = await client.post('/auth', {
+      username,
+      password,
+    });
+    if (response.status === 200) {
+      showSuccess();
+
+      const auth = {
+        'X-ID': response.data?.data?.id,
+        Authorization: response.data?.data?.accessToken,
+      };
+      client.defaults.headers.common = auth;
+      dispatchAuthSuccess(auth);
+    }
   };
 </script>
 
@@ -26,7 +64,11 @@
     </div>
     <input type="password" placeholder="password" bind:value={password} class="input input-bordered w-full max-w-xs" />
   </label>
+  <div class="label"></div>
   <div>
-    <button class="btn bg-slate-600" on:click={onDoAuth}>Auth</button>
+    <button class="btn bg-slate-600" on:click={doAuth}>Auth</button>
+    {#if authStatus === AuthStatusEnum.SUCCESS}
+      <span class="text-lime-400">Login Success</span>
+    {/if}
   </div>
 </Collapse>

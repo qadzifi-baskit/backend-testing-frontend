@@ -8,7 +8,6 @@
   import { DeliveryTypeEnum } from '@/lib/enum';
 
   export let client:AxiosInstance;
-  export let auth:Record<string,string>;
   export let userId:string;
   export let clientType = 'BASKIT_SHOP';
   export let onOrderCreated:(() => unknown) = () => null;
@@ -69,7 +68,6 @@
   };
 
   $: {
-    auth;
     onGetPaymentType();
     onGetCart();
   }

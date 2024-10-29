@@ -18,6 +18,7 @@ export type CompanyType = {
   id: string;
   name: string;
   type: string;
+  parentId: string;
 };
 
 export type WarehouseDetail = {

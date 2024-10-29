@@ -1,15 +1,15 @@
 <script lang="ts">
+  import { eventAuthSuccess } from '@/event';
+  import { debounce } from '@/lib/helper/util';
+  import type { Product } from '@/types';
   import type { AxiosInstance } from 'axios';
+  import type { MouseEventHandler } from 'svelte/elements';
+  import PaginationFancyButton from '../atoms/PaginationFancyButton.svelte';
   import Collapse from '../Collapse.svelte';
   import Select from '../Select.svelte';
-  import type { MouseEventHandler } from 'svelte/elements';
-  import type { Product } from '@/types';
   import Table from '../Table.svelte';
-  import { debounce } from '@/lib/helper/util';
-  import PaginationFancyButton from '../atoms/PaginationFancyButton.svelte';
 
   export let client:AxiosInstance;
-  export let auth:Record<string, string>;
   export let userId:string;
   export let onProductAdded:(() => unknown) = () => null;
   let companyId = '';
@@ -47,10 +47,12 @@
 
   const debounceGetProduct = debounce(onGetProduct);
 
-  $: {
-    auth;
-    onGetProduct();
-  }
+  addEventListener(
+    eventAuthSuccess,
+    () => {
+      onGetProduct();
+    },
+  );
 
   $: {
     companyId;

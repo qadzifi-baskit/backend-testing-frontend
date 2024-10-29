@@ -7,6 +7,7 @@
   import Config from '@/components/molecules/Config.svelte';
   import CreateOfflineUser from '@/components/molecules/CreateOfflineUser.svelte';
   import OrderDetail from '@/components/molecules/OrderDetail.svelte';
+  import { listenAuthSuccess } from '@/event';
   import type { Inventory, Order, PaymentType, UpdateOrderData, UserOffline } from '@/types';
   import axios from 'axios';
   import { Icon } from 'svelte-icons-pack';
@@ -66,21 +67,10 @@
     }
   };
 
-  const onAuth = async () => {
-    const response = await client.post('/auth', {
-      username,
-      password,
-    });
-    if (response.status === 200) {
-      userId = response.data?.data?.id;
-      client.defaults.headers.common = {
-        'X-ID': response.data?.data?.id,
-        Authorization: response.data?.data?.accessToken,
-      };
-      getMe();
-      getPaymentType();
-    }
-  };
+  listenAuthSuccess(() => {
+    getMe();
+    getPaymentType();
+  });
 
   const getInventory = async () => {
     const response = await client.get(`/inventory?companyId=${companyId}`);
@@ -272,9 +262,9 @@
 </Modal>
 <div class="p-6">
   <Auth
+    {client}
     bind:username
     bind:password
-    onAuth={onAuth}
   />
   <div class="divider"></div>
   <Collapse title="Inventory">

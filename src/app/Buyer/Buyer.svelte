@@ -1,16 +1,16 @@
 <script lang="ts">
-  import './buyer.css';
+  import Modal from '@/components/Modal.svelte';
+  import BuyerCart from '@/components/molecules/BuyerCart.svelte';
   import Config from '@/components/molecules/Config.svelte';
+  import Order from '@/components/molecules/Order.svelte';
+  import ProductList from '@/components/molecules/ProductList.svelte';
   import axios from 'axios';
-  import type { MouseEventHandler } from 'svelte/elements';
   import { writable } from 'svelte/store';
   import Collapse from '../../components/Collapse.svelte';
   import Auth from '../../components/molecules/Auth.svelte';
   import type { Warehouse } from '../../types';
-  import Order from '@/components/molecules/Order.svelte';
-  import Modal from '@/components/Modal.svelte';
-  import ProductList from '@/components/molecules/ProductList.svelte';
-  import BuyerCart from '@/components/molecules/BuyerCart.svelte';
+  import './buyer.css';
+  import { listenAuthSuccess } from '@/event';
 
   export let host = 'https://api-beta.baskit.app/v2';
   const client = axios.create({ baseURL: host });
@@ -54,24 +54,12 @@
       balance = response.data.data.balance;
     }
   };
-  let auth:Record<string, string> = {};
 
-  const onAuth:MouseEventHandler<HTMLButtonElement> = async () => {
-    const response = await client.post('/auth', {
-      username,
-      password,
-    });
-    if (response.status === 200) {
-      userId = response.data?.data?.id ?? '';
-      auth = {
-        'X-ID': response.data?.data?.id,
-        Authorization: response.data?.data?.accessToken,
-      };
-      client.defaults.headers.common = auth;
-      onGetBalance();
-      onGetWarehouse();
-    }
-  };
+  listenAuthSuccess(() => {
+    onGetBalance();
+    onGetWarehouse();
+  });
+
   let topUpDialog:HTMLDialogElement;
   let topUpAmount = 0;
   const onTopUp = () => {
@@ -123,9 +111,9 @@
   />
   <div class="divider"></div>
   <Auth
+    {client}
     bind:username
     bind:password
-    onAuth={onAuth}
   />
   <div class="divider"></div>
   <Collapse title="Profile">
@@ -137,7 +125,6 @@
   <div class="flex w-full rounded-box">
     <div class="card bg-base-300 rounded-box grid flex-grow w-2/5 h-fit">
       <ProductList
-        {auth}
         {userId}
         {client}
       />
@@ -146,7 +133,6 @@
     <div class="card bg-base-300 rounded-box grid flex-grow w-2/5 h-fit">
       <BuyerCart
         {client}
-        {auth}
         {userId}
         {onOrderCreated}
       />

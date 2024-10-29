@@ -6,6 +6,7 @@
   import axios from 'axios';
   import Inventory from '../seller/inventory/Inventory.svelte';
   import SellerList from '@/components/molecules/SellerList.svelte';
+  import CompanyTypeManagement from '@/components/molecules/CompanyTypeManagement.svelte';
 
   export let host = 'https://api-beta.baskit.app/v2';
   let clientType = 'WEB_CMS';
@@ -16,19 +17,6 @@
   $: {
     client.defaults.baseURL = host;
   }
-
-  const onAuth = async () => {
-    const response = await client.post('/auth', {
-      username,
-      password,
-    });
-    if (response.status === 200) {
-      client.defaults.headers.common = {
-        'X-ID': response.data?.data?.id,
-        Authorization: response.data?.data?.accessToken,
-      };
-    }
-  };
 </script>
 
 <div id="root" class="p-6 bg-[#27303b]">
@@ -39,9 +27,9 @@
   />
   <div class="divider"></div>
   <Auth
+    {client}
     bind:username
     bind:password
-    onAuth={onAuth}
   />
   <div class="divider"></div>
   <OrderList {client}/>
@@ -51,4 +39,6 @@
   <Inventory {client}/>
   <div class="divider"></div>
   <SellerList {client}/>
+  <div class="divider"></div>
+  <CompanyTypeManagement {client}/>
 </div>

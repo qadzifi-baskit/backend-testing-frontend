@@ -1,38 +1,55 @@
 <script lang="ts" generics="T extends Object">
   import '@andypf/json-viewer';
+  import type { Snippet } from 'svelte';
   // eslint-disable-next-line no-undef
   type Key = keyof T;
-  // eslint-disable-next-line no-undef
-  export let itemList: T[] = [];
-  export let headerList: string[] = Object.keys(itemList[0] ?? {});
-  export let keyList:Key[] = [
-    ...<Key[]>headerList,
-  ];
+  type Props = {
+    // eslint-disable-next-line no-undef
+    itemList?: T[],
+    headerList?: string[],
+    keyList?: Key[],
+    colgroup?: Snippet,
+    header?: Snippet,
+    // eslint-disable-next-line no-undef
+    content?: Snippet<[T, number?]>,
+  };
+  let {
+    itemList = [],
+    headerList = Object.keys(itemList[0] ?? {}),
+    keyList = <Key[]>headerList,
+    colgroup,
+    header,
+    content,
+  }:Props = $props();
 
-  $: {
+  $effect(() => {
     keyList = <Key[]>Object.keys(itemList[0] ?? {});
     headerList = <string[]>keyList;
-  }
+  });
 </script>
 
 <div class="overflow-x-auto">
   <table class="table">
-    <slot name="colgroup"/>
+    {@render colgroup?.()}
     <thead>
       <tr>
-        <slot name="header">
+        {#if header}
+          {@render header()}
+        {:else}
           {#each headerList as header}
             <th>
               <span class="capitalize">{header.split(/(?=[A-Z])/).join(' ')}</span>
             </th>
           {/each}
-        </slot>
+        {/if}
       </tr>
     </thead>
     <tbody>
       {#each itemList as item, index}
         <tr>
-          <slot name="item" {item} {index}>
+          {#if content}
+            {@render content(item, index)}
+          {:else}
             {#each keyList as key}
               <td>
                 {#if typeof item[key] === 'string'}
@@ -45,7 +62,7 @@
                 {/if}
               </td>
             {/each}
-          </slot>
+          {/if}
         </tr>
       {/each}
     </tbody>
