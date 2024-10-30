@@ -6,13 +6,19 @@
   import Table from '../Table.svelte';
   import { debounce } from '@/lib/helper/util';
   import AddProductModal from './AddProductModal.svelte';
+  import { BaskitAdminStore } from '@/store/store';
 
-  export let client:AxiosInstance;
+  type Props = {
+    client: AxiosInstance,
+  };
+  let {
+    client,
+  }:Props = $props();
 
-  let page = 1;
-  let max = 1;
-  let productList:ProductMaster[] = [];
-  let search = '';
+  let page = $state(1);
+  let max = $state(1);
+  let productList:ProductMaster[] = $state([]);
+  let search = $state('');
 
   const getProductList = async () => {
     const params = new URLSearchParams();
@@ -31,19 +37,21 @@
 
   const debounceGetProduct = debounce(getProductList);
 
-  $: {
+  $effect(() => {
     search;
     page = 1;
-  }
+  });
 
-  $: {
-    page;
-    search;
-    debounceGetProduct();
-  }
+  $effect(() => {
+    if ($BaskitAdminStore.loggedIn) {
+      page;
+      search;
+      debounceGetProduct();
+    }
+  });
 
-  let addProductDialog:HTMLDialogElement|undefined;
-  const onShowAddProduct = () => {
+  let addProductDialog:HTMLDialogElement|undefined = $state();
+  function onShowAddProduct() {
     addProductDialog?.showModal();
   };
 </script>
@@ -74,7 +82,7 @@
     bind:value={page}
   />
   <button class="btn bordered input-bordered"
-    on:click={onShowAddProduct}
+    onclick={onShowAddProduct}
   >
     Add Product
   </button>

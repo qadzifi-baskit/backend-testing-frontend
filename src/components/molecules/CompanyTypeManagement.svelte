@@ -8,6 +8,7 @@
   import { debounce } from '@/lib/helper/util';
   import PaginationFancyButton from '../atoms/PaginationFancyButton.svelte';
   import AddCompanyTypeModal from './AddCompanyTypeModal.svelte';
+  import { BaskitAdminStore } from '@/store/store';
 
   type Props = {
     client: AxiosInstance,
@@ -56,10 +57,12 @@
   });
 
   $effect(() => {
-    name;
-    search;
-    page;
-    debounceGetCompanyType();
+    if ($BaskitAdminStore.loggedIn) {
+      name;
+      search;
+      page;
+      debounceGetCompanyType();
+    }
   });
 
   let addCompanyTypeDialog:HTMLDialogElement|undefined = $state();

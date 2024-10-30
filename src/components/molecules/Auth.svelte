@@ -3,6 +3,7 @@
   import Collapse from '../Collapse.svelte';
   import { dispatchAuthSuccess, dispatchDoAuth } from '@/event';
   import type { AxiosInstance } from 'axios';
+  import type { AuthStore } from '@/types';
 
   const AuthStatusEnum = {
     IDLE: 'IDLE',
@@ -12,12 +13,22 @@
   type AuthStatusEnum =
     (typeof AuthStatusEnum)[keyof typeof AuthStatusEnum];
 
-  export let username:string;
-  export let password:string;
-  export let client:AxiosInstance;
+  type Props = {
+    username: string,
+    password: string,
+    client: AxiosInstance,
+    store?: AuthStore,
+  };
 
-  let authStatus:AuthStatusEnum = AuthStatusEnum.IDLE;
-  let authTimeout:ReturnType<typeof setTimeout>|undefined;
+  let {
+    username = $bindable(),
+    password = $bindable(),
+    client,
+    store,
+  }:Props = $props();
+
+  let authStatus:AuthStatusEnum = $state(AuthStatusEnum.IDLE);
+  let authTimeout:ReturnType<typeof setTimeout>|undefined = $state();
 
   function showSuccess() {
     authStatus = AuthStatusEnum.SUCCESS;
@@ -39,6 +50,11 @@
       password,
     });
     if (response.status === 200) {
+      store?.update((value) => ({
+        ...value,
+        loggedIn: true,
+      }));
+
       showSuccess();
 
       const auth = {
@@ -66,7 +82,7 @@
   </label>
   <div class="label"></div>
   <div>
-    <button class="btn bg-slate-600" on:click={doAuth}>Auth</button>
+    <button class="btn bg-slate-600" onclick={doAuth}>Auth</button>
     {#if authStatus === AuthStatusEnum.SUCCESS}
       <span class="text-lime-400">Login Success</span>
     {/if}

@@ -4,9 +4,9 @@
   import Config from '@/components/molecules/Config.svelte';
   import axios from 'axios';
   import { writable } from 'svelte/store';
-  import Inventory from './inventory/Inventory.svelte';
   import SellerRegister from '@/components/molecules/SellerRegister.svelte';
   import { listenAuthSuccess } from '@/event';
+  import InventoryList from '@/components/molecules/InventoryList.svelte';
 
   export let host = 'https://api-beta.baskit.app/v2';
   const client = axios.create({
@@ -77,5 +77,5 @@
     </div>
   </Collapse>
   <div class="divider"></div>
-  <Inventory {client}/>
+  <InventoryList {client}/>
 </div>

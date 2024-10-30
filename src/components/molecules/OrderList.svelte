@@ -9,14 +9,24 @@
   import NoWrap from '../atoms/NoWrap.svelte';
   import OrderDetail from './OrderDetail.svelte';
   import UpdateStatus from './UpdateStatus.svelte';
+  import { BaskitAdminStore } from '@/store/store';
 
-  export let endpoint = 'list-order';
-  export let client:AxiosInstance;
-  export let userId:string|undefined = undefined;
-  export let orderType = 'SHOP';
+  type Props = {
+    endpoint?: string,
+    client: AxiosInstance,
+    userId?: string,
+    orderType?: string,
+  };
 
-  let orderList:Order[] = [];
-  let page = '1';
+  let {
+    endpoint = 'list-order',
+    client,
+    userId = undefined,
+    orderType = 'SHOP',
+  }:Props = $props();
+
+  let orderList:Order[] = $state([]);
+  let page = $state('1');
 
   const onGetOrderList = async () => {
     const query:Record<string, string> = {
@@ -35,13 +45,17 @@
       orderList = response.data.data;
     }
   };
-  $: {
-    page;
-    onGetOrderList();
-  }
-  let selectedId = '';
-  let statusDialog:HTMLDialogElement;
-  let detailDialog:HTMLDialogElement;
+
+  $effect(() => {
+    if ($BaskitAdminStore.loggedIn) {
+      page;
+      onGetOrderList();
+    }
+  });
+
+  let selectedId = $state('');
+  let statusDialog:HTMLDialogElement|undefined = $state();
+  let detailDialog:HTMLDialogElement|undefined = $state();
   const updateStatus = (id: string) => () => {
     if (selectedId === id) {
       return closeDialog();
@@ -90,7 +104,7 @@
   />
 </Modal>
 <Collapse title='Order' onClick={onGetOrderList}>
-  <button class="btn" on:click={onGetOrderList}>Get Order</button>
+  <button class="btn" onclick={onGetOrderList}>Get Order</button>
   <select class="select w-full max-w-xs" bind:value={page}>
     <option selected value="1">1</option>
     {#each Array.from({ length: 99 }, (_, i) => i + 2) as num}
@@ -117,7 +131,7 @@
         <td>{order.orderCode}</td>
         <td>
           <button
-            on:click={updateStatus(order.id)}
+            onclick={updateStatus(order.id)}
             class="btn bg-slate-600"
           >
             <Icon src={FaSolidPencil}/>
@@ -125,7 +139,7 @@
         </td>
         <td>
           <button
-            on:click={showDetail(order.id)}
+            onclick={showDetail(order.id)}
             class="btn bg-slate-600"
           >
             <Icon src={FaSolidList}/>

@@ -5,14 +5,20 @@
   import AddInventoryModal from '@/components/molecules/AddInventoryModal.svelte';
   import Table from '@/components/Table.svelte';
   import { debounce } from '@/lib/helper/util';
+  import { BaskitAdminStore } from '@/store/store';
   import type { AxiosInstance } from 'axios';
 
-  export let client:AxiosInstance;
+  type Props = {
+    client: AxiosInstance,
+  };
+  let {
+    client,
+  }:Props = $props();
 
-  let inventoryList:object[] = [];
-  let page = 1;
-  let max = 1;
-  let search = '';
+  let inventoryList:object[] = $state([]);
+  let page = $state(1);
+  let max = $state(1);
+  let search = $state('');
 
   const getInventoryList = async () => {
     const params = new URLSearchParams();
@@ -32,18 +38,20 @@
 
   const debounceGetInventory = debounce(getInventoryList);
 
-  $: {
+  $effect(() => {
     search;
     page = 1;
-  }
+  });
 
-  $: {
-    page;
-    search;
-    debounceGetInventory();
-  }
+  $effect(() => {
+    if ($BaskitAdminStore.loggedIn) {
+      page;
+      search;
+      debounceGetInventory();
+    }
+  });
 
-  let addInventoryDialog:HTMLDialogElement|undefined;
+  let addInventoryDialog:HTMLDialogElement|undefined = $state();
   const onShowAddInventory = () => {
     addInventoryDialog?.showModal();
   };
@@ -65,7 +73,7 @@
     bind:value={page}
   />
   <button class="btn bordered input-bordered"
-    on:click={onShowAddInventory}
+    onclick={onShowAddInventory}
   >
     Add Inventory
   </button>

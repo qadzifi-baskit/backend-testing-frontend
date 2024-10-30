@@ -6,15 +6,21 @@
   import SearchField from '../atoms/SearchField.svelte';
   import { debounce, toURLStringEntries } from '@/lib/helper/util';
   import BulkCreateInventoryWorker from '@/worker/BulkCreateInventoryWorker?worker';
+  import { BaskitAdminStore } from '@/store/store';
 
-  export let client:AxiosInstance;
+  type Props = {
+    client: AxiosInstance,
+  };
+  let {
+    client,
+  }:Props = $props();
 
   const worker = new BulkCreateInventoryWorker();
 
-  let companyList:object[] = [];
-  let page = 1;
-  let max = 1;
-  let search = '';
+  let companyList:object[] = $state([]);
+  let page = $state(1);
+  let max = $state(1);
+  let search = $state('');
 
   const getCompanyList = async () => {
     const params = new URLSearchParams();
@@ -34,16 +40,18 @@
 
   const debounceGetCompany = debounce(getCompanyList);
 
-  $: {
+  $effect(() => {
     search;
     page = 1;
-  }
+  });
 
-  $: {
-    page;
-    search;
-    debounceGetCompany();
-  }
+  $effect(() => {
+    if ($BaskitAdminStore.loggedIn) {
+      page;
+      search;
+      debounceGetCompany();
+    }
+  });
 
   const onBulkAddInventory = () => {
     const params = toURLStringEntries({
@@ -72,7 +80,7 @@
     bind:value={page}
   />
   <button class="btn bordered input-bordered"
-    on:click={onBulkAddInventory}
+    onclick={onBulkAddInventory}
   >
     Bulk Add Inventory
   </button>
