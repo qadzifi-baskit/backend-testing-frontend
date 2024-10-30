@@ -5,7 +5,7 @@
 
   export let title = '';
   export let showValue = false;
-  export let options: [ValueType, string][] = [];
+  export let options: [ValueType, string, boolean?][] = [];
   export let value:ValueType;
   export let containerClass = '';
   export let labelClass = '';
@@ -18,8 +18,8 @@
     <span class={cn('label-text', labelClass)}>{title}</span>
   </div>
   <select bind:value class={cn('select select-bordered', clazz)}>
-    {#each options as [optionValue, optionLabel]}
-      <option value={optionValue}>{optionLabel}</option>
+    {#each options as [optionValue, optionLabel, disabled]}
+      <option value={optionValue} {disabled}>{optionLabel}</option>
     {/each}
   </select>
   {#if showValue}
