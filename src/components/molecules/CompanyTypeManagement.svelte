@@ -113,7 +113,7 @@
   <button class="btn bordered input-bordered"
     onclick={showAddCompannyTypeModal}
   >
-    Add Inventory
+    Add Company Type
   </button>
   {#if companyTypeList.length > 0}
     <Table5

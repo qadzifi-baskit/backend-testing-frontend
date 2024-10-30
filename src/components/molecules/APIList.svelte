@@ -9,15 +9,25 @@
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPlus } from 'svelte-icons-pack/fa';
   import AddApiModal from './AddAPIModal.svelte';
+  import { SuperAdminStore } from '@/store/store';
 
-  export let client:AxiosInstance;
+  type Props = {
+    client: AxiosInstance,
+  };
+  let {
+    client,
+  }:Props = $props();
 
-  let apiList:APIItem[] = [];
-  let page = 1;
-  let max = 1;
-  let search = '';
+  let apiList:APIItem[] = $state([]);
+  let page = $state(1);
+  let max = $state(1);
+  let search = $state('');
 
   const getAPIList = async () => {
+    if (!$SuperAdminStore.loggedIn) {
+      return;
+    }
+
     const params = new URLSearchParams();
     params.append('$page', `${page}`);
     params.append('$limit', '10');
@@ -34,13 +44,13 @@
 
   const debounceGetAPIList = debounce(getAPIList);
 
-  $: {
+  $effect(() => {
     page;
     search;
     debounceGetAPIList();
-  }
+  });
 
-  let addApiDialog:HTMLDialogElement|undefined;
+  let addApiDialog:HTMLDialogElement|undefined = $state();
 
   const showAddAPI = () => {
     addApiDialog?.showModal();
@@ -64,7 +74,7 @@
     bind:value={page}
   />
   <button
-    on:click={showAddAPI}
+    onclick={showAddAPI}
     class="btn bg-slate-600"
   >
     <Icon src={FaSolidPlus}/>

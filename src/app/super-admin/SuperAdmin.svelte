@@ -3,15 +3,22 @@
   import ApiList from '@/components/molecules/APIList.svelte';
   import Auth from '@/components/molecules/Auth.svelte';
   import Config from '@/components/molecules/Config.svelte';
+  import RoleManagement from '@/components/molecules/RoleManagement.svelte';
+  import { SuperAdminStore } from '@/store/store';
   import axios from 'axios';
 
-  export let host = 'https://api-beta.baskit.app/v2';
+  type Props = {
+    host?: string,
+  };
+  let {
+    host = $bindable('https://api-beta.baskit.app/v2'),
+  }: Props = $props();
 
   const client = axios.create({ baseURL: host });
 
-  let clientType = 'WEB_CMS';
-  let username = 'super.admin@testing.com';
-  let password = '12345678';
+  let clientType = $state('WEB_CMS');
+  let username = $state('super.admin@testing.com');
+  let password = $state('12345678');
 </script>
 
 <div id="root" class="p-6 bg-[#27303b]">
@@ -22,6 +29,7 @@
   />
   <div class="divider"></div>
   <Auth
+    store={SuperAdminStore}
     {client}
     bind:username
     bind:password
@@ -32,6 +40,10 @@
   />
   <div class="divider"></div>
   <AclList
+    {client}
+  />
+  <div class="divider"></div>
+  <RoleManagement
     {client}
   />
 </div>

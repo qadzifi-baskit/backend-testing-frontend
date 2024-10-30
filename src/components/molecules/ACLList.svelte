@@ -10,16 +10,26 @@
   import Collapse from '../Collapse.svelte';
   import Table from '../Table.svelte';
   import ModifyAclModal from './ModifyACLModal.svelte';
+  import { SuperAdminStore } from '@/store/store';
 
-  export let client:AxiosInstance;
+  type Props = {
+    client: AxiosInstance,
+  };
+  let {
+    client,
+  }:Props = $props();
 
-  let aclList:APIACLItem[] = [];
-  let page = 1;
-  let max = 1;
-  let search = '';
-  let selectedAclItem:APIACLItem|undefined;
+  let aclList:APIACLItem[] = $state([]);
+  let page = $state(1);
+  let max = $state(1);
+  let search = $state('');
+  let selectedAclItem:APIACLItem|undefined = $state();
 
   const getACLList = async () => {
+    if (!$SuperAdminStore.loggedIn) {
+      return;
+    }
+
     const params = new URLSearchParams();
     params.append('$page', `${page}`);
     params.append('$limit', '10');
@@ -36,22 +46,24 @@
 
   const debounceGetACLList = debounce(getACLList);
 
-  $: {
+  $effect(() => {
     page;
     search;
     debounceGetACLList();
-  }
+  });
 
-  let dialog:HTMLDialogElement|undefined;
+  let dialog:HTMLDialogElement|undefined = $state();
 
   const modifyAcl = (item:APIACLItem) => () => {
     selectedAclItem = item;
     dialog?.showModal();
   };
 
-  $: if (dialog) {
-    dialog.onclose = getACLList;
-  }
+  $effect(() => {
+    if (dialog) {
+      dialog.onclose = getACLList;
+    }
+  });
 </script>
 
 <ModifyAclModal
@@ -93,7 +105,7 @@
         <td><NoWrap>{item.id}</NoWrap></td>
         <td>
           <button
-            on:click={modifyAcl(item)}
+            onclick={modifyAcl(item)}
             class="btn bg-slate-600"
           >
             <Icon src={FaSolidPencil}/>

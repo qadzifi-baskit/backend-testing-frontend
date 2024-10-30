@@ -1,5 +1,9 @@
 <script lang="ts">
-  export let value = '';
+  type Props = {
+    value?: string,
+  };
+
+  let { value = $bindable('') }:Props = $props();
 </script>
 
 <label class="input input-bordered flex items-center gap-2 mb-12">

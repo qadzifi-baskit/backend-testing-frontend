@@ -1,12 +1,12 @@
 <script>
-  import { FaSolidBars } from 'svelte-icons-pack/fa';
   import { Icon } from 'svelte-icons-pack';
+  import { FaSolidAngleRight } from 'svelte-icons-pack/fa';
+  import BaskitAdmin from './app/baskit-admin/BaskitAdmin.svelte';
+  import BrandUser from './app/brand-user/BrandUser.svelte';
   import Buyer from './app/buyer';
   import Seller from './app/seller';
-  import BaskitAdmin from './app/baskit-admin/BaskitAdmin.svelte';
-  import Config from './components/molecules/Config.svelte';
   import SuperAdmin from './app/super-admin/SuperAdmin.svelte';
-  import BrandUser from './app/brand-user/BrandUser.svelte';
+  import Config from './components/molecules/Config.svelte';
   let selected = 1;
   let host = import.meta.env.VITE_API_HOST;
 
@@ -26,15 +26,17 @@
 <div style="--amount:{tabs.length}" role="tablist" class="tabs tabs-bordered w-full">
   {#each tabs as { component: Component }, index }
     <input checked={selected === index + 1} type="radio" name="my_tabs_1" role="tab" class="tab hidden" aria-label={`Tab ${index + 1}`}/>
-    <div role="tabpanel" class="tab-content"><Component bind:host/></div>
+    <div role="tabpanel" class="tab-content">
+      <Component bind:host/>
+    </div>
   {/each}
 </div>
 <div class="drawer">
   <input id="my-drawer" type="checkbox" class="drawer-toggle" />
-  <div class="drawer-content fixed bottom-8 left-8 z-10">
+  <div class="drawer-content fixed bottom-8 left-0 z-10">
     <!-- Page content here -->
-    <label for="my-drawer" class="btn btn-primary drawer-button">
-      <Icon src={FaSolidBars} className="text-xl"/>
+    <label for="my-drawer" class="btn btn-primary drawer-button p-0 rounded-l-none">
+      <Icon src={FaSolidAngleRight} className="text-xl"/>
     </label>
   </div> 
   <div class="drawer-side z-10">

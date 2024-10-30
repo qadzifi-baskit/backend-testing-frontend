@@ -4,6 +4,7 @@
   import { dispatchAuthSuccess, dispatchDoAuth } from '@/event';
   import type { AxiosInstance } from 'axios';
   import type { AuthStore } from '@/types';
+  import type { Writable } from 'svelte/store';
 
   const AuthStatusEnum = {
     IDLE: 'IDLE',
@@ -17,7 +18,7 @@
     username: string,
     password: string,
     client: AxiosInstance,
-    store?: AuthStore,
+    store?: Writable<AuthStore>,
   };
 
   let {

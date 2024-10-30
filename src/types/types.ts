@@ -1,9 +1,8 @@
 import type { OrderDetailStatusEnum } from '@/lib/enum';
-import type { Writable } from 'svelte/store';
 
-export type AuthStore = Writable<{
+export type AuthStore = {
   loggedIn: boolean,
-}>;
+};
 
 export type PriceTier = {
   id: string;
