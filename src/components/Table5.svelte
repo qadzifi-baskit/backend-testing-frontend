@@ -1,4 +1,5 @@
 <script lang="ts" generics="T extends Object">
+  import { cn } from '@/lib/helper/tailwind';
   import '@andypf/json-viewer';
   import type { Snippet } from 'svelte';
   // eslint-disable-next-line no-undef
@@ -6,20 +7,26 @@
   type Props = {
     // eslint-disable-next-line no-undef
     itemList?: T[],
+    class?: string,
     headerList?: string[],
     keyList?: Key[],
     colgroup?: Snippet,
     header?: Snippet,
+    firstRow?: Snippet,
     // eslint-disable-next-line no-undef
     content?: Snippet<[T, number?]>,
+    lastRow?: Snippet,
   };
   let {
+    class: clazz = '',
     itemList = [],
     headerList = Object.keys(itemList[0] ?? {}),
     keyList = <Key[]>headerList,
     colgroup,
     header,
+    firstRow,
     content,
+    lastRow,
   }:Props = $props();
 
   $effect(() => {
@@ -28,7 +35,7 @@
   });
 </script>
 
-<div class="overflow-x-auto">
+<div class={cn('overflow-x-auto', clazz)}>
   <table class="table">
     {@render colgroup?.()}
     <thead>
@@ -45,6 +52,9 @@
       </tr>
     </thead>
     <tbody>
+      {#if firstRow}
+        {@render firstRow()}
+      {/if}
       {#each itemList as item, index}
         <tr>
           {#if content}
@@ -65,6 +75,9 @@
           {/if}
         </tr>
       {/each}
+      {#if lastRow}
+        {@render lastRow()}
+      {/if}
     </tbody>
   </table>
 </div>

@@ -159,3 +159,11 @@ export type ACLItem = {
 export type APIACLItem = APIItem & {
   acls: ACLItem[],
 };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type PaginatialPanelProps<T extends (...args: any[]) => any = () => void> = {
+  search?: string,
+  max?: number,
+  page?: number,
+  onReload?: T,
+};

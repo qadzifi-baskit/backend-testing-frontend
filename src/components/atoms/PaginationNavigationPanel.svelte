@@ -1,19 +1,17 @@
 <script lang="ts">
   import { debounce } from '@/lib/helper/util';
+  import type { PaginatialPanelProps } from '@/types';
   import PaginationFancyButton from './PaginationFancyButton.svelte';
   import SearchField from './SearchField.svelte';
-
-  type Props = {
-    search?: string,
-    max?: number,
-    page?: number,
-  };
+  import { Icon } from 'svelte-icons-pack';
+  import { FaSolidRotate } from 'svelte-icons-pack/fa';
 
   let {
     search = $bindable(''),
     max = $bindable(1),
     page = $bindable(1),
-  }:Props = $props();
+    onReload,
+  }:PaginatialPanelProps = $props();
 
   const debounceResetPage = debounce(() => {
     page = 1;
@@ -32,3 +30,9 @@
   bind:max
   bind:value={page}
 />
+<button
+  onclick={onReload}
+  class="btn bg-slate-600"
+>
+  <Icon src={FaSolidRotate}/>
+</button>

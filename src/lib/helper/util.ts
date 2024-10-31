@@ -28,3 +28,13 @@ export function toURLStringEntries(data: Record<string, unknown>): Entry[] {
     <Entry[]>[],
   );
 }
+
+export function isObjectEmpty(item: unknown) {
+  if (item === undefined || item === null || typeof item !== 'object') {
+    throw new Error('Not an object');
+  }
+  for (const _key in item) {
+    return false;
+  }
+  return true;
+}

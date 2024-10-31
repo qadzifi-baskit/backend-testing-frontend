@@ -5,11 +5,19 @@
   // eslint-disable-next-line no-undef
   type LabelType = LT;
 
-  let clazz = '';
-  export { clazz as class };
-  export let options:[ValueType, LabelType][] = [];
-  export let placeholder = 'placeholder';
-  export let selectValue:ValueType|undefined = undefined;
+  type Props = {
+    class?: string,
+    options?: [ValueType, LabelType][],
+    placeholder?: string,
+    selectValue?: ValueType,
+  };
+
+  let {
+    class: clazz = '',
+    options = [],
+    placeholder = 'placeholder',
+    selectValue = $bindable(),
+  }:Props = $props();
 
   let selectElement:HTMLDetailsElement|undefined;
   const onSelect = () => {
@@ -22,7 +30,7 @@
 <details class={cn('dropdown w-full max-w-xs', clazz)}
   bind:this={selectElement}
 >
-  <summary class="btn input-bordered w-full justify-start">{selectValue ?? placeholder}</summary>
+  <summary class="btn input-bordered w-fit justify-start">{selectValue ?? placeholder}</summary>
   <ul class="menu input-bordered border dropdown-content bg-base-100 rounded-box z-[1000] w-52 p-0 shadow">
     {#each options as [value, label]}
       <button
@@ -35,7 +43,7 @@
             'has-[:checked]:bg-slate-700',
           )
         }
-        on:click={onSelect}
+        onclick={onSelect}
       >
         <label class="label cursor-pointer p-0">
           <span class="label-text">{label}</span>

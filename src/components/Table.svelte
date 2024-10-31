@@ -30,6 +30,7 @@
       </tr>
     </thead>
     <tbody>
+      <slot name="first"/>
       {#each itemList as item, index}
         <tr>
           <slot name="item" {item} {index}>
@@ -48,6 +49,7 @@
           </slot>
         </tr>
       {/each}
+      <slot name="last"/>
     </tbody>
   </table>
 </div>

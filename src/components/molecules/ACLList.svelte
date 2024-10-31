@@ -1,5 +1,6 @@
 <script lang="ts">
   import { debounce } from '@/lib/helper/util';
+  import { SuperAdminStore } from '@/store/store';
   import type { APIACLItem } from '@/types';
   import type { AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
@@ -8,9 +9,8 @@
   import PaginationFancyButton from '../atoms/PaginationFancyButton.svelte';
   import SearchField from '../atoms/SearchField.svelte';
   import Collapse from '../Collapse.svelte';
-  import Table from '../Table.svelte';
+  import Table5 from '../Table5.svelte';
   import ModifyAclModal from './ModifyACLModal.svelte';
-  import { SuperAdminStore } from '@/store/store';
 
   type Props = {
     client: AxiosInstance,
@@ -33,6 +33,7 @@
     const params = new URLSearchParams();
     params.append('$page', `${page}`);
     params.append('$limit', '10');
+    params.append('$order', 'createdAt');
     params.append('search', search);
     const response = await client.get(
       '/acls',
@@ -66,6 +67,39 @@
   });
 </script>
 
+{#snippet colgroup()}
+  <colgroup>
+    <col class="max-w-fit">
+    <col class="max-w-fit">
+    <col>
+    <col>
+    <col class="w-full">
+  </colgroup>
+{/snippet}
+
+{#snippet header()}
+  <th><span>Id</span></th>
+  <th></th>
+  <th><span>API Name</span></th>
+  <th><span>API Group</span></th>
+  <th><span>Endpoint</span></th>
+{/snippet}
+
+{#snippet content(item: APIACLItem)}
+  <td><NoWrap>{item.id}</NoWrap></td>
+  <td>
+    <button
+      onclick={modifyAcl(item)}
+      class="btn bg-slate-600"
+    >
+      <Icon src={FaSolidPencil}/>
+    </button>
+  </td>
+  <td><NoWrap>{item.apiName}</NoWrap></td>
+  <td><NoWrap>{item.apiGroup}</NoWrap></td>
+  <td><NoWrap>{item.endpoint}</NoWrap></td>
+{/snippet}
+
 <ModifyAclModal
   item={selectedAclItem}
   bind:dialog
@@ -84,37 +118,12 @@
     bind:value={page}
   />
   {#if aclList.length > 0}
-    <Table itemList={aclList.sort((first, second) => first.createdAt < second.createdAt ? -1 : 1)}>
-      <svelte:fragment slot="colgroup">
-        <colgroup>
-          <col class="max-w-fit">
-          <col class="max-w-fit">
-          <col>
-          <col>
-          <col class="w-full">
-        </colgroup>
-      </svelte:fragment>
-      <svelte:fragment slot="header">
-        <th><span>Id</span></th>
-        <th></th>
-        <th><span>API Name</span></th>
-        <th><span>API Group</span></th>
-        <th><span>Endpoint</span></th>
-      </svelte:fragment>
-      <svelte:fragment slot="item" let:item>
-        <td><NoWrap>{item.id}</NoWrap></td>
-        <td>
-          <button
-            onclick={modifyAcl(item)}
-            class="btn bg-slate-600"
-          >
-            <Icon src={FaSolidPencil}/>
-          </button>
-        </td>
-        <td><NoWrap>{item.apiName}</NoWrap></td>
-        <td><NoWrap>{item.apiGroup}</NoWrap></td>
-        <td><NoWrap>{item.endpoint}</NoWrap></td>
-      </svelte:fragment>
-    </Table>
+    <Table5
+      itemList={aclList}
+      {header}
+      {colgroup}
+      {content}
+    >
+    </Table5>
   {/if}
 </Collapse>

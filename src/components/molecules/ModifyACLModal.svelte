@@ -1,21 +1,46 @@
 <script lang="ts">
-  import type { ACLItem, APIACLItem } from '@/types';
+  import { isObjectEmpty } from '@/lib/helper/util';
+  import { SuperAdminStore } from '@/store/store';
+  import type { ACLItem, APIACLItem, Role } from '@/types';
   import type { AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
-  import { FaSolidPencil } from 'svelte-icons-pack/fa';
+  import { FaSolidFloppyDisk, FaSolidPencil } from 'svelte-icons-pack/fa';
   import Modal from '../Modal.svelte';
-  import Table from '../Table.svelte';
+  import Table5 from '../Table5.svelte';
+  import DropdownSelect from '../atoms/DropdownSelect.svelte';
   import NoWrap from '../atoms/NoWrap.svelte';
 
-  export let item:APIACLItem|undefined;
-  export let client:AxiosInstance;
-  export let dialog:HTMLDialogElement|undefined;
+  type Props = {
+    client: AxiosInstance,
+    item?: APIACLItem,
+    dialog?: HTMLDialogElement,
+  };
+  let {
+    client,
+    item = $bindable(),
+    dialog = $bindable(),
+  }: Props = $props();
 
-  let acls:Record<string, ACLItem> = {};
-
-  $: if (item?.acls) {
-    acls = Object.fromEntries(item.acls.map((acl) => [acl.id, acl]));
+  async function getRoleList() {
+    if (!$SuperAdminStore.loggedIn) return;
+    const response = await client.get('/role');
+    if (response.status !== 200) return;
+    roleList = response.data?.data ?? [];
   }
+
+  $effect(() => {
+    getRoleList();
+  });
+
+  let acls:Record<string, ACLItem> = $state({});
+  let addingNewAcl = $state(false);
+  let roleList:Role[] = $state([]);
+
+  $effect(() => {
+    if (item?.acls) {
+      acls = Object.fromEntries(item.acls.map((acl) => [acl.id, acl]));
+    }
+  });
 
   const updateACL = (target: ACLItem) => async () => {
     const payload: Partial<ACLItem> = {
@@ -38,57 +63,108 @@
     dialog?.close();
   };
 
+  $inspect({ roleList });
 </script>
+
+{#snippet colgroup()}
+  <colgroup>
+    <col class="max-w-fit">
+    <col class="max-w-fit">
+    <col>
+    <col>
+    <col>
+    <col>
+    <col>
+    <col>
+    <col class="w-full">
+  </colgroup>
+{/snippet}
+
+{#snippet header()}
+  <th>Id</th>
+  <th>Role Name</th>
+  <th></th>
+  <th>Get</th>
+  <th>Find</th>
+  <th>Post</th>
+  <th>Patch</th>
+  <th>Delete</th>
+{/snippet}
+
+{#snippet content(acl: ACLItem)}
+  {#if acl.id in acls}
+    <td><NoWrap>{acl.id}</NoWrap></td>
+    <td><NoWrap>{acl.role.roleName}</NoWrap></td>
+    <td>
+      <button
+        onclick={updateACL(acls[acl.id])}
+        class="btn bg-slate-600"
+      >
+        <Icon src={FaSolidPencil}/>
+      </button>
+    </td>
+    <td><input type="checkbox" bind:checked={acls[acl.id].methodGet} class="checkbox"></td>
+    <td><input type="checkbox" bind:checked={acls[acl.id].methodFind} class="checkbox"></td>
+    <td><input type="checkbox" bind:checked={acls[acl.id].methodPost} class="checkbox"></td>
+    <td><input type="checkbox" bind:checked={acls[acl.id].methodPatch} class="checkbox"></td>
+    <td><input type="checkbox" bind:checked={acls[acl.id].methodDelete} class="checkbox"></td>
+  {/if}
+{/snippet}
+
 
 <Modal
   bind:dialog
 >
-  {#if item}
+  {#if item && !isObjectEmpty(acls)}
     <div>
       <span class="badge badge-neutral">{item.endpoint}</span>
       <div class="label"></div>
+      <button class="btn bg-slate-600 w-fit"
+        onclick={() => addingNewAcl = !addingNewAcl}
+      >
+        Add ACL
+      </button>
       <div class="label"></div>
-      <Table itemList={item.acls.sort((first, second) => first.createdAt < second.createdAt ? -1 : 1)}>
-        <svelte:fragment slot="colgroup">
-          <colgroup>
-            <col class="max-w-fit">
-            <col class="max-w-fit">
-            <col>
-            <col>
-            <col>
-            <col>
-            <col>
-            <col class="w-full">
-          </colgroup>
-        </svelte:fragment>
-        <svelte:fragment slot="header">
-          <th>Id</th>
-          <th>Role Name</th>
-          <th></th>
-          <th>Get</th>
-          <th>Find</th>
-          <th>Post</th>
-          <th>Patch</th>
-          <th>Delete</th>
-        </svelte:fragment>
-        <svelte:fragment slot="item" let:item={api}>
-          <td><NoWrap>{api.id}</NoWrap></td>
-          <td><NoWrap>{api.role.roleName}</NoWrap></td>
-          <td>
-            <button
-              on:click={updateACL(acls[api.id])}
-              class="btn bg-slate-600"
-            >
-              <Icon src={FaSolidPencil}/>
-            </button>
-          </td>
-          <td><input type="checkbox" bind:checked={acls[api.id].methodGet} class="checkbox"></td>
-          <td><input type="checkbox" bind:checked={acls[api.id].methodFind} class="checkbox"></td>
-          <td><input type="checkbox" bind:checked={acls[api.id].methodPost} class="checkbox"></td>
-          <td><input type="checkbox" bind:checked={acls[api.id].methodPatch} class="checkbox"></td>
-          <td><input type="checkbox" bind:checked={acls[api.id].methodDelete} class="checkbox"></td>
-        </svelte:fragment>
-      </Table>
+      {#if addingNewAcl}
+        <div id="new-acl-panel" class="w-fit p-4 border bordered border-white grid gap-2">
+          <span>Role</span>
+          <span>Save</span>
+          <span>Get</span>
+          <span>Find</span>
+          <span>Post</span>
+          <span>Patch</span>
+          <span>Delete</span>
+          <DropdownSelect
+            options={roleList.map((role) => [role.id, role.roleName])}
+            placeholder="ROLE"
+          />
+          <button
+            class="btn bg-slate-600 w-fit"
+          >
+            <Icon src={FaSolidFloppyDisk}/>
+          </button>
+          <input type="checkbox" class="checkbox">
+          <input type="checkbox" class="checkbox">
+          <input type="checkbox" class="checkbox">
+          <input type="checkbox" class="checkbox">
+          <input type="checkbox" class="checkbox">
+        </div>
+      {/if}
+      <div class="label"></div>
+      <Table5
+        class="flex-grow"
+        itemList={item.acls.sort((first, second) => first.createdAt < second.createdAt ? -1 : 1)}
+        {colgroup}
+        {header}
+        {content}
+      >
+      </Table5>
     </div>
   {/if}
 </Modal>
+
+<style>
+  #new-acl-panel {
+    grid-template-columns: repeat(7, max-content);
+  }
+</style>

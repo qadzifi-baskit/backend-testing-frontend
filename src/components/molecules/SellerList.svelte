@@ -5,7 +5,7 @@
   import PaginationFancyButton from '../atoms/PaginationFancyButton.svelte';
   import SearchField from '../atoms/SearchField.svelte';
   import { debounce, toURLStringEntries } from '@/lib/helper/util';
-  import BulkCreateInventoryWorker from '@/worker/BulkCreateInventoryWorker?worker';
+  //import BulkCreateInventoryWorker from '@/worker/BulkCreateInventoryWorker?worker';
   import { BaskitAdminStore } from '@/store/store';
 
   type Props = {
@@ -15,7 +15,7 @@
     client,
   }:Props = $props();
 
-  const worker = new BulkCreateInventoryWorker();
+  //const worker = new BulkCreateInventoryWorker();
 
   let companyList:object[] = $state([]);
   let page = $state(1);
@@ -54,17 +54,15 @@
   });
 
   const onBulkAddInventory = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const params = toURLStringEntries({
       search,
     });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const config: AxiosRequestConfig = {
       url: '/company/seller',
       baseURL: client.defaults.baseURL,
     };
-    worker.postMessage({
-      config,
-      params,
-    });
   };
 </script>
 

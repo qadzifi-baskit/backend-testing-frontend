@@ -19,7 +19,7 @@
 
   let brandCompanyTypeList:CompanyType[] = $state([]);
   let brandBranchCompanyTypeList:CompanyType[] = $state([]);
-  let autoAdjust = $state(true);
+  let autoAdjust = $state(import.meta.env.MODE === 'development');
 
   const data = $state({
     companyType: 'Brand',
@@ -136,7 +136,6 @@
 <Collapse
   title="Register Brand"
   class="w-full"
-  show
 >
   <div class="form-control w-fit">
     <label class="label cursor-pointer">
