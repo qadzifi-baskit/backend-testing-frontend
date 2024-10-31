@@ -1,10 +1,10 @@
 <script lang="ts">
   import { DigitText, DigitTextID } from '@/consts/number';
+  import type { CompanyType } from '@/types';
   import type { AxiosInstance } from 'axios';
   import Collapse from '../Collapse.svelte';
-  import PostButton from '../atoms/PostButton.svelte';
-  import type { CompanyType } from '@/types';
   import Select from '../Select.svelte';
+  import PostButton from '../atoms/PostButton.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -19,6 +19,7 @@
 
   let brandCompanyTypeList:CompanyType[] = $state([]);
   let brandBranchCompanyTypeList:CompanyType[] = $state([]);
+  let autoAdjust = $state(true);
 
   const data = $state({
     companyType: 'Brand',
@@ -44,6 +45,7 @@
   });
 
   $effect(() => {
+    if (!autoAdjust) return;
     const firstDigit = data.phone.slice(prefixOffset, prefixOffset + 1);
     const firstName = DigitText[firstDigit] ?? '-';
     const lastDigit = data.phone.slice(prefixOffset + 1, prefixOffset + 2);
@@ -64,6 +66,7 @@
   });
 
   $effect(() => {
+    if (!autoAdjust) return;
     const firstDigit = data.branch.phone.slice(prefixOffset, prefixOffset + 1);
     const firstName = DigitText[firstDigit] ?? '-';
     const lastDigit = data.branch.phone.slice(prefixOffset + 1, prefixOffset + 2);
@@ -135,6 +138,12 @@
   class="w-full"
   show
 >
+  <div class="form-control w-fit">
+    <label class="label cursor-pointer">
+      <input type="checkbox" class="toggle" bind:checked={autoAdjust}/>
+      <span class="label-text ml-4">Auto Adjust</span>
+    </label>
+  </div>
   <div class="text-lg font-medium">Brand</div>
   <label class="form-control w-full max-w-xs">
     <div class="label">
