@@ -9,6 +9,7 @@
   import InventoryList from '@/components/molecules/InventoryList.svelte';
 
   export let host = 'https://api-beta.baskit.app/v2';
+  export let showHost = true;
   const client = axios.create({
     baseURL: host,
   });
@@ -20,10 +21,6 @@
   let companyId = '4439a3df-cfe0-441a-9776-d869bd6b6a89';
 
   const userId = writable('');
-
-  $: {
-    client.defaults.baseURL = host;
-  }
 
   const onGetBalance = async () => {
     const response = await client.get(`/wallet/${$userId}`);
@@ -49,7 +46,8 @@
   <Config
     bind:host
     bind:clientType
-    showHost={false}
+    {showHost}
+    {client}
   />
   <div class="divider"></div>
   <SellerRegister

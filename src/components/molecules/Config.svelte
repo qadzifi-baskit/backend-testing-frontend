@@ -1,10 +1,34 @@
 <script lang="ts">
+  import { dispatchChangeConfig } from '@/event';
   import Collapse from '../Collapse.svelte';
   import Select from '../Select.svelte';
-  export let host = 'http://127.0.0.1';
-  export let showHost = true;
-  export let clientType = 'BASKIT_SHOP';
-  export let showClient = true;
+  import type { AxiosInstance } from 'axios';
+
+  type Props = {
+    host?: string,
+    clientType?: string,
+    showHost?: boolean,
+    showClient?: boolean,
+    client?: AxiosInstance,
+  };
+  let {
+    host = $bindable('http://127.0.0.1'),
+    clientType = $bindable('BASKIT_SHOP'),
+    showHost = true,
+    showClient = true,
+    client,
+  }:Props = $props();
+
+  $effect(() => {
+    if (client) {
+      client.defaults.baseURL = host;
+    }
+
+    dispatchChangeConfig({
+      host,
+      clientType,
+    });
+  });
 </script>
 
 <Collapse title="Config">

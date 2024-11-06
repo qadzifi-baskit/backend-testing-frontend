@@ -13,6 +13,7 @@
   import { listenAuthSuccess } from '@/event';
 
   export let host = 'https://api-beta.baskit.app/v2';
+  export let showHost = true;
   const client = axios.create({ baseURL: host });
 
   const qtyMap:Record<string, number> = {};
@@ -24,10 +25,6 @@
   let username = 'eight.one@gmail.com';
   let password = '12345678';
   let warehouseOptions = [<[string, string]>['', 'All']];
-
-  $: {
-    client.defaults.baseURL = host;
-  }
 
   warehouseList.subscribe((value) => {
     warehouseOptions = [['', 'All']];
@@ -107,7 +104,8 @@
   <Config
     bind:host
     bind:clientType
-    showHost={false}
+    {showHost}
+    {client}
   />
   <div class="divider"></div>
   <Auth

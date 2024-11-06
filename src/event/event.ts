@@ -28,3 +28,9 @@ export const [
   dispatchDoAuth,
   listenDoAuth,
 ] = createEventManager('on-do-auth');
+
+export const [
+  eventConfigChage,
+  dispatchChangeConfig,
+  listenConfigChange,
+] = createEventManager('on-config-change');

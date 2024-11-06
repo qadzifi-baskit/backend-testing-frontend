@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { isObjectEmpty } from '@/lib/helper/util';
+  import { debounce, isObjectEmpty } from '@/lib/helper/util';
   import { SuperAdminStore } from '@/store/store';
   import type { ACLItem, APIACLItem, Role } from '@/types';
   import type { AxiosInstance } from 'axios';
@@ -23,18 +23,29 @@
 
   async function getRoleList() {
     if (!$SuperAdminStore.loggedIn) return;
-    const response = await client.get('/role');
+    const params = new URLSearchParams({
+      search: roleSearch,
+    });
+    const response = await client.get(
+      '/role',
+      { params },
+    );
     if (response.status !== 200) return;
     roleList = response.data?.data ?? [];
   }
 
+  const debounceGetRoleList = debounce(getRoleList);
+
   $effect(() => {
-    getRoleList();
+    $SuperAdminStore.loggedIn;
+    roleSearch;
+    debounceGetRoleList();
   });
 
   let acls:Record<string, ACLItem> = $state({});
   let addingNewAcl = $state(false);
   let roleList:Role[] = $state([]);
+  let roleSearch = $state('');
 
   $effect(() => {
     if (item?.acls) {
@@ -63,7 +74,35 @@
     dialog?.close();
   };
 
-  $inspect({ roleList });
+  const newACL = $state({
+    roleId: '',
+    apiId: item?.id,
+    methodPost: false,
+    methodGet: false,
+    methodPatch: false,
+    methodDelete: false,
+    methodFind: false,
+  });
+
+  $effect(() => {
+    newACL.apiId = item?.id;
+  });
+
+  async function createACL() {
+    if (!$SuperAdminStore.loggedIn) return;
+    const response = await client.post(
+      '/acls',
+      newACL,
+    );
+    if (response.status !== 200) return;
+    addingNewAcl = false;
+    newACL.roleId = '';
+    newACL.methodPost = false;
+    newACL.methodGet = false;
+    newACL.methodPatch = false;
+    newACL.methodDelete = false;
+    newACL.methodFind = false;
+  }
 </script>
 
 {#snippet colgroup()}
@@ -115,7 +154,7 @@
 <Modal
   bind:dialog
 >
-  {#if item && !isObjectEmpty(acls)}
+  {#if item}
     <div>
       <span class="badge badge-neutral">{item.endpoint}</span>
       <div class="label"></div>
@@ -126,8 +165,8 @@
       </button>
       <div class="label"></div>
       {#if addingNewAcl}
-        <div id="new-acl-panel" class="w-fit p-4 border bordered border-white grid gap-2">
-          <span>Role</span>
+        <div id="new-acl-panel" class="w-fit p-4 border bordered border-white grid gap-4">
+          <span class="w-80">Role</span>
           <span>Save</span>
           <span>Get</span>
           <span>Find</span>
@@ -135,30 +174,36 @@
           <span>Patch</span>
           <span>Delete</span>
           <DropdownSelect
+            bind:search={roleSearch}
+            bind:selectValue={newACL.roleId}
+            showValue
             options={roleList.map((role) => [role.id, role.roleName])}
+            display="LABEL"
             placeholder="ROLE"
           />
           <button
             class="btn bg-slate-600 w-fit"
+            onclick={createACL}
           >
             <Icon src={FaSolidFloppyDisk}/>
           </button>
-          <input type="checkbox" class="checkbox">
-          <input type="checkbox" class="checkbox">
-          <input type="checkbox" class="checkbox">
-          <input type="checkbox" class="checkbox">
-          <input type="checkbox" class="checkbox">
+          <input type="checkbox" bind:checked={newACL.methodGet} class="checkbox self-center justify-self-center">
+          <input type="checkbox" bind:checked={newACL.methodFind} class="checkbox self-center justify-self-center">
+          <input type="checkbox" bind:checked={newACL.methodPost} class="checkbox self-center justify-self-center">
+          <input type="checkbox" bind:checked={newACL.methodPatch} class="checkbox self-center justify-self-center">
+          <input type="checkbox" bind:checked={newACL.methodDelete} class="checkbox self-center justify-self-center">
         </div>
       {/if}
       <div class="label"></div>
-      <Table5
-        class="flex-grow"
-        itemList={item.acls.sort((first, second) => first.createdAt < second.createdAt ? -1 : 1)}
-        {colgroup}
-        {header}
-        {content}
-      >
-      </Table5>
+      {#if !isObjectEmpty(acls)}
+        <Table5
+          class="flex-grow"
+          itemList={item.acls.sort((first, second) => first.createdAt < second.createdAt ? -1 : 1)}
+          {colgroup}
+          {header}
+          {content}
+        />
+      {/if}
     </div>
   {/if}
 </Modal>

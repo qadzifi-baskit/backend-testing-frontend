@@ -5,6 +5,7 @@
   import Collapse from '../Collapse.svelte';
   import Select from '../Select.svelte';
   import PostButton from '../atoms/PostButton.svelte';
+  import { listenConfigChange } from '@/event';
 
   type Props = {
     client: AxiosInstance,
@@ -123,7 +124,7 @@
     data.branch.companyTypeId =  brandBranchCompanyTypeList.toReversed()[0].id;
   }
 
-  $effect(() => {
+  listenConfigChange(() => {
     getBrandCompanyTypeList();
     getBrandBranchCompanyTypeList();
   });

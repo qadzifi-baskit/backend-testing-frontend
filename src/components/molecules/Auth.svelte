@@ -42,6 +42,11 @@
     );
   }
 
+  let auth = $state({
+    'X-ID': '',
+    Authorization: '',
+  });
+
   const doAuth:MouseEventHandler<HTMLButtonElement> = async () => {
     authStatus = AuthStatusEnum.IDLE;
     clearTimeout(authTimeout);
@@ -58,7 +63,7 @@
 
       showSuccess();
 
-      const auth = {
+      auth = {
         'X-ID': response.data?.data?.id,
         Authorization: response.data?.data?.accessToken,
       };

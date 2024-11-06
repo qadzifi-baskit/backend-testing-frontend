@@ -9,9 +9,11 @@
 
   type Props = {
     host?: string,
+    showHost?: boolean,
   };
   let {
     host = $bindable('https://api-beta.baskit.app/v2'),
+    showHost = true,
   }: Props = $props();
 
   const client = axios.create({ baseURL: host });
@@ -25,7 +27,8 @@
   <Config
     bind:host
     bind:clientType
-    showHost={false}
+    {showHost}
+    {client}
   />
   <div class="divider"></div>
   <Auth

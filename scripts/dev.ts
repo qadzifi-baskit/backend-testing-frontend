@@ -7,11 +7,15 @@ import { viteSingleFile } from 'vite-plugin-singlefile';
 import { AppEntry, AppType } from './enum';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const root = path.resolve(__dirname, '..');
 
 const appList = [
   AppType.Buyer,
   AppType.Seller,
   AppType.SellerInbound,
+  AppType.BaskitAdmin,
+  AppType.BrandUser,
+  AppType.SuperAdmin,
 ] as const;
 
 const entry = await select({
@@ -23,17 +27,18 @@ const entry = await select({
 });
 
 const viteBaseConfig: InlineConfig = {
+  envDir: root,
   root: path.resolve(entry, '..'),
   configFile: false,
   plugins: [
     svelte({
-      configFile: path.resolve(__dirname, '..', 'svelte.config.js'),
+      configFile: path.resolve(root, 'svelte.config.js'),
     }),
     viteSingleFile(),
   ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, '..', 'src'),
+      '@': path.resolve(root, 'src'),
     },
   },
 };

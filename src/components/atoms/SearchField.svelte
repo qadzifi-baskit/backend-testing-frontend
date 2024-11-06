@@ -1,12 +1,20 @@
 <script lang="ts">
+  import { cn } from '@/lib/helper/tailwind';
+
   type Props = {
     value?: string,
+    class?: string,
   };
 
-  let { value = $bindable('') }:Props = $props();
+  let {
+    value = $bindable(''),
+    class: clazz = '',
+  }:Props = $props();
 </script>
 
-<label class="input input-bordered flex items-center gap-2 mb-12">
+<label
+  class={cn('input input-bordered flex items-center gap-2 mb-12', clazz)}
+>
   <input type="text" class="grow" placeholder="Search" bind:value>
   <svg
     xmlns="http://www.w3.org/2000/svg"

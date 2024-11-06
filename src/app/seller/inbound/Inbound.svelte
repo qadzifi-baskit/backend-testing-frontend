@@ -28,12 +28,7 @@
   let inboundList:Order[] = [];
   let selectedInbound:Order|null = null;
 
-  const client = axios.create({
-    baseURL: host,
-  });
-  $: {
-    client.defaults.baseURL = host;
-  }
+  const client = axios.create({ baseURL: host });
   let clientType = 'WEB_CMS';
    
   let userId = '';
@@ -183,6 +178,7 @@
 <Config
   bind:host
   bind:clientType
+  {client}
 />
 <Modal
   bind:dialog={inboundDialog}

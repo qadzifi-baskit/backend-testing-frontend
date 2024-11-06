@@ -5,96 +5,118 @@ export type AuthStore = {
 };
 
 export type PriceTier = {
-  id: string;
-  margin: number;
-  max: number;
-  min: number;
-  sellingPrice: number;
-  tierNo: number;
+  id: string,
+  margin: number,
+  max: number,
+  min: number,
+  sellingPrice: number,
+  tierNo: number,
 };
 
 export type PaymentType = {
-  id: string;
-  name: string;
+  id: string,
+  name: string,
+};
+
+export type CompanyDetail = {
+  id: string,
+  address: string,
+  personInCharge: string,
+};
+
+export type Company = {
+  id: string,
+  companyName: string,
+  detail: CompanyDetail,
 };
 
 export type CompanyType = {
-  id: string;
-  name: string;
-  type: string;
-  parentId: string|null;
+  id: string,
+  name: string,
+  type: string,
+  parentId: string|null,
 };
 
 export type WarehouseDetail = {
-  id: string;
-  name: number;
+  id: string,
+  name: number,
 };
 
 export type Warehouse = {
-  id: string;
-  name: string;
-  wareHouse: WarehouseDetail;
+  id: string,
+  name: string,
+  wareHouse: WarehouseDetail,
 };
 
+export type ContentEntity = {
+  id: string,
+  code: string,
+  name: string,
+};
+
+export type Brand = ContentEntity;
+
+export type Principal = ContentEntity;
+
 export type Product = {
-  name: string;
-  id: string; // Inventory ID
-  productId: string;
-  companyId: string;
+  name: string,
+  id: string, // Inventory ID
+  productId: string,
+  companyId: string,
   priceTiers: PriceTier[],
-  stock: number;
-  sellingPrice: number;
-  status: string;
-  warehouse: number;
+  stock: number,
+  sellingPrice: number,
+  status: string,
+  warehouse: number,
 };
 
 export type ProductMaster = {
-  id: string;
-  name: string;
-  fullName: string;
-  image: string;
+  id: string,
+  name: string,
+  fullName: string,
+  image: string,
 };
 
 export type UserOffline = {
-  id: string;
-  status: string;
-  firstName: string;
-  phone: string;
-  email: string;
-  customerTypeId: string;
-  address: string;
+  id: string,
+  status: string,
+  firstName: string,
+  phone: string,
+  email: string,
+  customerTypeId: string,
+  address: string,
 };
 
 export type Inventory = {
-  id: string;
-  stock: number;
-  fullName: string;
+  id: string,
+  stock: number,
+  fullName: string,
 };
 
 export type Cart = {
-  id: string; // Cart ID
-  inventoryId: string;
-  productId: string;
-  companyId: string;
-  sellingPrice: number;
-  fullName: string;
-  name: string;
-  qty: number;
-  warehouse: number;
+  id: string, // Cart ID
+  inventoryId: string,
+  productId: string,
+  companyId: string,
+  sellingPrice: number,
+  fullName: string,
+  name: string,
+  qty: number,
+  warehouse: number,
 };
 
 export type Order = {
-  createdAt: string;
-  id: string;
-  deliveryType: string;
-  orderStatus: string;
-  status: string;
-  orderCode: string;
-  paymentTerm: string;
-  paymentStatus: string;
-  paymentLinkStatus?: string|null;
-  total: number;
-  grandTotal: number;
+  createdAt: string,
+  id: string,
+  deliveryType: string,
+  orderStatus: string,
+  status: string,
+  orderCode: string,
+  paymentTerm: string,
+  paymentStatus: string,
+  paymentLinkStatus?: string|null,
+  total: number,
+  grandTotal: number,
   product: Omit<Cart, 'warehouse'>,
 };
 
@@ -134,7 +156,7 @@ export type OrderReason = {
 };
 
 export type APIItem = {
-  createdAt: string;
+  createdAt: string,
   id: string,
   apiName: string,
   apiGroup: string,
@@ -143,7 +165,7 @@ export type APIItem = {
 };
 
 export type ACLItem = {
-  createdAt: string;
+  createdAt: string,
   id: string,
   methodPost: boolean,
   methodGet: boolean,
@@ -160,8 +182,7 @@ export type APIACLItem = APIItem & {
   acls: ACLItem[],
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type PaginatialPanelProps<T extends (...args: any[]) => any = () => void> = {
+export type PaginatialPanelProps<T extends (...args: unknown[]) => unknown = () => void> = {
   search?: string,
   max?: number,
   page?: number,

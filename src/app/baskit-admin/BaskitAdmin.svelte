@@ -11,10 +11,12 @@
 
   type Props = {
     host?: string,
+    showHost?: boolean,
   };
 
   let {
     host = $bindable('https://api-beta.baskit.app/v2'),
+    showHost = true,
   }: Props = $props();
 
   let clientType = $state('WEB_CMS');
@@ -22,17 +24,14 @@
   let password = $state('12345678');
 
   const client = axios.create({ baseURL: host });
-
-  $effect(() => {
-    client.defaults.baseURL = host;
-  });
 </script>
 
 <div id="root" class="p-6 bg-[#27303b]">
   <Config
     bind:host
     bind:clientType
-    showHost={false}
+    {showHost}
+    {client}
   />
   <div class="divider"></div>
   <Auth

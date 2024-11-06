@@ -27,7 +27,7 @@
   {#each tabs as { component: Component }, index }
     <input checked={selected === index + 1} type="radio" name="my_tabs_1" role="tab" class="tab hidden" aria-label={`Tab ${index + 1}`}/>
     <div role="tabpanel" class="tab-content">
-      <Component bind:host/>
+      <Component bind:host showHost={false}/>
     </div>
   {/each}
 </div>

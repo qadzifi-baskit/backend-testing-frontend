@@ -18,7 +18,7 @@ const selectedApp: [AppTypeKey, string][] = await checkbox({
     key, value,
   ]) => ({
     name: value,
-    value: [<AppTypeKey>key, AppEntry[key]],
+    value: <[AppTypeKey, string]>[<AppTypeKey>key, AppEntry[key]],
   })),
 });
 
@@ -48,6 +48,8 @@ console.log('Building app...');
 selectedApp.forEach(async ([key, entry]) => {
   await build({
     ...viteBaseConfig,
+    envDir: root,
+    mode: 'beta',
     root: path.resolve(entry, '..'),
     build: {
       emptyOutDir: false,
