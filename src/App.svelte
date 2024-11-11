@@ -3,7 +3,7 @@
   import { FaSolidAngleRight } from 'svelte-icons-pack/fa';
   import BaskitAdmin from './app/baskit-admin/BaskitAdmin.svelte';
   import BrandUser from './app/brand-user/BrandUser.svelte';
-  import Buyer from './app/buyer';
+  import Buyer from './app/Buyer';
   import Seller from './app/seller';
   import SuperAdmin from './app/super-admin/SuperAdmin.svelte';
   import Config from './components/molecules/Config.svelte';

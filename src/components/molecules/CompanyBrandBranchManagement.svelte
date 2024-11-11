@@ -1,6 +1,9 @@
 <script lang="ts">
   import { BrandUserStore } from '@/store/store';
-  import type { Company, CompanyStatus } from '@/types';
+  import type {
+    Company,
+    CompanyStatus,
+  } from '@/types';
   import type { AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPencil } from 'svelte-icons-pack/fa';
@@ -58,6 +61,19 @@
     modifyDialog?.showModal();
   }
 
+  function toggleStatus(item: Company) {
+    return async (e: Event) => {
+      const target = e.target as (EventTarget & HTMLInputElement);
+      const status:CompanyStatus = target.checked ? 'APPROVED' : 'INACTIVE';
+      await client.patch(
+        `/company/brand/${item.id}`,
+        {
+          status,
+        },
+      );
+    };
+  }
+
   $effect(() => {
     if (modifyDialog) {
       modifyDialog.onclose = getBranchList;
@@ -96,19 +112,11 @@
       <div class="form-control w-52">
         <label class="label cursor-pointer">
           <input type="checkbox" class="toggle toggle-primary" checked={item.status === 'APPROVED'}
-            onchange={async (e) => {
-              const target = e.target as (EventTarget & HTMLInputElement);
-              const status:CompanyStatus = target.checked ? 'APPROVED' : 'INACTIVE';
-              await client.patch(
-                `/company/brand/${item.id}`,
-                {
-                  status,
-                },
-              );
-            }}
+            onchange={toggleStatus(item)}
           />
         </label>
       </div>
+    </div>
   </td>
 {/snippet}
 

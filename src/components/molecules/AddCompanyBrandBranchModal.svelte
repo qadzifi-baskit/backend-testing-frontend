@@ -85,6 +85,10 @@
     getBrandBranchCompanyTypeList();
   });
 
+  $effect(() => {
+    getBrandBranchCompanyTypeList();
+  });
+
   function onResponse() {
     dialog?.close();
   }
@@ -165,7 +169,7 @@
   <PostButton
     {client}
     {data}
-    path='/users/branch'
+    path='/users/brand/branch'
     {onResponse}
   >
     Register
