@@ -48,7 +48,12 @@
   });
 
   const doAuth:MouseEventHandler<HTMLButtonElement> = async () => {
+    store?.update((value) => ({
+      ...value,
+      loggedIn: false,
+    }));
     authStatus = AuthStatusEnum.IDLE;
+    client.defaults.headers.common = {};
     clearTimeout(authTimeout);
     dispatchDoAuth();
     const response = await client.post('/auth', {

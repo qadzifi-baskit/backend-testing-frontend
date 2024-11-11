@@ -23,7 +23,7 @@
       throw new Error('Brand user not logged in');
     }
     const response = await client.patch(
-      `/company/branch/${company.id}`,
+      `/company/brand/${company.id}`,
       {
         companyName: company.companyName,
         address: company.detail.address,

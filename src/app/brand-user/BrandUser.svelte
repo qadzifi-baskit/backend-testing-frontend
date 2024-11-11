@@ -4,7 +4,7 @@
   import CompanyBrandBranchManagement from '@/components/molecules/CompanyBrandBranchManagement.svelte';
   import Config from '@/components/molecules/Config.svelte';
   import RegisterBrand from '@/components/molecules/RegisterBrand.svelte';
-  import { listenDoAuth } from '@/event';
+  import { listenAuthSuccess, listenDoAuth } from '@/event';
   import { BrandUserStore } from '@/store/store';
   import type { Company } from '@/types';
   import axios from 'axios';
@@ -35,7 +35,10 @@
     getMyCompany();
   });
 
-  listenDoAuth(getMyCompany);
+  listenDoAuth(() => {
+    userCompanyId = '';
+  });
+  listenAuthSuccess(getMyCompany);
 </script>
 
 <div id="root" class="p-6 bg-[#27303b]">

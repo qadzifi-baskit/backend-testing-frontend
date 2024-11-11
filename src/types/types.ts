@@ -24,9 +24,12 @@ export type CompanyDetail = {
   personInCharge: string,
 };
 
+export type CompanyStatus = 'APPROVED'|'INACTIVE';
+
 export type Company = {
   id: string,
   companyName: string,
+  status: CompanyStatus,
   detail: CompanyDetail,
 };
 

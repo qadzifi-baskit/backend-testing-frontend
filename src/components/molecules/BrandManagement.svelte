@@ -12,6 +12,7 @@
   import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
   import NoWrap from '../atoms/NoWrap.svelte';
+  import { listenAuthSuccess, listenDoAuth } from '@/event';
 
   type Props = {
     client: AxiosInstance,
@@ -33,6 +34,10 @@
   let selectedPrincipalId = $state('');
   let principalSearch = $state('');
   let principalList:Principal[] = $state([]);
+
+  listenDoAuth(() => {
+    selectedPrincipalId = '';
+  });
 
   async function getPrincipalList() {
     if (!$BrandUserStore.loggedIn) return;
@@ -112,9 +117,24 @@
     await getAssignedBrandList();
   }
 
-  BrandUserStore.subscribe(async (value) => {
+  async function getPrincipalId() {
+    if (!$BrandUserStore.loggedIn) return;
+    const response = await client.patch(
+      `/company/brand/${userCompanyId}`,
+      {},
+    );
+    if (response.status !== 200) return;
+    selectedPrincipalId = response.data?.data?.principalId ?? '';
+  }
+
+  $effect(() => {
+    if (userCompanyId !== '') {
+      getPrincipalId();
+    }
+  });
+
+  listenAuthSuccess(async () => {
     await tick();
-    if (!value.loggedIn) return;
     getBrandList();
     getAssignedBrandList();
     getPrincipalList();

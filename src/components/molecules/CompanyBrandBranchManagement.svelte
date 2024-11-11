@@ -1,6 +1,6 @@
 <script lang="ts">
   import { BrandUserStore } from '@/store/store';
-  import type { Company } from '@/types';
+  import type { Company, CompanyStatus } from '@/types';
   import type { AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPencil } from 'svelte-icons-pack/fa';
@@ -76,6 +76,7 @@
   <th>Name</th>
   <th>Address</th>
   <th>PIC</th>
+  <th>Status</th>
 {/snippet}
 
 {#snippet content(item: Company)}
@@ -90,6 +91,25 @@
   <td><NoWrap>{item.companyName}</NoWrap></td>
   <td><NoWrap>{item.detail.address}</NoWrap></td>
   <td><NoWrap>{item.detail.personInCharge}</NoWrap></td>
+  <td>
+    <div class="flex flex-col">
+      <div class="form-control w-52">
+        <label class="label cursor-pointer">
+          <input type="checkbox" class="toggle toggle-primary" checked={item.status === 'APPROVED'}
+            onchange={async (e) => {
+              const target = e.target as (EventTarget & HTMLInputElement);
+              const status:CompanyStatus = target.checked ? 'APPROVED' : 'INACTIVE';
+              await client.patch(
+                `/company/brand/${item.id}`,
+                {
+                  status,
+                },
+              );
+            }}
+          />
+        </label>
+      </div>
+  </td>
 {/snippet}
 
 <AddCompanyBrandBranchModal
