@@ -2,18 +2,36 @@
   import type { AxiosInstance } from 'axios';
   import Modal from '../Modal.svelte';
 
-  export let client:AxiosInstance;
-  export let dialog:HTMLDialogElement|undefined;
+  type Props = {
+    client: AxiosInstance,
+    dialog: HTMLDialogElement|undefined,
+    companyId?: string,
+    productId?: string,
+  };
+  let {
+    client,
+    dialog = $bindable(),
+    companyId = $bindable(''),
+    productId = $bindable(''),
+  }: Props = $props();
 
-  const addInventoryData = {
+  const addInventoryData = $state({
     stock: 0,
     basePrice: 0,
     sellingPrice: 0,
     margin: 0,
-    companyId: '',
-    productId: '',
+    companyId,
+    productId,
     generateTier: false,
-  };
+  });
+
+  $effect(() => {
+    addInventoryData.companyId = companyId;
+  });
+
+  $effect(() => {
+    addInventoryData.productId = productId;
+  });
 
   const onAddInventory = async () => {
     const response = await client.post(
@@ -60,13 +78,17 @@
       <div class="label">
         <span class="label-text">Company ID</span>
       </div>
-      <input type="text" placeholder="companyId" bind:value={addInventoryData.companyId} class="input input-bordered w-full max-w-xs" />
+      <input type="text" placeholder="companyId" bind:value={addInventoryData.companyId} class="input input-bordered w-full max-w-xs"
+        disabled={companyId !== ''}
+      />
     </label>
     <label class="form-control w-full max-w-xs mb-2">
       <div class="label">
         <span class="label-text">Product ID</span>
       </div>
-      <input type="text" placeholder="productId" bind:value={addInventoryData.productId} class="input input-bordered w-full max-w-xs" />
+      <input type="text" placeholder="productId" bind:value={addInventoryData.productId} class="input input-bordered w-full max-w-xs"
+        disabled={productId !== ''}
+      />
     </label>
     <div class="form-control">
       <label class="label cursor-pointer">
@@ -75,7 +97,7 @@
       </label>
     </div>
     <button
-      on:click={onAddInventory}
+      onclick={onAddInventory}
       class="btn bg-slate-600"
     >
       Add

@@ -132,6 +132,9 @@
   const onResponse = async () => {
     console.log({ message: 'Register success' });
   };
+  let ktpFiles:FileList|undefined = $state();
+  let npwpFiles:FileList|undefined = $state();
+  let aktaFiles:FileList|undefined = $state();
 </script>
 
 <Collapse
@@ -145,6 +148,30 @@
     </label>
   </div>
   <div class="text-lg font-medium">Brand</div>
+  <label class="form-control w-full max-w-xs">
+    <div class="label">
+      <span class="label-text">KTP</span>
+    </div>
+    <input type="file" class="file-input file-input-bordered w-full max-w-xs"
+      bind:files={ktpFiles}
+    />
+  </label>
+  <label class="form-control w-full max-w-xs">
+    <div class="label">
+      <span class="label-text">NPWP</span>
+    </div>
+    <input type="file" class="file-input file-input-bordered w-full max-w-xs"
+      bind:files={npwpFiles}
+    />
+  </label>
+  <label class="form-control w-full max-w-xs">
+    <div class="label">
+      <span class="label-text">Akta</span>
+    </div>
+    <input type="file" class="file-input file-input-bordered w-full max-w-xs"
+      bind:files={aktaFiles}
+    />
+  </label>
   <label class="form-control w-full max-w-xs">
     <div class="label">
       <span class="label-text">First Name</span>

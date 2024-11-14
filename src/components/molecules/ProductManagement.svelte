@@ -1,29 +1,43 @@
 <script lang="ts">
-  import type { AxiosInstance } from 'axios';
-  import Collapse from '../Collapse.svelte';
-  import type { ProductMaster } from '@/types';
-  import PaginationFancyButton from '../atoms/PaginationFancyButton.svelte';
-  import Table from '../Table.svelte';
   import { debounce } from '@/lib/helper/util';
+  import type { AuthStore, ProductMaster } from '@/types';
+  import type { AxiosInstance } from 'axios';
+  import { Icon } from 'svelte-icons-pack';
+  import { FaSolidCheck, FaSolidPlus } from 'svelte-icons-pack/fa';
+  import type { Writable } from 'svelte/store';
+  import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
+  import Collapse from '../Collapse.svelte';
+  import Table5 from '../Table5.svelte';
   import AddProductModal from './AddProductModal.svelte';
-  import { BaskitAdminStore } from '@/store/store';
+  import AddInventoryModal from './AddInventoryModal.svelte';
 
   type Props = {
     client: AxiosInstance,
+    store: Writable<AuthStore>,
+    companyId?: string,
   };
   let {
     client,
+    store,
+    companyId = $bindable(),
   }:Props = $props();
 
   let page = $state(1);
   let max = $state(1);
   let productList:ProductMaster[] = $state([]);
   let search = $state('');
+  let productId = $state('');
 
   const getProductList = async () => {
-    const params = new URLSearchParams();
-    params.append('search', search);
-    params.append('$page', `${page}`);
+    if (!$store.loggedIn) return;
+    const params = new URLSearchParams({
+      search,
+      $page: `${page}`,
+    });
+    if (companyId && companyId !== '') {
+      params.append('companyId', companyId);
+      params.append('ownership', companyId);
+    }
     const response = await client.get(
       '/product/master',
       {
@@ -32,6 +46,7 @@
     );
     if (response.status === 200) {
       productList = response.data?.data ?? [];
+      max = response.data?.totalPage ?? 1;
     }
   };
 
@@ -43,7 +58,7 @@
   });
 
   $effect(() => {
-    if ($BaskitAdminStore.loggedIn) {
+    if ($store.loggedIn) {
       page;
       search;
       debounceGetProduct();
@@ -54,32 +69,66 @@
   function onShowAddProduct() {
     addProductDialog?.showModal();
   };
+
+  let addInventoryDialog:HTMLDialogElement|undefined = $state();
+  function onShowAddInventory(id: string) {
+    return () => {
+      productId = id;
+      addInventoryDialog?.showModal();
+    };
+  };
+
+  $effect(() => {
+    if (addInventoryDialog) {
+      addInventoryDialog.onclose = () => {
+        getProductList();
+      };
+    }
+  });
 </script>
+
+{#snippet header()}
+  <th>Id</th>
+  <th>Name</th>
+  <th>SKU</th>
+  <th></th>
+{/snippet}
+
+{#snippet content(item: ProductMaster)}
+  <td>{item.id}</td>
+  <td>{item.name}</td>
+  <td>{item.sku}</td>
+  <td>
+    <button class="btn bg-slate-600" disabled={item.isAdded}
+      onclick={onShowAddInventory(item.id)}
+    >
+      {#if item.isAdded}
+        <Icon src={FaSolidCheck}/>
+      {:else}
+        <Icon src={FaSolidPlus}/>
+      {/if}
+    </button>
+  </td>
+{/snippet}
 
 <AddProductModal
   bind:dialog={addProductDialog}
+  {client}
+/>
+<AddInventoryModal
+  bind:dialog={addInventoryDialog}
+  {productId}
+  {companyId}
   {client}
 />
 <Collapse title="Product"
   class="w-full"
   onClick={getProductList}
 >
-  <label class="input input-bordered flex items-center gap-2 mb-12">
-    <input type="text" class="grow" placeholder="Search" bind:value={search}/>
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 16 16"
-      fill="currentColor"
-      class="h-4 w-4 opacity-70">
-      <path
-        fill-rule="evenodd"
-        d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-        clip-rule="evenodd" />
-    </svg>
-  </label>
-  <PaginationFancyButton
+  <PaginationNavigationPanel
+    bind:search
     bind:max
-    bind:value={page}
+    bind:page
   />
   <button class="btn bordered input-bordered"
     onclick={onShowAddProduct}
@@ -87,6 +136,9 @@
     Add Product
   </button>
   {#if productList.length > 0}
-    <Table itemList={productList}/>
+    <Table5 itemList={productList}
+      {header}
+      {content}
+    />
   {/if}
 </Collapse>

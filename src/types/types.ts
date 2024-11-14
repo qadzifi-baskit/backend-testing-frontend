@@ -75,9 +75,11 @@ export type Product = {
 
 export type ProductMaster = {
   id: string,
+  sku: string,
   name: string,
   fullName: string,
   image: string,
+  isAdded: boolean,
 };
 
 export type UserOffline = {

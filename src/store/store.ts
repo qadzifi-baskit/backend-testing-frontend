@@ -12,3 +12,7 @@ export const BaskitAdminStore = writable<AuthStore>({
 export const SuperAdminStore = writable<AuthStore>({
   loggedIn: false,
 });
+
+export const SellerAdminStore = writable<AuthStore>({
+  loggedIn: false,
+});

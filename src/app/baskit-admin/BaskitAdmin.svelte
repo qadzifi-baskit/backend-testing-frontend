@@ -43,9 +43,9 @@
   <div class="divider"></div>
   <OrderList {client}/>
   <div class="divider"></div>
-  <ProductManagement {client}/>
+  <ProductManagement {client} store={BaskitAdminStore} />
   <div class="divider"></div>
-  <InventoryList {client}/>
+  <InventoryList {client} store={BaskitAdminStore}/>
   <div class="divider"></div>
   <SellerList {client}/>
   <div class="divider"></div>

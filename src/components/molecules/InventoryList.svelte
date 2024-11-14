@@ -1,18 +1,20 @@
 <script lang="ts">
-  import PaginationFancyButton from '@/components/atoms/PaginationFancyButton.svelte';
-  import SearchField from '@/components/atoms/SearchField.svelte';
   import Collapse from '@/components/Collapse.svelte';
   import AddInventoryModal from '@/components/molecules/AddInventoryModal.svelte';
   import Table from '@/components/Table.svelte';
   import { debounce } from '@/lib/helper/util';
-  import { BaskitAdminStore } from '@/store/store';
+  import type { AuthStore } from '@/types';
   import type { AxiosInstance } from 'axios';
+  import type { Writable } from 'svelte/store';
+  import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
 
   type Props = {
     client: AxiosInstance,
+    store: Writable<AuthStore>,
   };
   let {
     client,
+    store,
   }:Props = $props();
 
   let inventoryList:object[] = $state([]);
@@ -21,6 +23,7 @@
   let search = $state('');
 
   const getInventoryList = async () => {
+    if (!$store.loggedIn) return;
     const params = new URLSearchParams();
     params.append('search', search);
     params.append('$page', `${page}`);
@@ -44,7 +47,7 @@
   });
 
   $effect(() => {
-    if ($BaskitAdminStore.loggedIn) {
+    if ($store.loggedIn) {
       page;
       search;
       debounceGetInventory();
@@ -65,12 +68,10 @@
   class="w-full"
   onClick={getInventoryList}
 >
-  <SearchField
-    bind:value={search}
-  />
-  <PaginationFancyButton
+  <PaginationNavigationPanel
     bind:max
-    bind:value={page}
+    bind:search
+    bind:page
   />
   <button class="btn bordered input-bordered"
     onclick={onShowAddInventory}

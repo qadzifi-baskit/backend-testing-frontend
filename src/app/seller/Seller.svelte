@@ -1,45 +1,40 @@
 <script lang="ts">
-  import Collapse from '@/components/Collapse.svelte';
   import Auth from '@/components/molecules/Auth.svelte';
   import Config from '@/components/molecules/Config.svelte';
-  import axios from 'axios';
-  import { writable } from 'svelte/store';
-  import SellerRegister from '@/components/molecules/SellerRegister.svelte';
-  import { listenAuthSuccess } from '@/event';
   import InventoryList from '@/components/molecules/InventoryList.svelte';
+  import ProductManagement from '@/components/molecules/ProductManagement.svelte';
+  import SellerRegister from '@/components/molecules/SellerRegister.svelte';
+  import { listenAuthSuccess, listenDoAuth } from '@/event';
+  import { SellerAdminStore } from '@/store/store';
+  import type { Company } from '@/types';
+  import axios from 'axios';
 
-  export let host = 'https://api-beta.baskit.app/v2';
-  export let showHost = true;
-  const client = axios.create({
-    baseURL: host,
-  });
-  let clientType = 'WEB_CMS';
-  let username = 'nagamas@testing.com';
-  let password = '12345678';
-  let balance = 0;
-  let pendingBalance = 0;
-  let companyId = '4439a3df-cfe0-441a-9776-d869bd6b6a89';
-
-  const userId = writable('');
-
-  const onGetBalance = async () => {
-    const response = await client.get(`/wallet/${$userId}`);
-    if (response.status === 200) {
-      balance = response.data.data.balance;
-    }
+  type Props = {
+    host?: string,
+    showHost?: boolean,
   };
+  let {
+    host = $bindable('https://api-beta.baskit.app/v2'),
+    showHost = $bindable(true),
+  }:Props = $props();
+  const client = axios.create({ baseURL: host });
 
-  const onGetPendingBalance = async () => {
-    const response = await client.get(`/company/wallet/${companyId}`);
-    if (response.status === 200) {
-      pendingBalance = response.data.data.pendingBalance;
-    }
-  };
+  let clientType = $state('WEB_CMS');
+  let username = $state('nagamas@testing.com');
+  let password = $state('12345678');
+  let companyId = $state('');
 
-  listenAuthSuccess(() => {
-    onGetBalance();
-    onGetPendingBalance();
+  async function getMyCompany() {
+    if (!$SellerAdminStore.loggedIn) return;
+    const response = await client.get('/users/me');
+    if (response.status !== 200) return;
+    companyId = (<Company[]|undefined>response.data?.data?.companies)?.[0]?.id ?? '';
+  }
+
+  listenDoAuth(() => {
+    companyId = '';
   });
+  listenAuthSuccess(getMyCompany);
 </script>
 
 <div class="p-6 bg-[#27303b]">
@@ -55,25 +50,17 @@
   />
   <div class="divider"></div>
   <Auth
+    store={SellerAdminStore}
     {client}
     bind:username
     bind:password
   />
   <div class="divider"></div>
-  <Collapse title="Profile">
-    <input type="text" bind:value={companyId}
-      placeholder="company id"
-      class="input input-bordered w-full max-w-xs"
-    />
-    <div>
-      <button class="btn" on:click={onGetBalance}>Get Balance</button>
-      <span>Balance: {balance}</span>
-    </div>
-    <div>
-      <button class="btn" on:click={onGetBalance}>Get Pending Balance</button>
-      <span>Pending Balance: {pendingBalance}</span>
-    </div>
-  </Collapse>
+  <ProductManagement
+    store={SellerAdminStore}
+    {client}
+    bind:companyId
+  />
   <div class="divider"></div>
-  <InventoryList {client}/>
+  <InventoryList {client} store={SellerAdminStore}/>
 </div>
