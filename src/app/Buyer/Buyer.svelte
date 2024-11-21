@@ -31,20 +31,20 @@
     value.forEach((wh) => warehouseOptions.push(<[string, string]>[wh.id, wh.name]));
   });
 
-  const onGetWarehouse = async () => {
+  const getWarehouse = async () => {
     const response = await client.get('/warehouse');
     if (response.status === 200) {
       warehouseList.set(response.data.data);
     }
   };
 
-  const onOrderCreated = () => {
+  const resetQty = () => {
     for (const key in qtyMap) {
       delete qtyMap[key];
     }
   };
 
-  const onGetBalance = async () => {
+  const getBalance = async () => {
     const response = await client.get(`/wallet/${userId}`);
     if (response.status === 200) {
       walletId = response.data.data.id;
@@ -53,8 +53,8 @@
   };
 
   listenAuthSuccess(() => {
-    onGetBalance();
-    onGetWarehouse();
+    getBalance();
+    getWarehouse();
   });
 
   let topUpDialog:HTMLDialogElement;
@@ -115,7 +115,7 @@
   />
   <div class="divider"></div>
   <Collapse title="Profile">
-    <button on:click={onGetBalance} class="btn bg-slate-600">Get Balance</button>
+    <button on:click={getBalance} class="btn bg-slate-600">Get Balance</button>
     <span>Balance: {balance}</span>
     <button on:click={onTopUp} class="btn bg-slate-600">Top Up</button>
   </Collapse>
@@ -132,7 +132,7 @@
       <BuyerCart
         {client}
         {userId}
-        {onOrderCreated}
+        onOrderCreated={resetQty}
       />
     </div>
   </div>

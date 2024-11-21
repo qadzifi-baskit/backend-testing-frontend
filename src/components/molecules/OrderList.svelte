@@ -10,12 +10,14 @@
   import OrderDetail from './OrderDetail.svelte';
   import UpdateStatus from './UpdateStatus.svelte';
   import { BaskitAdminStore } from '@/store/store';
+  import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
 
   type Props = {
     endpoint?: string,
     client: AxiosInstance,
     userId?: string,
     orderType?: string,
+    companyId?: string,
   };
 
   let {
@@ -23,24 +25,31 @@
     client,
     userId = undefined,
     orderType = 'SHOP',
+    companyId,
   }:Props = $props();
 
   let orderList:Order[] = $state([]);
-  let page = $state('1');
+  let page = $state(1);
 
-  const onGetOrderList = async () => {
+  const getOrderList = async () => {
     const query:Record<string, string> = {
       $order: 'createdAt',
       $sort: 'DESC',
       $limit: '10',
-      $page: page,
+      $page: `${page}`,
       orderType,
     };
     if (userId) {
       query.userId = userId;
     }
+    if (companyId) {
+      query.companyId = companyId;
+    }
     const params = new URLSearchParams(query);
-    const response = await client.get(`/order/${endpoint}?${params.toString()}`);
+    const response = await client.get(
+      `/order/${endpoint}`,
+      { params },
+    );
     if (response.status === 200) {
       orderList = response.data.data;
     }
@@ -49,7 +58,7 @@
   $effect(() => {
     if ($BaskitAdminStore.loggedIn) {
       page;
-      onGetOrderList();
+      getOrderList();
     }
   });
 
@@ -80,7 +89,7 @@
   };
   const onUpdateStatus = () => {
     closeDialog();
-    onGetOrderList();
+    getOrderList();
   };
 </script>
 
@@ -103,14 +112,12 @@
     {client}
   />
 </Modal>
-<Collapse title='Order' onClick={onGetOrderList}>
-  <button class="btn" onclick={onGetOrderList}>Get Order</button>
-  <select class="select w-full max-w-xs" bind:value={page}>
-    <option selected value="1">1</option>
-    {#each Array.from({ length: 99 }, (_, i) => i + 2) as num}
-      <option value={num}>{num}</option>
-    {/each}
-  </select>
+<Collapse title='Order' onClick={getOrderList}>
+  <PaginationNavigationPanel
+    bind:page
+    onReload={getOrderList}
+  />
+  <button class="btn" onclick={getOrderList}>Get Order</button>
   {#if orderList.length > 0}
     <Table itemList={orderList}>
       <svelte:fragment slot="header">

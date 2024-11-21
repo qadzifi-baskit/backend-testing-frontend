@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { MouseEventHandler } from 'svelte/elements';
-  import Collapse from '../Collapse.svelte';
   import { dispatchAuthSuccess, dispatchDoAuth } from '@/event';
-  import type { AxiosInstance } from 'axios';
   import type { AuthStore } from '@/types';
+  import type { AxiosInstance } from 'axios';
+  import type { EventHandler } from 'svelte/elements';
   import type { Writable } from 'svelte/store';
+  import Collapse from '../Collapse.svelte';
 
   const AuthStatusEnum = {
     IDLE: 'IDLE',
@@ -47,7 +47,8 @@
     Authorization: '',
   });
 
-  const doAuth:MouseEventHandler<HTMLButtonElement> = async () => {
+  const doAuth:EventHandler<SubmitEvent, HTMLFormElement> = async (e) => {
+    e.preventDefault();
     store?.update((value) => ({
       ...value,
       loggedIn: false,
@@ -79,23 +80,25 @@
 </script>
 
 <Collapse title="Auth">
-  <label class="form-control w-full max-w-xs">
-    <div class="label">
-      <span class="label-text">Username</span>
+  <form onsubmit={doAuth}>
+    <label class="form-control w-full max-w-xs">
+      <div class="label">
+        <span class="label-text">Username</span>
+      </div>
+      <input type="text" placeholder="username" bind:value={username} class="input input-bordered w-full max-w-xs" />
+    </label>
+    <label class="form-control w-full max-w-xs">
+      <div class="label">
+        <span class="label-text">Password</span>
+      </div>
+      <input type="password" placeholder="password" bind:value={password} class="input input-bordered w-full max-w-xs" />
+    </label>
+    <div class="label"></div>
+    <div>
+      <button class="btn bg-slate-600" type="submit">Auth</button>
+      {#if authStatus === AuthStatusEnum.SUCCESS}
+        <span class="text-lime-400">Login Success</span>
+      {/if}
     </div>
-    <input type="text" placeholder="username" bind:value={username} class="input input-bordered w-full max-w-xs" />
-  </label>
-  <label class="form-control w-full max-w-xs">
-    <div class="label">
-      <span class="label-text">Password</span>
-    </div>
-    <input type="password" placeholder="password" bind:value={password} class="input input-bordered w-full max-w-xs" />
-  </label>
-  <div class="label"></div>
-  <div>
-    <button class="btn bg-slate-600" onclick={doAuth}>Auth</button>
-    {#if authStatus === AuthStatusEnum.SUCCESS}
-      <span class="text-lime-400">Login Success</span>
-    {/if}
-  </div>
+  </form>
 </Collapse>

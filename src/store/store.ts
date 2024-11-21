@@ -1,18 +1,16 @@
 import type { AuthStore } from '@/types';
 import { writable } from 'svelte/store';
 
-export const BrandUserStore = writable<AuthStore>({
+const createAuthStore = () => writable<AuthStore>({
   loggedIn: false,
 });
 
-export const BaskitAdminStore = writable<AuthStore>({
-  loggedIn: false,
-});
+export const BrandUserStore = createAuthStore();
 
-export const SuperAdminStore = writable<AuthStore>({
-  loggedIn: false,
-});
+export const BaskitAdminStore = createAuthStore();
 
-export const SellerAdminStore = writable<AuthStore>({
-  loggedIn: false,
-});
+export const SuperAdminStore = createAuthStore();
+
+export const SellerAdminStore = createAuthStore();
+
+export const GrosirSellerStore = createAuthStore();

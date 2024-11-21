@@ -4,6 +4,7 @@
   import Auth from '@/components/molecules/Auth.svelte';
   import Config from '@/components/molecules/Config.svelte';
   import RoleManagement from '@/components/molecules/RoleManagement.svelte';
+  import UserManagement from '@/components/molecules/UserManagement.svelte';
   import { SuperAdminStore } from '@/store/store';
   import axios from 'axios';
 
@@ -47,6 +48,10 @@
   />
   <div class="divider"></div>
   <RoleManagement
+    {client}
+  />
+  <div class="divider"></div>
+  <UserManagement
     {client}
   />
 </div>

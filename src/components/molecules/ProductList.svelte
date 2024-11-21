@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { eventAuthSuccess } from '@/event';
+  import { listenAuthSuccess } from '@/event';
   import { debounce } from '@/lib/helper/util';
   import type { Product } from '@/types';
   import type { AxiosInstance } from 'axios';
@@ -20,7 +20,7 @@
   const qtyMap:Record<string, number> = {};
   let warehouseOptions = [<[string, string]>['', 'All']];
 
-  export const onGetProduct = async () => {
+  export const getProduct = async () => {
     const params = new URLSearchParams();
     params.append('$page', `${page}`);
     if (companyId) {
@@ -45,14 +45,11 @@
     }
   };
 
-  const debounceGetProduct = debounce(onGetProduct);
+  const debounceGetProduct = debounce(getProduct);
 
-  addEventListener(
-    eventAuthSuccess,
-    () => {
-      onGetProduct();
-    },
-  );
+  listenAuthSuccess(() => {
+    getProduct();
+  });
 
   $: {
     companyId;
@@ -91,7 +88,7 @@
   }
 </script>
 
-<Collapse class="overflow-x-auto" onClick={onGetProduct} title="Product List">
+<Collapse class="overflow-x-auto" onClick={getProduct} title="Product List">
   <Select
     showValue
     options={warehouseOptions}
@@ -101,7 +98,7 @@
     bind:max
     bind:value={page}
   />
-  <button class="btn" on:click={onGetProduct}>Get Product</button>
+  <button class="btn" on:click={getProduct}>Get Product</button>
   {#if productList.length > 0}
     <Table itemList={productList}>
       <svelte:fragment slot="header">

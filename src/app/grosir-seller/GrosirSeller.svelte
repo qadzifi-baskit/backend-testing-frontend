@@ -2,13 +2,11 @@
   import Auth from '@/components/molecules/Auth.svelte';
   import BuyerCart from '@/components/molecules/BuyerCart.svelte';
   import Config from '@/components/molecules/Config.svelte';
-  import ExternalSalesManagament from '@/components/molecules/ExternalSalesManagament.svelte';
   import InventoryList from '@/components/molecules/InventoryList.svelte';
-  import OrderList from '@/components/molecules/OrderList.svelte';
   import ProductManagement from '@/components/molecules/ProductManagement.svelte';
   import SellerRegister from '@/components/molecules/SellerRegister.svelte';
   import { listenAuthSuccess, listenDoAuth } from '@/event';
-  import { SellerAdminStore } from '@/store/store';
+  import { GrosirSellerStore } from '@/store/store';
   import type { Company } from '@/types';
   import axios from 'axios';
 
@@ -29,7 +27,7 @@
   let userId = $state('');
 
   async function getMyCompany() {
-    if (!$SellerAdminStore.loggedIn) return;
+    if (!$GrosirSellerStore.loggedIn) return;
     const response = await client.get('/users/me');
     if (response.status !== 200) return;
     userId = (response.data?.data?.id)?.id ?? '';
@@ -42,6 +40,8 @@
     companyId = '';
   });
   listenAuthSuccess(getMyCompany);
+
+  $inspect({ companyId, userId });
 </script>
 
 <div class="p-6 bg-[#27303b]">
@@ -53,29 +53,27 @@
   />
   <div class="divider"></div>
   <SellerRegister
+    showEmail
+    helpGenerateEmail
     {client}
   />
   <div class="divider"></div>
   <Auth
-    store={SellerAdminStore}
+    store={GrosirSellerStore}
     {client}
     bind:username
     bind:password
   />
   <div class="divider"></div>
   <ProductManagement
-    store={SellerAdminStore}
+    store={GrosirSellerStore}
     {client}
     bind:companyId
   />
   <div class="divider"></div>
-  <InventoryList {client} store={SellerAdminStore}/>
-  <div class="divider"></div>
-  <ExternalSalesManagament {client}/>
-  <div class="divider"></div>
   <div class="flex w-full rounded-box">
     <div class="card bg-base-300 rounded-box grid flex-grow w-2/5 h-fit">
-      <InventoryList {client} store={SellerAdminStore}
+      <InventoryList {client} store={GrosirSellerStore}
         bind:userId
         isOrder
       />
@@ -88,6 +86,4 @@
       />
     </div>
   </div>
-  <div class="divider"></div>
-  <OrderList {client} {companyId}/>
 </div>

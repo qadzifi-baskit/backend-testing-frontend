@@ -2,8 +2,6 @@
   import { SuperAdminStore } from '@/store/store';
   import type { Role } from '@/types';
   import type { AxiosInstance } from 'axios';
-  import { Icon } from 'svelte-icons-pack';
-  import { FaSolidPlus } from 'svelte-icons-pack/fa';
   import Collapse from '../Collapse.svelte';
   import Table5 from '../Table5.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
@@ -71,13 +69,8 @@
     bind:search
     bind:page
     bind:max
+    onAdd={showAddRole}
   />
-  <button
-    onclick={showAddRole}
-    class="btn bg-slate-600"
-  >
-    <Icon src={FaSolidPlus}/>
-  </button>
   {#if roleList.length > 0}
     <Table5
       itemList={roleList}

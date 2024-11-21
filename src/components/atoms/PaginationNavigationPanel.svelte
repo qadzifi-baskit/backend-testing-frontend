@@ -4,13 +4,14 @@
   import PaginationFancyButton from './PaginationFancyButton.svelte';
   import SearchField from './SearchField.svelte';
   import { Icon } from 'svelte-icons-pack';
-  import { FaSolidRotate } from 'svelte-icons-pack/fa';
+  import { FaSolidPlus, FaSolidRotate } from 'svelte-icons-pack/fa';
 
   let {
     search = $bindable(''),
     max = $bindable(1),
     page = $bindable(1),
     onReload,
+    onAdd,
   }:PaginatialPanelProps = $props();
 
   const debounceResetPage = debounce(() => {
@@ -35,4 +36,10 @@
   class="btn bg-slate-600"
 >
   <Icon src={FaSolidRotate}/>
+</button>
+<button
+  onclick={onAdd}
+  class="btn bg-slate-600"
+>
+  <Icon src={FaSolidPlus}/>
 </button>

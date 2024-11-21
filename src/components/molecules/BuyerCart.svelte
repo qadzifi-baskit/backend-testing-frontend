@@ -4,21 +4,34 @@
   import Collapse from '../Collapse.svelte';
   import Table from '../Table.svelte';
   import type { AxiosInstance } from 'axios';
-  import type { Cart, PaymentType, WarehouseDetail } from '@/types';
+  import type { AuthStore, Cart, PaymentType, WarehouseDetail } from '@/types';
   import { DeliveryTypeEnum } from '@/lib/enum';
+  import type { Writable } from 'svelte/store';
+  import { listenAuthSuccess } from '@/event';
 
-  export let client:AxiosInstance;
-  export let userId:string;
-  export let clientType = 'BASKIT_SHOP';
-  export let onOrderCreated:(() => unknown) = () => null;
+  type Props = {
+    client: AxiosInstance,
+    store?: Writable<AuthStore>,
+    userId?: string,
+    clientType?: string,
+    onOrderCreated?: () => unknown,
+  };
+  let {
+    client,
+    store,
+    userId = $bindable(),
+    clientType = 'BASKIT_SHOP',
+    onOrderCreated = () => null,
+  }:Props = $props();
 
   const cartQtyMap:Record<string, number> = {};
-  let paymentTypeList = <PaymentType[]>[];
-  let cartList = <Cart[]>[];
-  let paymentTypeId = '';
-  let deliveryType = DeliveryTypeEnum.SELLER_DELIVERY;
+  let paymentTypeList:PaymentType[] = $state([]);
+  let cartList:Cart[] = $state([]);
+  let paymentTypeId = $state('');
+  let deliveryType:DeliveryTypeEnum = $state(DeliveryTypeEnum.SELLER_DELIVERY);
 
-  const onGetPaymentType = async () => {
+  const getPaymentType = async () => {
+    if (store && $store?.loggedIn === false) return;
     const paymentResponse = await client.get('/payment-type', {
       headers: {
         'X-CLIENT': clientType,
@@ -29,7 +42,8 @@
     }
   };
 
-  const onCreateOrder = async () => {
+  const createOrder = async () => {
+    if (store && $store?.loggedIn === false) return;
     const response = await client.post('/order', {
       paymentTypeId,
       deliveryType,
@@ -48,7 +62,8 @@
     }
   };
 
-  const onGetCart = async () => {
+  const getCart = async () => {
+    if (store && $store?.loggedIn === false) return;
     const response = await client.get('/order');
     if (response.status === 200) {
       const cartOrderList:{
@@ -67,12 +82,8 @@
     }
   };
 
-  $: {
-    onGetPaymentType();
-    onGetCart();
-  }
-
   const updateCartQty = async (cartId: string, qty: number) => {
+    if (store && $store?.loggedIn === false) return;
     const response = await client.patch(`/cart/${cartId}`, {
       qty,
     });
@@ -80,13 +91,23 @@
       for (const key in cartQtyMap) {
         delete cartQtyMap[key];
       }
-      onGetCart();
+      getCart();
     }
   };
+
+  $effect(() => {
+    getPaymentType();
+    getCart();
+  });
+
+  listenAuthSuccess(() => {
+    getPaymentType();
+    getCart();
+  });
 </script>
 
-<Collapse class="overflow-x-auto" onClick={onGetCart} title="Order Summary">
-  <button class="btn" on:click={onGetCart}>Get Cart</button>
+<Collapse class="overflow-x-auto" onClick={getCart} title="Order Summary">
+  <button class="btn" onclick={getCart}>Get Cart</button>
   {#if cartList.length > 0}
     <Table itemList={cartList}>
       <svelte:fragment slot="header">
@@ -105,12 +126,12 @@
       <svelte:fragment slot="item" let:item={cart}>
         <td>
           <input type="number" value={cart.qty} class="input input-bordered w-24 max-w-xs"
-            on:change={(e) => { cartQtyMap[cart.id] = Number(e.currentTarget.value) }}
+            onchange={(e) => { cartQtyMap[cart.id] = Number(e.currentTarget.value) }}
           >
         </td>
         <td>
           <button
-            on:click={() => updateCartQty(cart.id, cartQtyMap[cart.id])}
+            onclick={() => updateCartQty(cart.id, cartQtyMap[cart.id])}
             class="btn bg-slate-600"
           >
             <Icon src={FaFloppyDisk}/>
@@ -118,7 +139,7 @@
         </td>
         <td>
           <button
-            on:click={() => updateCartQty(cart.id, 0)}
+            onclick={() => updateCartQty(cart.id, 0)}
             class="btn bg-slate-600"
           >
             <Icon src={FaTrashCan}/>
@@ -150,6 +171,6 @@
         <option value={value}>{label}</option>
       {/each}
     </select>
-    <button class="btn" on:click={onCreateOrder} disabled={paymentTypeId === ''}>Create Order</button>
+    <button class="btn" onclick={createOrder} disabled={paymentTypeId === ''}>Create Order</button>
   </div>
 </Collapse>

@@ -1,18 +1,22 @@
-<script>
+<script lang="ts">
+  import type { Component } from 'svelte';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidAngleRight } from 'svelte-icons-pack/fa';
   import BaskitAdmin from './app/baskit-admin/BaskitAdmin.svelte';
   import BrandUser from './app/brand-user/BrandUser.svelte';
   import Buyer from './app/Buyer';
+  import GrosirSeller from './app/grosir-seller';
   import Seller from './app/seller';
   import SuperAdmin from './app/super-admin/SuperAdmin.svelte';
   import Config from './components/molecules/Config.svelte';
   let selected = 1;
   let host = import.meta.env.VITE_API_HOST;
 
-  const tabs = [
+  type PageComponent = Component<{ host: string, showHost: boolean }>;
+  const tabs:{ label: string, component: PageComponent }[] = [
     { label: 'Buyer', component: Buyer },
     { label: 'Seller', component: Seller },
+    { label: 'Grosir Seller', component: GrosirSeller },
     { label: 'Baskit Admin', component: BaskitAdmin },
     { label: 'Brand User', component: BrandUser },
     { label: 'Super Admin', component: SuperAdmin },

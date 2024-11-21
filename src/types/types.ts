@@ -96,6 +96,10 @@ export type Inventory = {
   id: string,
   stock: number,
   fullName: string,
+  productId: string,
+  companyId: string,
+  isActive: boolean,
+  sellingPrice: number,
 };
 
 export type Cart = {
@@ -187,9 +191,56 @@ export type APIACLItem = APIItem & {
   acls: ACLItem[],
 };
 
-export type PaginatialPanelProps<T extends (...args: unknown[]) => unknown = () => void> = {
+export type PaginatialPanelProps<
+  OnReload extends (...args: unknown[]) => unknown = () => void,
+  OnAdd extends (...args: unknown[]) => unknown = () => void,
+> = {
   search?: string,
   max?: number,
   page?: number,
-  onReload?: T,
+  onReload?: OnReload,
+  onAdd?: OnAdd,
+};
+
+export type Profile = {
+  avatars: string|null,
+  firstName: string,
+  lastName: string,
+  address: string,
+  country: string|null,
+  position: string|null,
+  gstRegistrationNo: string|null,
+  zipCode: string|null,
+  state: string|null,
+  language: string|null,
+  currency: string|null,
+  timeZone: string|null,
+  socialAccount: string|null,
+  targetDuration: string|null,
+  targetAmount: number,
+  idCard: string|null,
+  taxPayerIdNumber: string|null,
+  document: string|null,
+  provinceId: string|null,
+  regencyId: string|null,
+  districtId: number,
+  referralCode: string|null,
+};
+
+export type User = {
+  id: string,
+  email: string,
+  phone: string,
+  status: string,
+  rejectReason: string|null,
+  activatedToken: string|null,
+  fcmToken: string|null,
+  shopLoggedIn: false,
+  mongoId: string|null,
+  profile: Profile|null,
+  roles: Role[],
+  countBuyerAssigned: number,
+  leader: string|null,
+  lastAccess: string|null,
+  createdAt: string
 };

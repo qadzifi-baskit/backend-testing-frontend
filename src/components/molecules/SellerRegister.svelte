@@ -1,18 +1,50 @@
 <script lang="ts">
   import type { AxiosInstance } from 'axios';
   import PostButton from '../atoms/PostButton.svelte';
-  import Collapse from '../Collapse.svelte';
   import DropdownSelect from '../atoms/DropdownSelect.svelte';
+  import { debounce } from '@/lib/helper/util';
+  import Collapse5 from '../Collapse5.svelte';
+  import FormWrapper from '../atoms/FormWrapper.svelte';
 
-  export let client:AxiosInstance;
+  type Props = {
+    client: AxiosInstance,
+    showEmail?: boolean,
+    helpGenerateEmail?: boolean,
+  };
+  let {
+    client,
+    showEmail = false,
+    helpGenerateEmail = false,
+  }:Props = $props();
 
-  const data = {
+  const payload = $state({
     firstName: '',
     lastName: '',
     phone: '',
+    email: <string|undefined>undefined,
     companyName: '',
     subscriptionType: 'ENTERPRISE',
-  };
+  });
+
+  function generateEmail() {
+    payload.email = `${payload.firstName.replace(/\s+/g, '-').toLowerCase()}.` +
+      `${payload.lastName.replace(/\s+/g, '-').toLowerCase()}@testing.com`;
+  }
+
+  const debounceGenerateEmail = debounce(generateEmail);
+
+  $effect(() => {
+    console.log({ data: payload });
+    if (helpGenerateEmail && payload.firstName !== '' && payload.lastName !== '') {
+      debounceGenerateEmail();
+    }
+  });
+
+  $effect(() => {
+    if (payload.phone.startsWith('0')) {
+      payload.phone = payload.phone.replace(/^0+/, '+62');
+    }
+  });
 
   const SubscriptionTypeOptions:[string, string][] = [
     ['ENTERPRISE', 'Enterprise'],
@@ -20,49 +52,59 @@
   ];
 </script>
 
-
-<Collapse title="Register Seller"
-  class="overflow-visible"
->
-  <div slot="content" class="collapse-content">
-    <label class="form-control w-full max-w-xs">
-      <div class="label">
-        <span class="label-text">First Name</span>
+{#snippet content()}
+  <div class="collapse-content">
+    <FormWrapper
+      {client}
+      {payload}
+      path="/auth/register"
+    >
+      <label class="form-control w-full max-w-xs">
+        <div class="label">
+          <span class="label-text">First Name</span>
+        </div>
+        <input type="text" placeholder="first name" bind:value={payload.firstName} class="input input-bordered w-full max-w-xs" />
+      </label>
+      <label class="form-control w-full max-w-xs">
+        <div class="label">
+          <span class="label-text">Last Name</span>
+        </div>
+        <input type="text" placeholder="last name" bind:value={payload.lastName} class="input input-bordered w-full max-w-xs" />
+      </label>
+      <label class="form-control w-full max-w-xs">
+        <div class="label">
+          <span class="label-text">Phone</span>
+        </div>
+        <input type="text" placeholder="phone" bind:value={payload.phone} class="input input-bordered w-full max-w-xs" />
+      </label>
+      {#if showEmail}
+        <label class="form-control w-full max-w-xs">
+          <div class="label">
+            <span class="label-text">E-Mail</span>
+          </div>
+          <input type="text" placeholder="email" bind:value={payload.email} class="input input-bordered w-full max-w-xs" />
+        </label>
+      {/if}
+      <label class="form-control w-full max-w-xs">
+        <div class="label">
+          <span class="label-text">Company Name</span>
+        </div>
+        <input type="text" placeholder="company name" bind:value={payload.companyName} class="input input-bordered w-full max-w-xs" />
+      </label>
+      <DropdownSelect
+        class="my-4"
+        options={SubscriptionTypeOptions}
+        placeholder="subscription type"
+        bind:selectValue={payload.subscriptionType}
+      />
+      <div>
+        <button class="btn bg-slate-600" type="submit">Register</button>
       </div>
-      <input type="text" placeholder="first name" bind:value={data.firstName} class="input input-bordered w-full max-w-xs" />
-    </label>
-    <label class="form-control w-full max-w-xs">
-      <div class="label">
-        <span class="label-text">Last Name</span>
-      </div>
-      <input type="text" placeholder="last name" bind:value={data.lastName} class="input input-bordered w-full max-w-xs" />
-    </label>
-    <label class="form-control w-full max-w-xs">
-      <div class="label">
-        <span class="label-text">Phone</span>
-      </div>
-      <input type="text" placeholder="phone" bind:value={data.phone} class="input input-bordered w-full max-w-xs" />
-    </label>
-    <label class="form-control w-full max-w-xs">
-      <div class="label">
-        <span class="label-text">Company Name</span>
-      </div>
-      <input type="text" placeholder="company name" bind:value={data.companyName} class="input input-bordered w-full max-w-xs" />
-    </label>
-    <DropdownSelect
-      class="my-4"
-      options={SubscriptionTypeOptions}
-      placeholder="subscription type"
-      bind:selectValue={data.subscriptionType}
-    />
-    <div>
-      <PostButton
-        path="/auth/register"
-        {client}
-        {data}
-      >
-        Register
-      </PostButton>
-    </div>
+    </FormWrapper>
   </div>
-</Collapse>
+{/snippet}
+
+<Collapse5 title="Register Seller"
+  class="overflow-visible"
+  {content}
+/>
