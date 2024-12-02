@@ -11,6 +11,7 @@
   import Collapse from '../Collapse.svelte';
   import Table5 from '../Table5.svelte';
   import ModifyAclModal from './ModifyACLModal.svelte';
+  import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -110,12 +111,11 @@
   class="w-full"
   onClick={getACLList}
 >
-  <SearchField
-    bind:value={search}
-  />
-  <PaginationFancyButton
+  <PaginationNavigationPanel
     bind:max
-    bind:value={page}
+    bind:page
+    bind:search
+    onReload={getACLList}
   />
   {#if aclList.length > 0}
     <Table5

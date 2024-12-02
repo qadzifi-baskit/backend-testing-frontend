@@ -38,3 +38,7 @@ export function isObjectEmpty(item: unknown) {
   }
   return true;
 }
+
+export function isNil(value: unknown) {
+  return value === undefined || value === null;
+}

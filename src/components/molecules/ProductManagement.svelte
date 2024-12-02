@@ -10,17 +10,25 @@
   import Table5 from '../Table5.svelte';
   import AddProductModal from './AddProductModal.svelte';
   import AddInventoryModal from './AddInventoryModal.svelte';
+  import NoWrap from '../atoms/NoWrap.svelte';
+  import type { AddInventoryOptions } from '@/types/inventory';
 
   type Props = {
     client: AxiosInstance,
     store: Writable<AuthStore>,
     companyId?: string,
+    addOptions?: AddInventoryOptions,
   };
   let {
     client,
     store,
     companyId = $bindable(),
+    addOptions = {},
   }:Props = $props();
+  const {
+    moq = 1,
+    tierAmount = 4,
+  } = addOptions;
 
   let page = $state(1);
   let max = $state(1);
@@ -66,7 +74,7 @@
   });
 
   let addProductDialog:HTMLDialogElement|undefined = $state();
-  function onShowAddProduct() {
+  function showAddProduct() {
     addProductDialog?.showModal();
   };
 
@@ -89,15 +97,14 @@
 
 {#snippet header()}
   <th>Id</th>
+  <th></th>
   <th>Name</th>
   <th>SKU</th>
-  <th></th>
+  <th>Full Name</th>
 {/snippet}
 
 {#snippet content(item: ProductMaster)}
-  <td>{item.id}</td>
-  <td>{item.name}</td>
-  <td>{item.sku}</td>
+  <td><NoWrap>{item.id}</NoWrap></td>
   <td>
     <button class="btn bg-slate-600" disabled={item.isAdded}
       onclick={onShowAddInventory(item.id)}
@@ -109,6 +116,9 @@
       {/if}
     </button>
   </td>
+  <td><NoWrap>{item.name}</NoWrap></td>
+  <td><NoWrap>{item.sku}</NoWrap></td>
+  <td><NoWrap>{item.fullName}</NoWrap></td>
 {/snippet}
 
 <AddProductModal
@@ -117,6 +127,10 @@
 />
 <AddInventoryModal
   bind:dialog={addInventoryDialog}
+  addOptions={{
+    moq,
+    tierAmount,
+  }}
   {productId}
   {companyId}
   {client}
@@ -129,12 +143,9 @@
     bind:search
     bind:max
     bind:page
+    onReload={getProductList}
+    onAdd={showAddProduct}
   />
-  <button class="btn bordered input-bordered"
-    onclick={onShowAddProduct}
-  >
-    Add Product
-  </button>
   {#if productList.length > 0}
     <Table5 itemList={productList}
       {header}

@@ -1,13 +1,15 @@
 <script lang="ts">
   import Collapse from '@/components/Collapse.svelte';
   import AddInventoryModal from '@/components/molecules/AddInventoryModal.svelte';
-  import Table from '@/components/Table.svelte';
   import { debounce } from '@/lib/helper/util';
   import type { AuthStore, Inventory } from '@/types';
   import type { AxiosInstance } from 'axios';
+  import { Icon } from 'svelte-icons-pack';
+  import { FaSolidPencil } from 'svelte-icons-pack/fa';
   import type { Writable } from 'svelte/store';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import Table5 from '../Table5.svelte';
+  import ModifyInventoryModal from './ModifyInventoryModal.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -15,6 +17,7 @@
     isGrosir?: boolean,
     isOrder?: boolean,
     userId?: string,
+    companyId?: string,
   };
   let {
     client,
@@ -22,6 +25,7 @@
     isGrosir = false,
     isOrder = false,
     userId = $bindable(),
+    companyId = $bindable(),
   }:Props = $props();
 
   const prefix = isGrosir ? '/grosirindo' : '';
@@ -30,12 +34,19 @@
   let page = $state(1);
   let max = $state(1);
   let search = $state('');
+  let selectedInventoryId = $state('');
 
   const getInventoryList = async () => {
     if (!$store.loggedIn) return;
-    const params = new URLSearchParams();
-    params.append('search', search);
-    params.append('$page', `${page}`);
+    const params = new URLSearchParams({
+      search,
+      $page: `${page}`,
+      $order: 'createdAt',
+      $sort: 'ASC',
+    });
+    if (companyId && companyId !== '') {
+      params.append('companyId', companyId);
+    }
     const response = await client.get(
       `${prefix}/inventory`,
       {
@@ -87,14 +98,26 @@
       wareHouse: 0,
     });
   }
+
+  let modifyInventoryDialog:HTMLDialogElement|undefined = $state();
+  function showModifyInventory(item: Inventory) {
+    return () => {
+      selectedInventoryId = item.id;
+      modifyInventoryDialog?.showModal();
+    };
+  }
 </script>
 
 {#snippet header()}
   <th>Stock</th>
   <th>Status</th>
   <th>Price</th>
-  <th>Qty</th>
-  <th></th>
+  {#if isOrder}
+    <th>Qty</th>
+    <th></th>
+  {:else}
+    <th></th>
+  {/if}
   <th>Name</th>
 {/snippet}
 
@@ -102,24 +125,40 @@
   <td>{item.stock}</td>
   <td>{item.isActive}</td>
   <td>{item.sellingPrice}</td>
-  <td>
-    <input type="number" placeholder="qty" class="input input-bordered w-24 max-w-xs"
-      onclick={changeQtyHandler(item.id)}
-    />
-  </td>
-  <td>
-    <button class="btn bg-slate-600"
-      onclick={addItem(item)}
-    >
-      Add
-    </button>
-  </td>
+  {#if isOrder}
+    <td>
+      <input type="number" placeholder="qty" class="input input-bordered w-24 max-w-xs"
+        onclick={changeQtyHandler(item.id)}
+      />
+    </td>
+    <td>
+      <button class="btn bg-slate-600"
+        onclick={addItem(item)}
+      >
+        Add
+      </button>
+    </td>
+  {:else}
+    <td>
+      <button class="btn bg-slate-600"
+        onclick={showModifyInventory(item)}
+      >
+        <Icon src={FaSolidPencil}/>
+      </button>
+    </td>
+  {/if}
   <td>{item.fullName}</td>
 {/snippet}
 
 <AddInventoryModal
   bind:dialog={addInventoryDialog}
   {client}
+/>
+<ModifyInventoryModal
+  bind:dialog={modifyInventoryDialog}
+  {client}
+  bind:inventoryId={selectedInventoryId}
+  onupdate={getInventoryList}
 />
 <Collapse title="Inventory"
   class="w-full"
@@ -137,14 +176,10 @@
     Add Inventory
   </button>
   {#if inventoryList.length > 0}
-    {#if isOrder}
-      <Table5
-        {header}
-        {content}
-        itemList={inventoryList}
-      />
-    {:else}
-      <Table itemList={inventoryList}/>
-    {/if}
+    <Table5
+      {header}
+      {content}
+      itemList={inventoryList}
+    />
   {/if}
 </Collapse>

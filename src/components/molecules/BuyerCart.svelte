@@ -87,12 +87,11 @@
     const response = await client.patch(`/cart/${cartId}`, {
       qty,
     });
-    if (response.status === 200) {
-      for (const key in cartQtyMap) {
-        delete cartQtyMap[key];
-      }
-      getCart();
+    if (response.status !== 200) return;
+    for (const key in cartQtyMap) {
+      delete cartQtyMap[key];
     }
+    getCart();
   };
 
   $effect(() => {

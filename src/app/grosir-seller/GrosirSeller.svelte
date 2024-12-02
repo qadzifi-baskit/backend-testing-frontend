@@ -40,8 +40,6 @@
     companyId = '';
   });
   listenAuthSuccess(getMyCompany);
-
-  $inspect({ companyId, userId });
 </script>
 
 <div class="p-6 bg-[#27303b]">
@@ -69,13 +67,19 @@
     store={GrosirSellerStore}
     {client}
     bind:companyId
+    addOptions={{ tierAmount: 5 }}
+  />
+  <div class="divider"></div>
+  <InventoryList {client} store={GrosirSellerStore}
+    {companyId}
+    bind:userId
   />
   <div class="divider"></div>
   <div class="flex w-full rounded-box">
     <div class="card bg-base-300 rounded-box grid flex-grow w-2/5 h-fit">
-      <InventoryList {client} store={GrosirSellerStore}
+      <InventoryList isOrder {client} store={GrosirSellerStore}
+        {companyId}
         bind:userId
-        isOrder
       />
     </div>
     <div class="divider divider-horizontal"></div>

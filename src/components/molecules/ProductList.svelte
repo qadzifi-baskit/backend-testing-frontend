@@ -9,18 +9,25 @@
   import Select from '../Select.svelte';
   import Table from '../Table.svelte';
 
-  export let client:AxiosInstance;
-  export let userId:string;
-  export let onProductAdded:(() => unknown) = () => null;
-  let companyId = '';
-  let productList:Product[] = [];
-  let page = 1;
-  let max = 1;
+  type Props = {
+    client: AxiosInstance,
+    userId: string,
+    onProductAdded?: (() => unknown),
+  };
+  let {
+    client,
+    userId,
+    onProductAdded = () => null,
+  }: Props = $props();
+  let companyId = $state('');
+  let productList:Product[] = $state([]);
+  let page = $state(1);
+  let max = $state(1);
 
-  const qtyMap:Record<string, number> = {};
-  let warehouseOptions = [<[string, string]>['', 'All']];
+  const qtyMap:Record<string, number> = $state({});
+  let warehouseOptions = $state<[string, string][]>([['', 'All']]);
 
-  export const getProduct = async () => {
+  const getProduct = async () => {
     const params = new URLSearchParams();
     params.append('$page', `${page}`);
     if (companyId) {
@@ -51,16 +58,16 @@
     getProduct();
   });
 
-  $: {
+  $effect(() => {
     companyId;
     page = 1;
-  }
+  });
 
-  $: {
+  $effect(() => {
     companyId;
     page;
     debounceGetProduct();
-  }
+  });
 
   const onAddProduct = ({
     productId,
@@ -83,9 +90,9 @@
     };
   };
 
-  $: {
+  $effect(() => {
     productList.forEach(({ id }) => { qtyMap[id] = 0 });
-  }
+  });
 </script>
 
 <Collapse class="overflow-x-auto" onClick={getProduct} title="Product List">
@@ -98,7 +105,7 @@
     bind:max
     bind:value={page}
   />
-  <button class="btn" on:click={getProduct}>Get Product</button>
+  <button class="btn" onclick={getProduct}>Get Product</button>
   {#if productList.length > 0}
     <Table itemList={productList}>
       <svelte:fragment slot="header">
@@ -115,11 +122,11 @@
         <td>{item.sellingPrice}</td>
         <td>
           <input type="number" placeholder="qty" value={qtyMap[item.id]} class="input input-bordered w-24 max-w-xs"
-            on:change={(e) => { qtyMap[item.id] = Number(e.currentTarget.value) }}
+            onchange={(e) => { qtyMap[item.id] = Number(e.currentTarget.value) }}
           />
         </td>
         <td>
-          <button class="btn bg-slate-600" on:click={onAddProduct(item)}>Add</button>
+          <button class="btn bg-slate-600" onclick={onAddProduct(item)}>Add</button>
         </td>
         <td>{item.name}</td>
       </svelte:fragment>

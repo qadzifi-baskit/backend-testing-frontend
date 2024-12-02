@@ -9,7 +9,7 @@
   import Seller from './app/seller';
   import SuperAdmin from './app/super-admin/SuperAdmin.svelte';
   import Config from './components/molecules/Config.svelte';
-  let selected = 1;
+  let selected = 3;
   let host = import.meta.env.VITE_API_HOST;
 
   type PageComponent = Component<{ host: string, showHost: boolean }>;
@@ -48,7 +48,17 @@
     <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
       <!-- Sidebar content here -->
       {#each tabs as { label }, index }
-        <li><button class="btn" on:click={() => selected = index + 1}>{label}</button></li>
+        <li>
+          {#if selected === index + 1}
+            <button class="btn bg-slate-800" on:click={() => selected = index + 1}>
+              {label}
+            </button>
+          {:else}
+            <button class="btn" on:click={() => selected = index + 1}>
+              {label}
+            </button>
+          {/if}
+        </li>
       {/each}
     </ul>
   </div>

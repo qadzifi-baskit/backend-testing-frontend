@@ -40,6 +40,11 @@
     userList = response.data?.data ?? [];
   }
 
+  $effect(() => {
+    search;
+    getUserList();
+  });
+
   let excludeRoleId:string[] = $state([]);
 
   $effect(() => {

@@ -2,10 +2,16 @@
   import type { AxiosInstance } from 'axios';
   import Modal from '../Modal.svelte';
 
-  export let client:AxiosInstance;
-  export let dialog:HTMLDialogElement|undefined;
+  type Props = {
+    client: AxiosInstance,
+    dialog?: HTMLDialogElement,
+  };
+  let {
+    client,
+    dialog = $bindable(),
+  }: Props = $props();
 
-  const addProductData = {
+  const addProductData = $state({
     name: '',
     variant: '',
     size: 0,
@@ -15,9 +21,9 @@
     principal: '',
     uomId: '',
     sku: '',
-  };
+  });
 
-  const onAddProduct = async () => {
+  const addProduct = async () => {
     const params = new URLSearchParams();
     params.append('type', 'PUBLIC');
     const response = await client.post(
@@ -94,7 +100,7 @@
       <input type="text" placeholder="sku" bind:value={addProductData.sku} class="input input-bordered w-full max-w-xs" />
     </label>
     <button
-      on:click={onAddProduct}
+      onclick={addProduct}
       class="btn bg-slate-600"
     >
       Add
