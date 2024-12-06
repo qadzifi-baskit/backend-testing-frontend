@@ -126,8 +126,6 @@
       return;
     };
   }
-
-  $inspect(userList);
 </script>
 
 {#snippet colgroup()}
@@ -204,7 +202,7 @@
     bind:search
     bind:page
     bind:max
-    onReload={reloadData}
+    onreload={reloadData}
   />
   {#if userList.length > 0}
     <Table5

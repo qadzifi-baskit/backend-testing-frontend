@@ -19,7 +19,7 @@
   };
   let {
     class: clazz = '',
-    itemList = [],
+    itemList = $bindable([]),
     headerList = Object.keys(itemList[0] ?? {}),
     keyList = <Key[]>headerList,
     colgroup,
@@ -30,8 +30,10 @@
   }:Props = $props();
 
   $effect(() => {
-    keyList = <Key[]>Object.keys(itemList[0] ?? {});
-    headerList = <string[]>keyList;
+    if (itemList.length > 0) {
+      keyList = <Key[]>Object.keys(itemList[0] ?? {});
+      headerList = <string[]>keyList;
+    }
   });
 </script>
 

@@ -138,7 +138,7 @@
     bind:search
     bind:max
     bind:page
-    onReload={getBranchList}
+    onreload={getBranchList}
   />
   <button class="btn bordered input-bordered"
     onclick={() => addDialog?.showModal()}

@@ -5,13 +5,15 @@ export function createPaginationPanelState(
     search = '',
     max = 1,
     page = 1,
-    onReload = () => undefined,
+    onreload = () => undefined,
+    onadd = () => undefined,
   }: PaginatialPanelProps = {},
 ):Required<PaginatialPanelProps> {
   return {
     search,
     max,
     page,
-    onReload,
+    onreload,
+    onadd,
   };
 }

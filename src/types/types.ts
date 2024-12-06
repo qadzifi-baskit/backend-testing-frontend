@@ -2,6 +2,7 @@ import type { OrderDetailStatusEnum } from '@/lib/enum';
 import type { MemberDiscountLevel } from '@/lib/enum/memberDiscount.enum';
 
 export type AuthStore = {
+  userId: string,
   loggedIn: boolean,
 };
 
@@ -117,7 +118,9 @@ export type Cart = {
   inventoryId: string,
   productId: string,
   companyId: string,
+  initialPrice: number,
   sellingPrice: number,
+  finalPrice: number,
   fullName: string,
   name: string,
   qty: number,
@@ -208,8 +211,8 @@ export type PaginatialPanelProps<
   search?: string,
   max?: number,
   page?: number,
-  onReload?: OnReload,
-  onAdd?: OnAdd,
+  onreload?: OnReload,
+  onadd?: OnAdd,
 };
 
 export type Profile = {

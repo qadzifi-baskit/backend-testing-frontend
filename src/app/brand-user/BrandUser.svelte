@@ -10,7 +10,7 @@
   import axios from 'axios';
 
   type Props = {
-    host: string,
+    host?: string,
     showHost?: boolean,
   };
 

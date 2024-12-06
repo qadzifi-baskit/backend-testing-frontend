@@ -40,6 +40,8 @@
     companyId = '';
   });
   listenAuthSuccess(getMyCompany);
+
+  let memberLevel = $state<string|null>(null);
 </script>
 
 <div class="p-6 bg-[#27303b]">
@@ -79,13 +81,15 @@
     <div class="card bg-base-300 rounded-box grid flex-grow w-2/5 h-fit">
       <InventoryList isOrder {client} store={GrosirSellerStore}
         {companyId}
+        bind:memberLevel
         bind:userId
       />
     </div>
     <div class="divider divider-horizontal"></div>
     <div class="card bg-base-300 rounded-box grid flex-grow w-2/5 h-fit">
-      <BuyerCart
+      <BuyerCart store={GrosirSellerStore}
         {client}
+        bind:memberLevel
         bind:userId={customerId}
       />
     </div>

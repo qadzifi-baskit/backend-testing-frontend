@@ -6,12 +6,10 @@
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPencil } from 'svelte-icons-pack/fa';
   import NoWrap from '../atoms/NoWrap.svelte';
-  import PaginationFancyButton from '../atoms/PaginationFancyButton.svelte';
-  import SearchField from '../atoms/SearchField.svelte';
+  import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import Collapse from '../Collapse.svelte';
   import Table5 from '../Table5.svelte';
   import ModifyAclModal from './ModifyACLModal.svelte';
-  import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -115,7 +113,7 @@
     bind:max
     bind:page
     bind:search
-    onReload={getACLList}
+    onreload={getACLList}
   />
   {#if aclList.length > 0}
     <Table5

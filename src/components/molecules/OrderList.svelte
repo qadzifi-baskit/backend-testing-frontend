@@ -95,7 +95,7 @@
 
 <Modal
   bind:dialog={statusDialog}
-  onClose={onCloseModal}
+  onclose={onCloseModal}
 >
   <UpdateStatus
     bind:id={selectedId}
@@ -105,7 +105,7 @@
 </Modal>
 <Modal
   bind:dialog={detailDialog}
-  onClose={onCloseModal}
+  onclose={onCloseModal}
 >
   <OrderDetail
     bind:id={selectedId}
@@ -115,7 +115,7 @@
 <Collapse title='Order' onClick={getOrderList}>
   <PaginationNavigationPanel
     bind:page
-    onReload={getOrderList}
+    onreload={getOrderList}
   />
   <button class="btn" onclick={getOrderList}>Get Order</button>
   {#if orderList.length > 0}

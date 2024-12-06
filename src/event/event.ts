@@ -34,3 +34,9 @@ export const [
   dispatchChangeConfig,
   listenConfigChange,
 ] = createEventManager('on-config-change');
+
+export const [
+  eventUpdateMemberLevel,
+  dispatchUpdateMemberLevel,
+  listenUpdateMemberLevel,
+] = createEventManager('on-update-member-level');

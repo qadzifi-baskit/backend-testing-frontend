@@ -227,7 +227,7 @@
             bind:search
             bind:max
             bind:page
-            onReload={getBrandList}
+            onreload={getBrandList}
           />
           {#if selectedPrincipalId !== ''}
             <Table5
@@ -245,7 +245,7 @@
             bind:search
             bind:max
             bind:page
-            onReload={getAssignedBrandList}
+            onreload={getAssignedBrandList}
           />
           {#if selectedPrincipalId !== ''}
             <Table5

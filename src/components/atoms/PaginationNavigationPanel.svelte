@@ -10,8 +10,8 @@
     search = $bindable(''),
     max = $bindable(1),
     page = $bindable(1),
-    onReload,
-    onAdd,
+    onreload,
+    onadd,
   }:PaginatialPanelProps = $props();
 
   const debounceResetPage = debounce(() => {
@@ -32,13 +32,13 @@
   bind:value={page}
 />
 <button
-  onclick={onReload}
+  onclick={onreload}
   class="btn bg-slate-600"
 >
   <Icon src={FaSolidRotate}/>
 </button>
 <button
-  onclick={onAdd}
+  onclick={onadd}
   class="btn bg-slate-600"
 >
   <Icon src={FaSolidPlus}/>

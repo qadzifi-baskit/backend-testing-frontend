@@ -1,9 +1,8 @@
 <script lang="ts">
-  import type { AxiosInstance } from 'axios';
-  import PostButton from '../atoms/PostButton.svelte';
-  import DropdownSelect from '../atoms/DropdownSelect.svelte';
   import { debounce } from '@/lib/helper/util';
+  import type { AxiosInstance } from 'axios';
   import Collapse5 from '../Collapse5.svelte';
+  import DropdownSelect from '../atoms/DropdownSelect.svelte';
   import FormWrapper from '../atoms/FormWrapper.svelte';
 
   type Props = {
@@ -34,7 +33,6 @@
   const debounceGenerateEmail = debounce(generateEmail);
 
   $effect(() => {
-    console.log({ data: payload });
     if (helpGenerateEmail && payload.firstName !== '' && payload.lastName !== '') {
       debounceGenerateEmail();
     }

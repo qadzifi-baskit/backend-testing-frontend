@@ -1,19 +1,20 @@
 <script lang="ts">
+  import { listenAuthSuccess } from '@/event';
+  import { DeliveryTypeEnum } from '@/lib/enum';
+  import type { AuthStore, Cart, PaymentType, WarehouseDetail } from '@/types';
+  import type { AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaFloppyDisk, FaTrashCan } from 'svelte-icons-pack/fa';
-  import Collapse from '../Collapse.svelte';
-  import Table from '../Table.svelte';
-  import type { AxiosInstance } from 'axios';
-  import type { AuthStore, Cart, PaymentType, WarehouseDetail } from '@/types';
-  import { DeliveryTypeEnum } from '@/lib/enum';
   import type { Writable } from 'svelte/store';
-  import { listenAuthSuccess } from '@/event';
+  import Collapse from '../Collapse.svelte';
+  import Table5 from '../Table5.svelte';
 
   type Props = {
     client: AxiosInstance,
     store?: Writable<AuthStore>,
     userId?: string,
     clientType?: string,
+    memberLevel?: string|null,
     onOrderCreated?: () => unknown,
   };
   let {
@@ -21,6 +22,7 @@
     store,
     userId = $bindable(),
     clientType = 'BASKIT_SHOP',
+    memberLevel = $bindable(null),
     onOrderCreated = () => null,
   }:Props = $props();
 
@@ -31,7 +33,7 @@
   let deliveryType:DeliveryTypeEnum = $state(DeliveryTypeEnum.SELLER_DELIVERY);
 
   const getPaymentType = async () => {
-    if (store && $store?.loggedIn === false) return;
+    if (!$store || !$store.loggedIn) return;
     const paymentResponse = await client.get('/payment-type', {
       headers: {
         'X-CLIENT': clientType,
@@ -43,7 +45,7 @@
   };
 
   const createOrder = async () => {
-    if (store && $store?.loggedIn === false) return;
+    if (!$store || !$store.loggedIn) return;
     const response = await client.post('/order', {
       paymentTypeId,
       deliveryType,
@@ -63,27 +65,28 @@
   };
 
   const getCart = async () => {
-    if (store && $store?.loggedIn === false) return;
-    const response = await client.get('/order');
-    if (response.status === 200) {
-      const cartOrderList:{
-        wareHouse: WarehouseDetail,
-        product: Cart[],
-      }[] = response.data.data;
-      cartList = cartOrderList.reduce(
-        (prev, curr) => [...prev, ...(curr.product.map(
-          (cart) => ({
-            ...cart,
-            warehouse: curr.wareHouse.name,
-          }),
-        ))],
-        <Cart[]>[],
-      );
-    }
+    if (!$store || !$store.loggedIn) return;
+    const params = new URLSearchParams();
+    params.append('orderType', 'GROSIR_OFFLINE');
+    const response = await client.get('/order', { params });
+    if (response.status !== 200) return;
+    const cartOrderList:{
+      wareHouse: WarehouseDetail,
+      product: Cart[],
+    }[] = response.data.data;
+    cartList = cartOrderList.reduce(
+      (prev, curr) => [...prev, ...(curr.product.map(
+        (cart) => ({
+          ...cart,
+          warehouse: curr.wareHouse.name,
+        }),
+      ))],
+      <Cart[]>[],
+    );
   };
 
   const updateCartQty = async (cartId: string, qty: number) => {
-    if (store && $store?.loggedIn === false) return;
+    if (!store || $store?.loggedIn === false) return;
     const response = await client.patch(`/cart/${cartId}`, {
       qty,
     });
@@ -93,6 +96,22 @@
     }
     getCart();
   };
+
+  const updateCartMemberLevel = async () => {
+    if (!$store || !$store.loggedIn) return;
+    const params = new URLSearchParams();
+    params.append('createdBy', $store.userId);
+    const response = await client.patch('/cart', {
+      memberLevel,
+    }, { params });
+    if (response.status !== 200) return;
+    getCart();
+  };
+
+  $effect(() => {
+    memberLevel;
+    updateCartMemberLevel();
+  });
 
   $effect(() => {
     getPaymentType();
@@ -105,54 +124,59 @@
   });
 </script>
 
+{#snippet header()}
+  <th>
+    Qty
+  </th>
+  <th></th>
+  <th></th>
+  <th>Initial Price</th>
+  <th>Selling Price</th>
+  <th>Final Price</th>
+  <th>
+    Warehouse
+  </th>
+  <th>
+    Name
+  </th>
+{/snippet}
+
+{#snippet content(cart: Cart)}
+  <td>
+    <input type="number" value={cart.qty} class="input input-bordered w-24 max-w-xs"
+      onchange={(e) => { cartQtyMap[cart.id] = Number(e.currentTarget.value) }}
+    >
+  </td>
+  <td>
+    <button
+      onclick={() => updateCartQty(cart.id, cartQtyMap[cart.id])}
+      class="btn bg-slate-600"
+    >
+      <Icon src={FaFloppyDisk}/>
+    </button>
+  </td>
+  <td>
+    <button
+      onclick={() => updateCartQty(cart.id, 0)}
+      class="btn bg-slate-600"
+    >
+      <Icon src={FaTrashCan}/>
+    </button>
+  </td>
+  <td>{cart.initialPrice}</td>
+  <td>{cart.sellingPrice}</td>
+  <td>{cart.finalPrice}</td>
+  <td>{cart.warehouse}</td>
+  <td>{cart.fullName}</td>
+{/snippet}
+
 <Collapse class="overflow-x-auto" onClick={getCart} title="Order Summary">
   <button class="btn" onclick={getCart}>Get Cart</button>
-  {#if cartList.length > 0}
-    <Table itemList={cartList}>
-      <svelte:fragment slot="header">
-        <th>
-          Qty
-        </th>
-        <th></th>
-        <th></th>
-        <th>
-          Warehouse
-        </th>
-        <th>
-          Name
-        </th>
-      </svelte:fragment>
-      <svelte:fragment slot="item" let:item={cart}>
-        <td>
-          <input type="number" value={cart.qty} class="input input-bordered w-24 max-w-xs"
-            onchange={(e) => { cartQtyMap[cart.id] = Number(e.currentTarget.value) }}
-          >
-        </td>
-        <td>
-          <button
-            onclick={() => updateCartQty(cart.id, cartQtyMap[cart.id])}
-            class="btn bg-slate-600"
-          >
-            <Icon src={FaFloppyDisk}/>
-          </button>
-        </td>
-        <td>
-          <button
-            onclick={() => updateCartQty(cart.id, 0)}
-            class="btn bg-slate-600"
-          >
-            <Icon src={FaTrashCan}/>
-          </button>
-        </td>
-        <td>
-          {cart.warehouse}
-        </td>
-        <td>
-          {cart.fullName}
-        </td>
-      </svelte:fragment>
-    </Table>
-  {/if}
+  <Table5
+    itemList={cartList}
+    {header}
+    {content}
+  />
   <div class="label"></div>
   <div>
     <select bind:value={paymentTypeId} class="select select-bordered w-full max-w-xs">

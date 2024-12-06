@@ -2,6 +2,7 @@ import type { AuthStore } from '@/types';
 import { writable } from 'svelte/store';
 
 const createAuthStore = () => writable<AuthStore>({
+  userId: '',
   loggedIn: false,
 });
 

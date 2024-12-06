@@ -69,7 +69,7 @@
     bind:search
     bind:page
     bind:max
-    onAdd={showAddRole}
+    onadd={showAddRole}
   />
   {#if roleList.length > 0}
     <Table5

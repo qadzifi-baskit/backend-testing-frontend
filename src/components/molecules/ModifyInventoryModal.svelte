@@ -46,7 +46,7 @@
 
   async function modifyInventory() {
     const response = await client.patch(
-      '/inventory',
+      `/inventory/${inventoryId}`,
       data,
     );
     if (response.status !== 200) return;
@@ -83,10 +83,15 @@
     if (response.status !== 200) return;
     afterUpdate();
   }
+
+  function onclose() {
+    inventoryId = '';
+  }
 </script>
 
 <Modal
   bind:dialog
+  {onclose}
 >
   <div
     class="flex flex-col items-start w-full h-full"

@@ -30,7 +30,7 @@
 
 <Modal
   bind:dialog
-  {onClose}
+  onclose={onClose}
 >
   <div
     class="flex flex-col items-start w-full h-full"

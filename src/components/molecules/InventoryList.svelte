@@ -10,6 +10,7 @@
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import Table5 from '../Table5.svelte';
   import ModifyInventoryModal from './ModifyInventoryModal.svelte';
+  import DropdownSelect from '../atoms/DropdownSelect.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -18,6 +19,7 @@
     isOrder?: boolean,
     userId?: string,
     companyId?: string,
+    memberLevel?: string|null,
   };
   let {
     client,
@@ -26,6 +28,7 @@
     isOrder = false,
     userId = $bindable(),
     companyId = $bindable(),
+    memberLevel = $bindable(null),
   }:Props = $props();
 
   const prefix = isGrosir ? '/grosirindo' : '';
@@ -75,7 +78,7 @@
   });
 
   let addInventoryDialog:HTMLDialogElement|undefined = $state();
-  const onShowAddInventory = () => {
+  const showAddInventory = () => {
     addInventoryDialog?.showModal();
   };
 
@@ -96,6 +99,7 @@
       productId: item.productId,
       companyId: item.companyId,
       wareHouse: 0,
+      memberLevel,
     });
   }
 
@@ -168,13 +172,20 @@
     bind:max
     bind:search
     bind:page
-    onReload={getInventoryList}
+    onreload={getInventoryList}
+    onadd={showAddInventory}
   />
-  <button class="btn bordered input-bordered"
-    onclick={onShowAddInventory}
-  >
-    Add Inventory
-  </button>
+  <DropdownSelect
+    bind:selectValue={memberLevel}
+    display="LABEL"
+    placeholder="None"
+    options={[
+      [null, 'None'],
+      ['SILVER', 'Silver'],
+      ['GOLD', 'Gold'],
+      ['PLATINUM', 'Platinum'],
+    ]}
+  />
   {#if inventoryList.length > 0}
     <Table5
       {header}

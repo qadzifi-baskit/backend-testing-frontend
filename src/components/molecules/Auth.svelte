@@ -64,6 +64,7 @@
     if (response.status === 200) {
       store?.update((value) => ({
         ...value,
+        userId: response.data?.data?.id ?? '',
         loggedIn: true,
       }));
 

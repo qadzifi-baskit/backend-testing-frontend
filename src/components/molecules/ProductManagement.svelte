@@ -143,8 +143,8 @@
     bind:search
     bind:max
     bind:page
-    onReload={getProductList}
-    onAdd={showAddProduct}
+    onreload={getProductList}
+    onadd={showAddProduct}
   />
   {#if productList.length > 0}
     <Table5 itemList={productList}

@@ -69,8 +69,8 @@
   title="External Salesman"
 >
   <PaginationNavigationPanel
-    onReload={getExternalSalesman}
-    onAdd={openAddExternalSalesDialog}
+    onreload={getExternalSalesman}
+    onadd={openAddExternalSalesDialog}
     bind:max
     bind:page
   />
