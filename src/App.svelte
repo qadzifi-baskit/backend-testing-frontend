@@ -9,7 +9,7 @@
   import Seller from './app/seller';
   import SuperAdmin from './app/super-admin/SuperAdmin.svelte';
   import Config from './components/molecules/Config.svelte';
-  let selected = 3;
+  let selected = 1;
   let host = import.meta.env.VITE_API_HOST;
 
   type PageComponent = Component<{ host: string, showHost: boolean }>;
