@@ -18,12 +18,12 @@
     inventoryId = $bindable(''),
     dialog = $bindable(),
     onupdate,
-    isGrosir = false,
   }: Props = $props();
 
   const data = $state({
     stock: 0,
     basePrice: 0,
+    customerPrice: 0,
     priceTier: <PriceTier[]>[],
     sellerPriceTier: <PriceTier[]>[],
     memberDiscount: <MemberDiscount[]>[],
@@ -126,11 +126,17 @@
       </div>
       <input type="number" placeholder="basePrice" bind:value={data.basePrice} class="input input-bordered w-full max-w-xs" />
     </label>
+    <label class="form-control w-full max-w-xs mb-2">
+      <div class="label">
+        <span class="label-text">Base Price</span>
+      </div>
+      <input type="number" placeholder="basePrice" bind:value={data.customerPrice} class="input input-bordered w-full max-w-xs" />
+    </label>
     <button
       onclick={modifyInventory}
       class="btn bg-slate-600 mt-2"
     >
-      Add
+      Save
     </button>
     <PriceTierManagement
       onsave={savePriceTier}
