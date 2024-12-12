@@ -11,18 +11,21 @@
     inventoryId: string;
     dialog: HTMLDialogElement | undefined;
     onupdate?: () => unknown,
+    isGrosir?: boolean,
   };
   let {
     client,
     inventoryId = $bindable(''),
     dialog = $bindable(),
     onupdate,
+    isGrosir = false,
   }: Props = $props();
 
   const data = $state({
     stock: 0,
     basePrice: 0,
     priceTier: <PriceTier[]>[],
+    sellerPriceTier: <PriceTier[]>[],
     memberDiscount: <MemberDiscount[]>[],
   });
 
@@ -37,6 +40,7 @@
     data.stock = inventory.stock;
     data.basePrice = inventory.basePrice;
     data.priceTier = inventory.priceTier;
+    data.sellerPriceTier = inventory.sellerPriceTier;
     data.memberDiscount = inventory.memberDiscount;
   }
 
@@ -64,6 +68,20 @@
       `/price-tier/inventory/${inventoryId}`,
       {
         priceTiers: payload.map((tier) => ({
+          ...tier,
+          id: undefined,
+        })),
+      },
+    );
+    if (response.status !== 200) return;
+    afterUpdate();
+  }
+
+  async function saveSellerPriceTier(payload: PriceTier[]) {
+    const response = await client.patch(
+      `/price-tier/inventory/${inventoryId}`,
+      {
+        sellerPriceTiers: payload.map((tier) => ({
           ...tier,
           id: undefined,
         })),
@@ -117,7 +135,12 @@
     <PriceTierManagement
       onsave={savePriceTier}
       bind:tierList={data.priceTier}
+    />
+    <PriceTierManagement
+      onsave={saveSellerPriceTier}
+      bind:tierList={data.sellerPriceTier}
       tierMin={0}
+      buttonSnippet="Save Seller Price Tier"
     />
     <MemberDiscountManagement
       onsave={saveMemberDiscount}

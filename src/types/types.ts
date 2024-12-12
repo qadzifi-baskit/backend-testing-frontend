@@ -110,6 +110,7 @@ export type Inventory = {
   basePrice: number,
   sellingPrice: number,
   priceTier: PriceTier[],
+  sellerPriceTier: PriceTier[],
   memberDiscount: MemberDiscount[],
 };
 
@@ -119,12 +120,14 @@ export type Cart = {
   productId: string,
   companyId: string,
   initialPrice: number,
+  tierPrice: number,
   sellingPrice: number,
-  finalPrice: number,
   fullName: string,
   name: string,
   qty: number,
   warehouse: number,
+  memberLevel: MemberDiscountLevel|null,
+  memberDiscountAmount: number|null,
 };
 
 export type Order = {

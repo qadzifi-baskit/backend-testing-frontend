@@ -1,6 +1,6 @@
 <script lang="ts">
   import { listenAuthSuccess } from '@/event';
-  import { DeliveryTypeEnum } from '@/lib/enum';
+  import { DeliveryTypeEnum, OrderTypeEnum } from '@/lib/enum';
   import type { AuthStore, Cart, PaymentType, WarehouseDetail } from '@/types';
   import type { AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
@@ -13,6 +13,7 @@
     client: AxiosInstance,
     store?: Writable<AuthStore>,
     userId?: string,
+    orderType?: OrderTypeEnum,
     clientType?: string,
     memberLevel?: string|null,
     onOrderCreated?: () => unknown,
@@ -21,6 +22,7 @@
     client,
     store,
     userId = $bindable(),
+    orderType = OrderTypeEnum.SHOP,
     clientType = 'BASKIT_SHOP',
     memberLevel = $bindable(null),
     onOrderCreated = () => null,
@@ -30,6 +32,9 @@
   let paymentTypeList:PaymentType[] = $state([]);
   let cartList:Cart[] = $state([]);
   let paymentTypeId = $state('');
+  let subTotal = $state(0);
+  let totalTierPrice = $state(0);
+  let total = $state(0);
   let deliveryType:DeliveryTypeEnum = $state(DeliveryTypeEnum.SELLER_DELIVERY);
 
   const getPaymentType = async () => {
@@ -49,6 +54,7 @@
     const response = await client.post('/order', {
       paymentTypeId,
       deliveryType,
+      orderType,
       product: cartList.map((value) => ({
         cartId: value.id,
         inventoryId: value.inventoryId,
@@ -56,6 +62,8 @@
         qty: value.qty,
         price: value.sellingPrice,
         companyId: value.companyId,
+        memberLevel: value.memberLevel,
+        memberDiscountAmount: value.memberDiscountAmount,
       })),
       userId,
     });
@@ -67,21 +75,31 @@
   const getCart = async () => {
     if (!$store || !$store.loggedIn) return;
     const params = new URLSearchParams();
-    params.append('orderType', 'GROSIR_OFFLINE');
+    params.append('orderType', orderType);
     const response = await client.get('/order', { params });
     if (response.status !== 200) return;
     const cartOrderList:{
+      subTotal: number,
+      totalTierPrice: number,
+      total: number,
       wareHouse: WarehouseDetail,
       product: Cart[],
     }[] = response.data.data;
-    cartList = cartOrderList.reduce(
-      (prev, curr) => [...prev, ...(curr.product.map(
-        (cart) => ({
-          ...cart,
-          warehouse: curr.wareHouse.name,
-        }),
-      ))],
-      <Cart[]>[],
+    [subTotal, totalTierPrice, total, cartList] = cartOrderList.reduce(
+      (prev, curr): [number, number, number, Cart[]] => [
+        prev[0] + curr.subTotal,
+        prev[1] + curr.totalTierPrice,
+        prev[2] + curr.total,
+        [
+          ...prev[3], ...(curr.product.map(
+            (cart) => ({
+              ...cart,
+              warehouse: curr.wareHouse.name,
+            }),
+          )),
+        ],
+      ],
+      <[number, number, number, Cart[]]>[0, 0, 0, []],
     );
   };
 
@@ -131,8 +149,8 @@
   <th></th>
   <th></th>
   <th>Initial Price</th>
+  <th>Tier Price</th>
   <th>Selling Price</th>
-  <th>Final Price</th>
   <th>
     Warehouse
   </th>
@@ -164,8 +182,8 @@
     </button>
   </td>
   <td>{cart.initialPrice}</td>
+  <td>{cart.tierPrice}</td>
   <td>{cart.sellingPrice}</td>
-  <td>{cart.finalPrice}</td>
   <td>{cart.warehouse}</td>
   <td>{cart.fullName}</td>
 {/snippet}
@@ -177,6 +195,33 @@
     {header}
     {content}
   />
+  <div class="label"></div>
+  <div class="overflow-x-auto">
+    <table class="table">
+      <tbody>
+        <tr>
+          <td>
+            <strong>Sub Total</strong>
+          </td>
+          <td>{subTotal}</td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Total Tier Price</strong>
+          </td>
+          <td>{totalTierPrice}</td>
+          <td>-{subTotal - totalTierPrice}</td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Total</strong>
+          </td>
+          <td>{total}</td>
+          <td>-{totalTierPrice - total}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   <div class="label"></div>
   <div>
     <select bind:value={paymentTypeId} class="select select-bordered w-full max-w-xs">

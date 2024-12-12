@@ -4,7 +4,7 @@
   import type { Product } from '@/types';
   import type { AxiosInstance } from 'axios';
   import type { MouseEventHandler } from 'svelte/elements';
-  import PaginationFancyButton from '../atoms/PaginationFancyButton.svelte';
+  import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import Collapse from '../Collapse.svelte';
   import Select from '../Select.svelte';
   import Table from '../Table.svelte';
@@ -23,6 +23,7 @@
   let productList:Product[] = $state([]);
   let page = $state(1);
   let max = $state(1);
+  let search = $state('');
 
   const qtyMap:Record<string, number> = $state({});
   let warehouseOptions = $state<[string, string][]>([['', 'All']]);
@@ -30,6 +31,7 @@
   const getProduct = async () => {
     const params = new URLSearchParams();
     params.append('$page', `${page}`);
+    params.append('name', search);
     if (companyId) {
       params.append('id', companyId);
     }
@@ -60,12 +62,14 @@
 
   $effect(() => {
     companyId;
+    search;
     page = 1;
   });
 
   $effect(() => {
     companyId;
     page;
+    search;
     debounceGetProduct();
   });
 
@@ -101,9 +105,10 @@
     options={warehouseOptions}
     bind:value={companyId}
   />
-  <PaginationFancyButton
+  <PaginationNavigationPanel
     bind:max
-    bind:value={page}
+    bind:page
+    bind:search
   />
   <button class="btn" onclick={getProduct}>Get Product</button>
   {#if productList.length > 0}

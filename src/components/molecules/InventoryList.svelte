@@ -31,7 +31,7 @@
     memberLevel = $bindable(null),
   }:Props = $props();
 
-  const prefix = isGrosir ? '/grosirindo' : '';
+  const prefix = isGrosir ? '' : '';
 
   let inventoryList:Inventory[] = $state([]);
   let page = $state(1);
@@ -163,6 +163,7 @@
   {client}
   bind:inventoryId={selectedInventoryId}
   onupdate={getInventoryList}
+  {isGrosir}
 />
 <Collapse title="Inventory"
   class="w-full"

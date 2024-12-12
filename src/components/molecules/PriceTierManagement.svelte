@@ -6,12 +6,14 @@
     tierMin?: number,
     tierMax?: number,
     onsave?: (data: PriceTier[]) => unknown,
+    buttonSnippet?: Snippet|string,
   };
   let {
     tierList = $bindable([]),
     tierMin = 1,
     tierMax = 4,
     onsave,
+    buttonSnippet,
   }:Props = $props();
 
   let tierSettings:PriceTier[] = $state([]);
@@ -102,5 +104,13 @@
   onclick={savePriceTier}
   class="btn bg-slate-600 mt-2"
 >
-  Save Tier
+  {#if buttonSnippet}
+    {#if typeof buttonSnippet === 'string'}
+      {buttonSnippet}
+    {:else}
+      {@render buttonSnippet()}
+    {/if}
+  {:else}
+    Save Price Tier
+  {/if}
 </button>

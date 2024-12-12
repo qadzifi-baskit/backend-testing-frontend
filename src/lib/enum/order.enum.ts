@@ -1,3 +1,17 @@
+export const OrderTypeEnum = {
+  ONLINE: 'ONLINE',
+  OFFLINE: 'OFFLINE',
+  GROSIR_OFFLINE: 'GROSIR_OFFLINE',
+  SHOP: 'SHOP',
+  INBOUND: 'INBOUND',
+  RETURN: 'RETURN',
+  MANUAL_INBOUND: 'MANUAL_INBOUND',
+  MANUAL_OUTBOUND: 'MANUAL_OUTBOUND',
+  PARTICIPATE_SURVEY: 'PARTICIPATE_SURVEY',
+  MERCHANT_SALES: 'MERCHANT_SALES',
+} as const;
+export type OrderTypeEnum = (typeof OrderTypeEnum)[keyof typeof OrderTypeEnum];
+
 export const OrderStatusEnum = {
   ORDER_CREATED: 'ORDER_CREATED',
   WAITING_FOR_PICK_UP: 'WAITING_FOR_PICK_UP',

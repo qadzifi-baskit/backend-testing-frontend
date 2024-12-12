@@ -6,6 +6,7 @@
   import ProductManagement from '@/components/molecules/ProductManagement.svelte';
   import SellerRegister from '@/components/molecules/SellerRegister.svelte';
   import { listenAuthSuccess, listenDoAuth } from '@/event';
+  import { OrderTypeEnum } from '@/lib/enum';
   import { GrosirSellerStore } from '@/store/store';
   import type { Company } from '@/types';
   import axios from 'axios';
@@ -75,6 +76,7 @@
   <InventoryList {client} store={GrosirSellerStore}
     {companyId}
     bind:userId
+    isGrosir
   />
   <div class="divider"></div>
   <div class="flex w-full rounded-box">
@@ -91,6 +93,7 @@
         {client}
         bind:memberLevel
         bind:userId={customerId}
+        orderType={OrderTypeEnum.GROSIR_OFFLINE}
       />
     </div>
   </div>
