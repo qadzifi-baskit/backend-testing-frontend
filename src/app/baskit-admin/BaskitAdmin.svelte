@@ -41,7 +41,7 @@
     bind:password
   />
   <div class="divider"></div>
-  <OrderList {client}/>
+  <OrderList {client} store={BaskitAdminStore} />
   <div class="divider"></div>
   <ProductManagement {client} store={BaskitAdminStore} />
   <div class="divider"></div>

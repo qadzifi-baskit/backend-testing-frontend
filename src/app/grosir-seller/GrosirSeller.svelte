@@ -2,7 +2,9 @@
   import Auth from '@/components/molecules/Auth.svelte';
   import BuyerCart from '@/components/molecules/BuyerCart.svelte';
   import Config from '@/components/molecules/Config.svelte';
+  import FieldTeamManagement from '@/components/molecules/FieldTeamManagement.svelte';
   import InventoryList from '@/components/molecules/InventoryList.svelte';
+  import OrderList from '@/components/molecules/OrderList.svelte';
   import ProductManagement from '@/components/molecules/ProductManagement.svelte';
   import SellerRegister from '@/components/molecules/SellerRegister.svelte';
   import { listenAuthSuccess, listenDoAuth } from '@/event';
@@ -66,11 +68,18 @@
     bind:password
   />
   <div class="divider"></div>
+  <FieldTeamManagement
+    {client}
+    role="GROSIR_ADMIN"
+    bind:companyId
+    title="Grosir Admin Management"
+    store={GrosirSellerStore}
+  />
+  <div class="divider"></div>
   <ProductManagement
     store={GrosirSellerStore}
     {client}
     bind:companyId
-    addOptions={{ tierAmount: 5 }}
   />
   <div class="divider"></div>
   <InventoryList {client} store={GrosirSellerStore}
@@ -97,4 +106,11 @@
       />
     </div>
   </div>
+  <div class="divider"></div>
+  <OrderList
+    {client}
+    store={GrosirSellerStore}
+    {companyId}
+    orderType={OrderTypeEnum.GROSIR_OFFLINE}
+  />
 </div>

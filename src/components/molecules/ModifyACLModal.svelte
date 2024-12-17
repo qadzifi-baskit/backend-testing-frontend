@@ -103,6 +103,10 @@
     newACL.methodDelete = false;
     newACL.methodFind = false;
   }
+
+  async function toggleAddingACL() {
+    addingNewAcl = !addingNewAcl;
+  }
 </script>
 
 {#snippet colgroup()}
@@ -159,7 +163,7 @@
       <span class="badge badge-neutral">{item.endpoint}</span>
       <div class="label"></div>
       <button class="btn bg-slate-600 w-fit"
-        onclick={() => addingNewAcl = !addingNewAcl}
+        onclick={toggleAddingACL}
       >
         Add ACL
       </button>
@@ -198,7 +202,7 @@
       {#if !isObjectEmpty(acls)}
         <Table5
           class="flex-grow"
-          itemList={item.acls.sort((first, second) => first.createdAt < second.createdAt ? -1 : 1)}
+          itemList={item.acls.toSorted((first, second) => first.createdAt < second.createdAt ? -1 : 1)}
           {colgroup}
           {header}
           {content}

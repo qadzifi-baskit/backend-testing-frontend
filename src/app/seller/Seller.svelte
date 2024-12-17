@@ -71,7 +71,9 @@
   <div class="divider"></div>
   <InventoryList {client} store={SellerAdminStore}/>
   <div class="divider"></div>
-  <ExternalSalesManagament {client}/>
+  <ExternalSalesManagament {client}
+    bind:companyId
+  />
   <div class="divider"></div>
   <div class="flex w-full rounded-box">
     <div class="card bg-base-300 rounded-box grid flex-grow w-2/5 h-fit">

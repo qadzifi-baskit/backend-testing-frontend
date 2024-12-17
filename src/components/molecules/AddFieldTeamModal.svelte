@@ -5,10 +5,12 @@
 
   type Props = {
     client: AxiosInstance,
+    roleName: string,
     dialog: HTMLDialogElement|undefined,
   };
   let {
     client,
+    roleName,
     dialog = $bindable(),
   }:Props = $props();
 
@@ -16,6 +18,7 @@
     phone: '',
     firstName: '',
     lastName: '',
+    roleName,
   });
 </script>
 
@@ -43,10 +46,12 @@
       </div>
       <input type="text" placeholder="last name" bind:value={data.lastName} class="input input-bordered w-full max-w-xs" />
     </label>
+    <PostButton
+      path="/users/field-team"
+      bind:data
+      {client}
+    >
+      Add
+    </PostButton>
   </div>
-  <PostButton
-    path="/users/field-team"
-    bind:data
-    {client}
-  />
 </Modal>

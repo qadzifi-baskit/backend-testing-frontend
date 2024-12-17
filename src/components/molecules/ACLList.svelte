@@ -100,7 +100,7 @@
 {/snippet}
 
 <ModifyAclModal
-  item={selectedAclItem}
+  bind:item={selectedAclItem}
   bind:dialog
   {client}
 />

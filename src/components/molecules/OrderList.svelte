@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Order } from '@/types';
+  import type { AuthStore, Order } from '@/types';
   import type { AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidList, FaSolidPencil } from 'svelte-icons-pack/fa';
@@ -9,8 +9,8 @@
   import NoWrap from '../atoms/NoWrap.svelte';
   import OrderDetail from './OrderDetail.svelte';
   import UpdateStatus from './UpdateStatus.svelte';
-  import { BaskitAdminStore } from '@/store/store';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
+  import type { Writable } from 'svelte/store';
 
   type Props = {
     endpoint?: string,
@@ -18,6 +18,7 @@
     userId?: string,
     orderType?: string,
     companyId?: string,
+    store?: Writable<AuthStore>,
   };
 
   let {
@@ -26,12 +27,14 @@
     userId = undefined,
     orderType = 'SHOP',
     companyId,
+    store,
   }:Props = $props();
 
   let orderList:Order[] = $state([]);
   let page = $state(1);
 
   const getOrderList = async () => {
+    if ($store && !$store.loggedIn) return;
     const query:Record<string, string> = {
       $order: 'createdAt',
       $sort: 'DESC',
@@ -56,10 +59,8 @@
   };
 
   $effect(() => {
-    if ($BaskitAdminStore.loggedIn) {
-      page;
-      getOrderList();
-    }
+    page;
+    getOrderList();
   });
 
   let selectedId = $state('');

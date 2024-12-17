@@ -1,25 +1,44 @@
 <script lang="ts">
-  import type { OrderDetail, OrderReason, UpdateOrderData, UpdateOrderDetailPayload } from '@/types';
+  import type { AuthStore, OrderDetail, OrderReason, UpdateOrderData, UpdateOrderDetailPayload } from '@/types';
   import type { HistoryEntity } from '@/types/history';
   import { type AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidTrash } from 'svelte-icons-pack/fa';
   import Table from '../Table.svelte';
-  export let id:string;
-  export let client:AxiosInstance;
+  import type { Writable } from 'svelte/store';
+
+  type Props = {
+    client: AxiosInstance,
+    id: string,
+    store?: Writable<AuthStore>,
+    onUpdateOrder?:((data: UpdateOrderData[]) => unknown),
+  };
+  let {
+    client,
+    id = $bindable(''),
+    store,
+    onUpdateOrder = async (data) => {
+      await client.patch(`/order/detail/bulk/${id}`, data);
+      getDetail(id);
+    },
+  }:Props = $props();
 
   const updateDataMap:Record<string, UpdateOrderDetailPayload> = {};
 
-  let detailList:OrderDetail[] = [];
-  let reasonList:OrderReason[] = [];
-  let historyList:HistoryEntity[] = [];
+  let detailList:OrderDetail[] = $state([]);
+  let reasonList:OrderReason[] = $state([]);
+  let historyList:HistoryEntity[] = $state([]);
 
   const getHistory = async (orderId: string) => {
-    const params = new URLSearchParams();
-    params.append('$order', 'createdAt');
-    params.append('refId', orderId);
+    if ($store && !$store.loggedIn) return;
+    const params = new URLSearchParams({
+      $order: 'createdAt',
+      $sort: 'DESC',
+      refId: orderId,
+    });
     const response = await client.get(
       '/history',
+      { params },
     );
     if (response.status !== 200) {
       return;
@@ -29,6 +48,7 @@
   };
 
   const getDetail = async (detailId: string) => {
+    if ($store && !$store.loggedIn) return;
     const detailResponse = await client.get(`/order/${detailId}`);
     if (detailResponse.status === 200) {
       const newDetailList:OrderDetail[] = detailResponse?.data?.data?.orderDetail ?? [];
@@ -46,12 +66,15 @@
     }
   };
 
-  $: if (id) {
-    getDetail(id);
-    getHistory(id);
-  }
+  $effect(() => {
+    if (id) {
+      getDetail(id);
+      getHistory(id);
+    }
+  });
 
   const onCancel = (detailId: string) => async () => {
+    if ($store && !$store.loggedIn) return;
     await client.patch(`/order/detail/bulk/${id}`, [
       {
         id: detailId,
@@ -63,12 +86,8 @@
     getDetail(id);
   };
 
-  export let onUpdateOrder:((data: UpdateOrderData[]) => unknown) = async (data) => {
-    await client.patch(`/order/detail/bulk/${id}`, data);
-    getDetail(id);
-  };
-
   const processUpdate = () => {
+    if ($store && !$store.loggedIn) return;
     const updateData:UpdateOrderData[] = Object.entries(updateDataMap).map(([detailId, detail]) => (
       {
         id: detailId,
@@ -93,13 +112,13 @@
     <td>{item.fullName}</td>
     <td>
       <input type="number" placeholder="qty" bind:value={updateDataMap[item.id].qty} class="input input-bordered w-24 max-w-xs"
-        on:change={(e) => { updateDataMap[item.id].qty = Number(e.currentTarget.value) }}
+        onchange={(e) => { updateDataMap[item.id].qty = Number(e.currentTarget.value) }}
       />
     </td>
     <td>{item.status}</td>
     <td>
       <button
-        on:click={onCancel(item.id)}
+        onclick={onCancel(item.id)}
         class="btn"
       >
         <Icon
@@ -112,7 +131,7 @@
 <Table itemList={historyList}>
 </Table>
 <button class="btn bg-slate-600"
-  on:click={processUpdate}
+  onclick={processUpdate}
 >
   Update
 </button>
