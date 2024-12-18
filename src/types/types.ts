@@ -207,17 +207,6 @@ export type APIACLItem = APIItem & {
   acls: ACLItem[],
 };
 
-export type PaginatialPanelProps<
-  OnReload extends (...args: unknown[]) => unknown = () => void,
-  OnAdd extends (...args: unknown[]) => unknown = () => void,
-> = {
-  search?: string,
-  max?: number,
-  page?: number,
-  onreload?: OnReload,
-  onadd?: OnAdd,
-};
-
 export type Profile = {
   avatars: string|null,
   firstName: string,

@@ -1,16 +1,26 @@
 <script lang="ts" generics="T">
   import { cn } from '@/lib/helper/tailwind';
   import type { AxiosInstance } from 'axios';
+  import type { Snippet } from 'svelte';
   // eslint-disable-next-line no-undef
   type ResponseType = T;
 
-  let clazz = '';
-  export { clazz as class };
-
-  export let path: string;
-  export let data: object;
-  export let client:AxiosInstance;
-  export let onResponse:((data?: ResponseType) => void) = () => undefined;
+  type Props = {
+    client: AxiosInstance,
+    path: string,
+    data?: object,
+    class?: string,
+    onResponse?: (data: ResponseType) => void,
+    children?: Snippet,
+  };
+  let {
+    client,
+    path,
+    data = $bindable({}),
+    class: clazz = '',
+    onResponse = () => undefined,
+    children,
+  }: Props = $props();
 
   const onClick = async () => {
     const response = await client.post(
@@ -24,8 +34,10 @@
 </script>
 
 <button
-  on:click={onClick}
+  onclick={onClick}
   class={cn('btn bg-slate-600', clazz)}
 >
-  <slot/>
+  {#if children}
+    {@render children()}
+  {/if}
 </button>

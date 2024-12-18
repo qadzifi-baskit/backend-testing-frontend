@@ -2,15 +2,22 @@
   import type { AxiosInstance } from 'axios';
   import Modal from '../Modal.svelte';
   import PostButton from '../atoms/PostButton.svelte';
+  import type { CreateFieldTeamResponse } from '@/types/user';
+  import type { Writable } from 'svelte/store';
+  import type { AuthStore, Role } from '@/types';
 
   type Props = {
     client: AxiosInstance,
     roleName: string,
+    companyId?: string,
+    store?: Writable<AuthStore>,
     dialog: HTMLDialogElement|undefined,
   };
   let {
     client,
     roleName,
+    store,
+    companyId,
     dialog = $bindable(),
   }:Props = $props();
 
@@ -20,6 +27,33 @@
     lastName: '',
     roleName,
   });
+
+  async function assignRole(data: CreateFieldTeamResponse) {
+    console.log({ user: data });
+    if (companyId === undefined) return;
+    if ($store && !$store.loggedIn) return;
+    const roleParams = new URLSearchParams({
+      roleName,
+    });
+    const roleResponse = await client.get(
+      '/role',
+      { params: roleParams },
+    );
+    if (roleResponse.status !== 200) return;
+    const roleList:Role[] = roleResponse.data.data ?? [];
+    if (roleList.length === 0) return;
+    const roleId = roleList[0].id;
+    const assignRoleResponse = await client.post(
+      '/company/user',
+      {
+        companyId,
+        roleId,
+        userId: data.data.id,
+      },
+    );
+    if (assignRoleResponse.status !== 200) return;
+    dialog?.close();
+  }
 </script>
 
 <Modal
@@ -49,6 +83,7 @@
     <PostButton
       path="/users/field-team"
       bind:data
+      onResponse={assignRole}
       {client}
     >
       Add

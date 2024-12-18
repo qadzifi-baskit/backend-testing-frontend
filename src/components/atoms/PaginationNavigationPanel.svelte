@@ -1,18 +1,22 @@
 <script lang="ts">
   import { debounce } from '@/lib/helper/util';
-  import type { PaginatialPanelProps } from '@/types';
   import PaginationFancyButton from './PaginationFancyButton.svelte';
   import SearchField from './SearchField.svelte';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPlus, FaSolidRotate } from 'svelte-icons-pack/fa';
+  import DropdownSelect from './DropdownSelect.svelte';
+  import type { PaginationPanelProps } from '@/types/pagination';
 
   let {
     search = $bindable(''),
     max = $bindable(1),
     page = $bindable(1),
+    sort = $bindable(null),
+    order = $bindable('ASC'),
     onreload,
     onadd,
-  }:PaginatialPanelProps = $props();
+    sortOptions = [],
+  }:PaginationPanelProps = $props();
 
   const debounceResetPage = debounce(() => {
     page = 1;
@@ -21,6 +25,10 @@
   $effect(() => {
     search;
     debounceResetPage();
+  });
+
+  $effect(() => {
+    if (!onreload) return;
   });
 </script>
 
@@ -31,6 +39,26 @@
   bind:max
   bind:value={page}
 />
+{#if sortOptions.length > 0}
+  <DropdownSelect
+    class="w-fit"
+    placeholder="SORT"
+    bind:selectValue={sort}
+    display="LABEL"
+    options={[
+      [null, 'NONE'],
+      ...sortOptions.map(([value, label]):[string, string] => [value, label ?? value]),
+    ]}
+  />
+  <DropdownSelect
+    class="w-fit"
+    bind:selectValue={order}
+    options={[
+      ['ASC', 'Ascending'],
+      ['DESC', 'Descending'],
+    ]}
+  />
+{/if}
 <button
   onclick={onreload}
   class="btn bg-slate-600"

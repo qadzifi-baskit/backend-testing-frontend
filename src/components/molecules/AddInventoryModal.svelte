@@ -26,6 +26,7 @@
     stock: 0,
     basePrice: 0,
     sellingPrice: 0,
+    customerPrice: 0,
     margin: 0,
     companyId,
     productId,
@@ -69,13 +70,19 @@
       <div class="label">
         <span class="label-text">Base Price</span>
       </div>
-      <input type="number" placeholder="basePrice" bind:value={addInventoryData.basePrice} class="input input-bordered w-full max-w-xs" />
+      <input type="number" placeholder="base price" bind:value={addInventoryData.basePrice} class="input input-bordered w-full max-w-xs" />
     </label>
     <label class="form-control w-full max-w-xs mb-2">
       <div class="label">
         <span class="label-text">Selling Price</span>
       </div>
-      <input type="number" placeholder="sellingPrice" bind:value={addInventoryData.sellingPrice} class="input input-bordered w-full max-w-xs" />
+      <input type="number" placeholder="selling price" bind:value={addInventoryData.sellingPrice} class="input input-bordered w-full max-w-xs" />
+    </label>
+    <label class="form-control w-full max-w-xs mb-2">
+      <div class="label">
+        <span class="label-text">Customer Price</span>
+      </div>
+      <input type="number" placeholder="customer price" bind:value={addInventoryData.customerPrice} class="input input-bordered w-full max-w-xs" />
     </label>
     <label class="form-control w-full max-w-xs mb-2">
       <div class="label">
@@ -87,7 +94,7 @@
       <div class="label">
         <span class="label-text">Company ID</span>
       </div>
-      <input type="text" placeholder="companyId" bind:value={addInventoryData.companyId} class="input input-bordered w-full max-w-xs"
+      <input type="text" placeholder="company id" bind:value={addInventoryData.companyId} class="input input-bordered w-full max-w-xs"
         disabled={companyId !== ''}
       />
     </label>
@@ -95,7 +102,7 @@
       <div class="label">
         <span class="label-text">Product ID</span>
       </div>
-      <input type="text" placeholder="productId" bind:value={addInventoryData.productId} class="input input-bordered w-full max-w-xs"
+      <input type="text" placeholder="product id" bind:value={addInventoryData.productId} class="input input-bordered w-full max-w-xs"
         disabled={productId !== ''}
       />
     </label>

@@ -3,6 +3,7 @@
   import SearchField from './SearchField.svelte';
   import type { Snippet } from 'svelte';
   import type { DropdownReturnType } from '@/types/component';
+  import NoWrap from './NoWrap.svelte';
   // eslint-disable-next-line no-undef
   type ValueType = VT;
   // eslint-disable-next-line no-undef
@@ -81,7 +82,9 @@
       onclick={onSelect}
     >
       <label class="label cursor-pointer py-0 px-4 w-full h-full">
-        <span class="label-text">{label}</span>
+        <span class="label-text">
+          <NoWrap>{label}</NoWrap>
+        </span>
         <input
           bind:group={selectValue}
           type="radio"

@@ -6,9 +6,10 @@
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import { clamp } from '@/lib/helper/math';
   import { debounce } from '@/lib/helper/util';
-  import type { AuthStore } from '@/types';
+  import type { AuthStore, User } from '@/types';
   import type { Writable } from 'svelte/store';
   import AddFieldTeamModal from './AddFieldTeamModal.svelte';
+  import type { PaginationOrder } from '@/types/pagination';
 
   type Props = {
     client: AxiosInstance,
@@ -25,10 +26,12 @@
     companyId = $bindable(),
   }:Props = $props();
 
-  let userList:object[] = $state([]);
+  let userList:User[] = $state([]);
   let max = $state(1);
   let page = $state(1);
   let search = $state('');
+  let sort:string|null = $state(null);
+  let order:PaginationOrder = $state('ASC');
 
   async function getFieldTeam() {
     if ($store && !$store.loggedIn) return;
@@ -38,7 +41,11 @@
       search,
     });
     if (companyId) {
-      params.append('company_id', companyId);
+      params.append('sellerId', companyId);
+    }
+    if (sort !== null) {
+      params.append('$order', sort);
+      params.append('$sort', order);
     }
     const response = await client.get(
       '/company/user',
@@ -60,6 +67,8 @@
   $effect(() => {
     search;
     page;
+    sort;
+    order;
     debounceGetFieldTeam();
   });
 
@@ -80,9 +89,33 @@
   });
 </script>
 
+{#snippet header()}
+  <th>Created At</th>
+  <th>Id</th>
+  <th>E-Mail</th>
+  <th>Phone</th>
+  <th>First Name</th>
+  <th>Last Name</th>
+  <th>Status</th>
+  <th>Last Access</th>
+{/snippet}
+
+{#snippet content(user: User)}
+  <td>{user.createdAt}</td>
+  <td>{user.id}</td>
+  <td>{user.email}</td>
+  <td>{user.phone}</td>
+  <td>{user.profile?.firstName ?? '-'}</td>
+  <td>{user.profile?.lastName ?? '-'}</td>
+  <td>{user.status}</td>
+  <td>{user.lastAccess ?? '-'}</td>
+{/snippet}
+
 <AddFieldTeamModal
   bind:dialog={addFieldTeamDialog}
   roleName={role}
+  {store}
+  {companyId}
   {client}
 />
 <Collapse5
@@ -94,8 +127,15 @@
     bind:max
     bind:page
     bind:search
+    bind:sort
+    bind:order
+    sortOptions={[
+      ['createdAt', 'Created At'],
+    ]}
   />
   <Table5
     itemList={userList}
+    {header}
+    {content}
   />
 </Collapse5>
