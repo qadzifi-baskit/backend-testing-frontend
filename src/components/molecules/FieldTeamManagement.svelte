@@ -13,7 +13,7 @@
 
   type Props = {
     client: AxiosInstance,
-    role: string,
+    role: string|string[],
     title?: string,
     store?: Writable<AuthStore>,
     companyId?: string,
@@ -37,9 +37,13 @@
     if ($store && !$store.loggedIn) return;
     const params = new URLSearchParams({
       $page: `${page}`,
-      role,
       search,
     });
+    if (Array.isArray(role)) {
+      role.forEach((r) => params.append('role', r));
+    } else {
+      params.append('role', role);
+    }
     if (companyId) {
       params.append('sellerId', companyId);
     }

@@ -76,6 +76,22 @@
     store={GrosirSellerStore}
   />
   <div class="divider"></div>
+  <FieldTeamManagement
+    {client}
+    role="GROSIR_CASHIER"
+    bind:companyId
+    title="Grosir Cashier Management"
+    store={GrosirSellerStore}
+  />
+  <div class="divider"></div>
+  <FieldTeamManagement
+    {client}
+    role={['GROSIR_ADMIN', 'GROSIR_CASHIER']}
+    bind:companyId
+    title="Grosir Admin/Cashier Management"
+    store={GrosirSellerStore}
+  />
+  <div class="divider"></div>
   <ProductManagement
     store={GrosirSellerStore}
     {client}
