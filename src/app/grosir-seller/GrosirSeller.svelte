@@ -12,7 +12,7 @@
   import { OrderTypeEnum } from '@/lib/enum';
   import { GrosirSellerStore } from '@/store/store';
   import type { Company } from '@/types';
-  import axios from 'axios';
+  import { createAxiosInstance } from '@/lib/helper/axios.svelte';
 
   type Props = {
     host?: string,
@@ -22,7 +22,7 @@
     host = $bindable(import.meta.env.VITE_API_HOST),
     showHost = $bindable(true),
   }:Props = $props();
-  const client = axios.create({ baseURL: host });
+  const client = createAxiosInstance({ baseURL: host });
 
   let clientType = $state('WEB_CMS');
   let username = $state('nagamas@testing.com');

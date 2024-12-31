@@ -1,7 +1,9 @@
 <script lang="ts">
+  import 'toastify-js/src/toastify.css';
   import type { Component } from 'svelte';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidAngleRight } from 'svelte-icons-pack/fa';
+  import { BiError } from 'svelte-icons-pack/bi';
   import BaskitAdmin from './app/baskit-admin/BaskitAdmin.svelte';
   import BrandUser from './app/brand-user/BrandUser.svelte';
   import Buyer from './app/Buyer';
@@ -9,8 +11,9 @@
   import Seller from './app/seller';
   import SuperAdmin from './app/super-admin/SuperAdmin.svelte';
   import Config from './components/molecules/Config.svelte';
-  let selected = 1;
-  let host = import.meta.env.VITE_API_HOST;
+  import ErrorManagerModal from './components/molecules/ErrorManagerModal.svelte';
+  let selected = $state(1);
+  let host = $state(import.meta.env.VITE_API_HOST);
 
   type PageComponent = Component<{ host: string, showHost: boolean }>;
   const tabs:{ label: string, component: PageComponent }[] = [
@@ -21,8 +24,13 @@
     { label: 'Brand User', component: BrandUser },
     { label: 'Super Admin', component: SuperAdmin },
   ];
+
+  let errorModal:HTMLDialogElement|undefined = $state();
 </script>
 
+<ErrorManagerModal
+  bind:dialog={errorModal}
+/>
 <Config
   bind:host
   showClient={false}
@@ -50,11 +58,11 @@
       {#each tabs as { label }, index }
         <li>
           {#if selected === index + 1}
-            <button class="btn bg-slate-800" on:click={() => selected = index + 1}>
+            <button class="btn bg-slate-800" onclick={() => selected = index + 1}>
               {label}
             </button>
           {:else}
-            <button class="btn" on:click={() => selected = index + 1}>
+            <button class="btn" onclick={() => selected = index + 1}>
               {label}
             </button>
           {/if}
@@ -63,6 +71,9 @@
     </ul>
   </div>
 </div>
+<button class="btn btn-error fixed bottom-8 right-8" onclick={() => errorModal?.showModal()}>
+  <Icon src={BiError}/>
+</button>
 
 <style lang="">
   div.tabs {

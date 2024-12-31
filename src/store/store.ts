@@ -1,4 +1,5 @@
 import type { AuthStore } from '@/types';
+import type { AxiosError } from 'axios';
 import { writable } from 'svelte/store';
 
 const createAuthStore = () => writable<AuthStore>({
@@ -15,3 +16,5 @@ export const SuperAdminStore = createAuthStore();
 export const SellerAdminStore = createAuthStore();
 
 export const GrosirSellerStore = createAuthStore();
+
+export const axiosErrorStore = writable<AxiosError[]>([]);

@@ -4,17 +4,17 @@
   import Config from '@/components/molecules/Config.svelte';
   import Order from '@/components/molecules/Order.svelte';
   import ProductList from '@/components/molecules/ProductList.svelte';
-  import axios from 'axios';
   import { writable } from 'svelte/store';
   import Collapse from '../../components/Collapse.svelte';
   import Auth from '../../components/molecules/Auth.svelte';
   import type { Warehouse } from '../../types';
   import './buyer.css';
   import { listenAuthSuccess } from '@/event';
+  import { createAxiosInstance } from '@/lib/helper/axios.svelte';
 
   export let host = 'https://api-beta.baskit.app/v2';
   export let showHost = true;
-  const client = axios.create({ baseURL: host });
+  const client = createAxiosInstance({ baseURL: host });
 
   const qtyMap:Record<string, number> = {};
   const warehouseList = writable(<Warehouse[]>[]);
