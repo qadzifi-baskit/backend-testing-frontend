@@ -74,8 +74,12 @@
 
   const getCart = async () => {
     if (!$store || !$store.loggedIn) return;
-    const params = new URLSearchParams();
-    params.append('orderType', orderType);
+    const params = new URLSearchParams({
+      orderType,
+    });
+    if ($store.userId) {
+      params.append('createdBy', $store.userId);
+    }
     const response = await client.get('/order', { params });
     if (response.status !== 200) return;
     const cartOrderList:{

@@ -5,10 +5,11 @@
   import type { CreateFieldTeamResponse } from '@/types/user';
   import type { Writable } from 'svelte/store';
   import type { AuthStore, Role } from '@/types';
+  import DropdownSelect from '../atoms/DropdownSelect.svelte';
 
   type Props = {
     client: AxiosInstance,
-    roleName: string,
+    roleName: string|string[],
     companyId?: string,
     store?: Writable<AuthStore>,
     dialog: HTMLDialogElement|undefined,
@@ -27,13 +28,18 @@
     lastName: '',
     roleName,
   });
+  let selectedRole = $state('');
+  if (typeof roleName === 'string') {
+    selectedRole = roleName;
+  } else {
+    selectedRole = roleName[0];
+  }
 
   async function assignRole(data: CreateFieldTeamResponse) {
-    console.log({ user: data });
     if (companyId === undefined) return;
     if ($store && !$store.loggedIn) return;
     const roleParams = new URLSearchParams({
-      roleName,
+      roleName: selectedRole,
     });
     const roleResponse = await client.get(
       '/role',
@@ -59,15 +65,17 @@
 <Modal
   bind:dialog
 >
+  {#if typeof roleName === 'string'}
+    <span>{roleName}</span>
+  {:else}
+    <DropdownSelect
+      bind:selectValue={selectedRole}
+      options={roleName.map((role) => [role, role])}
+    />
+  {/if}
   <div
     class="flex flex-col items-start w-full h-full"
   >
-    <label class="form-control w-full max-w-xs mb-2">
-      <div class="label">
-        <span class="label-text">Phone</span>
-      </div>
-      <input type="text" placeholder="phone" bind:value={data.phone} class="input input-bordered w-full max-w-xs" />
-    </label>
     <label class="form-control w-full max-w-xs mb-2">
       <div class="label">
         <span class="label-text">First Name</span>
@@ -79,6 +87,12 @@
         <span class="label-text">Last Name</span>
       </div>
       <input type="text" placeholder="last name" bind:value={data.lastName} class="input input-bordered w-full max-w-xs" />
+    </label>
+    <label class="form-control w-full max-w-xs mb-2">
+      <div class="label">
+        <span class="label-text">Phone</span>
+      </div>
+      <input type="text" placeholder="phone" bind:value={data.phone} class="input input-bordered w-full max-w-xs" />
     </label>
     <PostButton
       path="/users/field-team"

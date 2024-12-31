@@ -2,15 +2,16 @@
   import Collapse from '@/components/Collapse.svelte';
   import AddInventoryModal from '@/components/molecules/AddInventoryModal.svelte';
   import { debounce } from '@/lib/helper/util';
-  import type { AuthStore, Inventory } from '@/types';
+  import type { AuthStore } from '@/types';
+  import type { Inventory } from '@/types/inventory';
   import type { AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPencil } from 'svelte-icons-pack/fa';
   import type { Writable } from 'svelte/store';
+  import DropdownSelect from '../atoms/DropdownSelect.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import Table5 from '../Table5.svelte';
   import ModifyInventoryModal from './ModifyInventoryModal.svelte';
-  import DropdownSelect from '../atoms/DropdownSelect.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -95,7 +96,7 @@
     return async () => client.post(`${prefix}/cart`, {
       inventoryId: item.id,
       qty: qtyMap[item.id],
-      userId,
+      userId: null,
       productId: item.productId,
       companyId: item.companyId,
       wareHouse: 0,

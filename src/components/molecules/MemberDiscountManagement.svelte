@@ -1,7 +1,7 @@
 <script lang="ts">
   import { MemberDiscountLevelList } from '@/consts/memberDiscount';
   import type { MemberDiscountLevel } from '@/lib/enum/memberDiscount.enum';
-  import type { MemberDiscount } from '@/types';
+  import type { MemberDiscount } from '@/types/inventory';
 
   type Props = {
     discountList: MemberDiscount[],

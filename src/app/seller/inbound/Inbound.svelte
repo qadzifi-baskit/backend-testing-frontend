@@ -8,7 +8,9 @@
   import CreateOfflineUser from '@/components/molecules/CreateOfflineUser.svelte';
   import OrderDetail from '@/components/molecules/OrderDetail.svelte';
   import { listenAuthSuccess } from '@/event';
-  import type { Inventory, Order, PaymentType, UpdateOrderData, UserOffline } from '@/types';
+  import type { Order, PaymentType, UpdateOrderData } from '@/types';
+  import type { Inventory } from '@/types/inventory';
+  import type { UserOffline } from '@/types/user';
   import axios from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPencil } from 'svelte-icons-pack/fa';

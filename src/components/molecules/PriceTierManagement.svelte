@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { PriceTier } from '@/types';
+  import type { PriceTier } from '@/types/inventory';
+  import type { Snippet } from 'svelte';
 
   type Props = {
     tierList: PriceTier[],

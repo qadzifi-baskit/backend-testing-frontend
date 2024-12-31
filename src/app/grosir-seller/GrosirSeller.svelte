@@ -7,6 +7,7 @@
   import OrderList from '@/components/molecules/OrderList.svelte';
   import ProductManagement from '@/components/molecules/ProductManagement.svelte';
   import SellerRegister from '@/components/molecules/SellerRegister.svelte';
+  import UserOFflineManagement from '@/components/molecules/UserOFflineManagement.svelte';
   import { listenAuthSuccess, listenDoAuth } from '@/event';
   import { OrderTypeEnum } from '@/lib/enum';
   import { GrosirSellerStore } from '@/store/store';
@@ -90,6 +91,12 @@
     bind:companyId
     title="Grosir Admin/Cashier Management"
     store={GrosirSellerStore}
+  />
+  <div class="divider"></div>
+  <UserOFflineManagement
+    {client}
+    store={GrosirSellerStore}
+    bind:companyId
   />
   <div class="divider"></div>
   <ProductManagement

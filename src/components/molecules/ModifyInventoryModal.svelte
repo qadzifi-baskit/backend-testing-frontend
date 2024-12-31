@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { AxiosInstance } from 'axios';
   import Modal from '../Modal.svelte';
-  import type { Inventory, MemberDiscount, PriceTier } from '@/types';
   import { isNil } from '@/lib/helper/util';
   import PriceTierManagement from './PriceTierManagement.svelte';
   import MemberDiscountManagement from './MemberDiscountManagement.svelte';
+  import type { Inventory, MemberDiscount, PriceTier } from '@/types/inventory';
 
   type Props = {
     client: AxiosInstance;
@@ -128,7 +128,7 @@
     </label>
     <label class="form-control w-full max-w-xs mb-2">
       <div class="label">
-        <span class="label-text">Base Price</span>
+        <span class="label-text">Customer Price</span>
       </div>
       <input type="number" placeholder="basePrice" bind:value={data.customerPrice} class="input input-bordered w-full max-w-xs" />
     </label>

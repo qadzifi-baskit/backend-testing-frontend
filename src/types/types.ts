@@ -6,15 +6,6 @@ export type AuthStore = {
   loggedIn: boolean,
 };
 
-export type PriceTier = {
-  id: string,
-  margin: number,
-  max: number,
-  min: number,
-  sellingPrice: number,
-  tierNo: number,
-};
-
 export type PaymentType = {
   id: string,
   name: string,
@@ -63,18 +54,6 @@ export type Brand = ContentEntity;
 
 export type Principal = ContentEntity;
 
-export type Product = {
-  name: string,
-  id: string, // Inventory ID
-  productId: string,
-  companyId: string,
-  priceTiers: PriceTier[],
-  stock: number,
-  sellingPrice: number,
-  status: string,
-  warehouse: number,
-};
-
 export type ProductMaster = {
   id: string,
   sku: string,
@@ -82,36 +61,6 @@ export type ProductMaster = {
   fullName: string,
   image: string,
   isAdded: boolean,
-};
-
-export type UserOffline = {
-  id: string,
-  status: string,
-  firstName: string,
-  phone: string,
-  email: string,
-  customerTypeId: string,
-  address: string,
-};
-
-export type MemberDiscount = {
-  level: MemberDiscountLevel,
-  inventoryId: string,
-  amount: number,
-};
-
-export type Inventory = {
-  id: string,
-  stock: number,
-  fullName: string,
-  productId: string,
-  companyId: string,
-  isActive: boolean,
-  basePrice: number,
-  sellingPrice: number,
-  priceTier: PriceTier[],
-  sellerPriceTier: PriceTier[],
-  memberDiscount: MemberDiscount[],
 };
 
 export type Cart = {
