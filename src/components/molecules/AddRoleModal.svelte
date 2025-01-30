@@ -19,7 +19,7 @@
     data.mongoRoleId = data.roleName;
   });
 
-  function onResponse() {
+  function onsuccess() {
     dialog?.close();
   }
 </script>
@@ -47,7 +47,7 @@
       path="/role"
       {client}
       {data}
-      {onResponse}
+      {onsuccess}
     >
       Create
     </PostButton>

@@ -1,5 +1,6 @@
 <script lang="ts" generics="T">
   import { cn } from '@/lib/helper/tailwind';
+  import { stringToast } from '@/lib/helper/toast';
   import type { AuthStore } from '@/types';
   import type { AxiosInstance } from 'axios';
   import type { Snippet } from 'svelte';
@@ -8,38 +9,41 @@
   type ResponseType = T;
 
   type Props = {
-    client: AxiosInstance,
-    path: string,
+    client?: AxiosInstance,
     store?: Writable<AuthStore>,
+    path?: string,
     data?: object,
     class?: string,
-    onResponse?: (data: ResponseType) => void,
+    onsuccess?: (data: ResponseType) => void,
     children?: Snippet,
   };
   let {
     client,
-    path,
     store,
+    path = '',
     data = $bindable({}),
     class: clazz = '',
-    onResponse = () => undefined,
+    onsuccess = () => undefined,
     children,
   }: Props = $props();
 
-  const onClick = async () => {
-    if ($store && !$store.loggedIn) return;
+  const onclick = async () => {
+    if (!client) return;
+    if ($store && !$store.loggedIn) {
+      return stringToast('Not logged in');
+    }
     const response = await client.post(
       path,
       data,
     );
     if (response.status === 200) {
-      onResponse(response.data);
+      onsuccess(response.data);
     }
   };
 </script>
 
 <button
-  onclick={onClick}
+  {onclick}
   class={cn('btn bg-slate-600', clazz)}
 >
   {#if children}

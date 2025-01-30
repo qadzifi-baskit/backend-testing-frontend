@@ -89,7 +89,7 @@
     getBrandBranchCompanyTypeList();
   });
 
-  function onResponse() {
+  function onsuccess() {
     dialog?.close();
   }
 </script>
@@ -170,7 +170,7 @@
     {client}
     {data}
     path='/users/brand/branch'
-    {onResponse}
+    {onsuccess}
   >
     Register
   </PostButton>

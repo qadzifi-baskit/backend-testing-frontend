@@ -10,3 +10,7 @@ html {
 .divider::before, .divider::after {
   @apply bg-slate-500;
 }
+
+.toastify {
+  @apply z-[100];
+}

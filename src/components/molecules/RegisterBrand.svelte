@@ -129,7 +129,7 @@
     getBrandBranchCompanyTypeList();
   });
 
-  const onResponse = async () => {
+  const onsuccess = async () => {
     console.log({ message: 'Register success' });
   };
   let ktpFiles:FileList|undefined = $state();
@@ -284,7 +284,7 @@
     {client}
     {data}
     path='/auth/register'
-    {onResponse}
+    {onsuccess}
   >
     Register
   </PostButton>

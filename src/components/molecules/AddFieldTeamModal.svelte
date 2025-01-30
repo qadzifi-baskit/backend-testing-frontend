@@ -27,15 +27,24 @@
     firstName: '',
     lastName: '',
     roleName,
+    email: <string|undefined>undefined,
   });
   let selectedRole = $state('');
+  let email = $state('');
   if (typeof roleName === 'string') {
     selectedRole = roleName;
   } else {
     selectedRole = roleName[0];
   }
+  $effect(() => {
+    if (email !== '') {
+      data.email = email;
+    } else {
+      data.email = undefined;
+    }
+  });
 
-  async function assignRole(data: CreateFieldTeamResponse) {
+  async function onsuccess(data: CreateFieldTeamResponse) {
     if (companyId === undefined) return;
     if ($store && !$store.loggedIn) return;
     const roleParams = new URLSearchParams({
@@ -94,10 +103,16 @@
       </div>
       <input type="text" placeholder="phone" bind:value={data.phone} class="input input-bordered w-full max-w-xs" />
     </label>
+    <label class="form-control w-full max-w-xs mb-2">
+      <div class="label">
+        <span class="label-text">E-Mail</span>
+      </div>
+      <input type="text" placeholder="email" bind:value={email} class="input input-bordered w-full max-w-xs" />
+    </label>
     <PostButton
       path="/users/field-team"
       bind:data
-      onResponse={assignRole}
+      {onsuccess}
       {client}
     >
       Add

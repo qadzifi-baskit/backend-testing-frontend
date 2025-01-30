@@ -1,8 +1,14 @@
-import Toastify from 'toastify-js';
+import { axiosErrorStore, currentModalStore } from '@/store/store';
+import type { ErrorResponseData } from '@/types/http';
 import type { AxiosError, AxiosInstance, CreateAxiosDefaults } from 'axios';
 import axios from 'axios';
-import type { ErrorResponseData } from '@/types/http';
-import { axiosErrorStore } from '@/store/store';
+import Toastify from 'toastify-js';
+
+let selector:HTMLDialogElement|null = null;
+
+currentModalStore.subscribe((value) => {
+  selector = value;
+});
 
 export function createAxiosInstance(
   config?: CreateAxiosDefaults,
@@ -18,11 +24,17 @@ export function createAxiosInstance(
 
       const data = error.response.data as ErrorResponseData;
       toastContainer.textContent = data.message ?? error.message;
-      
-      Toastify({
+
+      const options:Toastify.Options = {
         node: toastContainer,
         duration: 3000,
-      }).showToast();
+      };
+
+      if (selector) {
+        options.selector = selector;
+      }
+      
+      Toastify(options).showToast();
     },
   );
 

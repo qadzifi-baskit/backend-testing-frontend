@@ -1,7 +1,9 @@
-<script lang="ts">
+<script lang="ts" generics="T">
   import type { RequestMethod } from '@/types/http';
-  import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+  import type { AxiosInstance, AxiosRequestConfig } from 'axios';
   import type { Snippet } from 'svelte';
+  // eslint-disable-next-line no-undef
+  type ResponseType = T;
 
   type Props = {
     children: Snippet,
@@ -9,7 +11,7 @@
     payload: unknown,
     path: string,
     method?: RequestMethod,
-    onsuccess?: (response: AxiosResponse) => void,
+    onsuccess?: (data: ResponseType) => void,
   };
   let {
     client,
@@ -31,7 +33,7 @@
     }
     const response = await client(config);
     if (response.status !== 200) return;
-    if (onsuccess) onsuccess(response);
+    if (onsuccess) onsuccess(response.data?.data);
   }
 </script>
 

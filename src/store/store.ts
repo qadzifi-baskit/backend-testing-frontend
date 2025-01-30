@@ -18,3 +18,5 @@ export const SellerAdminStore = createAuthStore();
 export const GrosirSellerStore = createAuthStore();
 
 export const axiosErrorStore = writable<AxiosError[]>([]);
+
+export const currentModalStore = writable<HTMLDialogElement|null>(null);

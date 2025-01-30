@@ -1,7 +1,7 @@
 <script lang="ts">
   import { listenAuthSuccess } from '@/event';
   import { debounce } from '@/lib/helper/util';
-  import type { Product } from '@/types';
+  import type { Product } from '@/types/product';
   import type { AxiosInstance } from 'axios';
   import type { MouseEventHandler } from 'svelte/elements';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';

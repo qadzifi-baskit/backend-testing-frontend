@@ -21,7 +21,7 @@
     type: '',
   });
 
-  function onResponse() {
+  function onsuccess() {
     data.name = '';
     data.type = '';
     dialog?.close();
@@ -51,7 +51,7 @@
       path="/company/type"
       {client}
       {data}
-      {onResponse}
+      {onsuccess}
     >
       Add
     </PostButton>

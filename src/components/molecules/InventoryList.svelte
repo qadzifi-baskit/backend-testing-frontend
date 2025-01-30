@@ -116,7 +116,8 @@
 {#snippet header()}
   <th>Stock</th>
   <th>Status</th>
-  <th>Price</th>
+  <th>Base Price</th>
+  <th>Customer Price</th>
   {#if isOrder}
     <th>Qty</th>
     <th></th>
@@ -130,6 +131,7 @@
   <td>{item.stock}</td>
   <td>{item.isActive}</td>
   <td>{item.sellingPrice}</td>
+  <td>{item.customerPrice}</td>
   {#if isOrder}
     <td>
       <input type="number" placeholder="qty" class="input input-bordered w-24 max-w-xs"

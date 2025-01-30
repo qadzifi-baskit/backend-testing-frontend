@@ -1,7 +1,8 @@
 <script lang="ts">
-  import type { EventHandler } from 'svelte/elements';
   import { cn } from '@/lib/helper/tailwind';
+  import { currentModalStore } from '@/store/store';
   import type { Snippet } from 'svelte';
+  import type { EventHandler } from 'svelte/elements';
 
   type Props = {
     dialog?: HTMLDialogElement,
@@ -15,6 +16,14 @@
     onclose = () => undefined,
     children,
   }: Props = $props();
+
+  function ontoggle() {
+    if (dialog?.open) {
+      currentModalStore.set(dialog);
+    } else {
+      currentModalStore.set(null);
+    }
+  }
 </script>
 
 <dialog bind:this={dialog}
@@ -23,6 +32,7 @@
     clazz,
   )}
   {onclose}
+  {ontoggle}
 >
   {@render children?.()}
 </dialog>

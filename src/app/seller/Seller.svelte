@@ -3,11 +3,13 @@
   import BuyerCart from '@/components/molecules/BuyerCart.svelte';
   import Config from '@/components/molecules/Config.svelte';
   import ExternalSalesManagament from '@/components/molecules/ExternalSalesManagament.svelte';
+  import FieldTeamManagement from '@/components/molecules/FieldTeamManagement.svelte';
   import InventoryList from '@/components/molecules/InventoryList.svelte';
   import OrderList from '@/components/molecules/OrderList.svelte';
   import ProductManagement from '@/components/molecules/ProductManagement.svelte';
   import SellerRegister from '@/components/molecules/SellerRegister.svelte';
   import { listenAuthSuccess, listenDoAuth } from '@/event';
+  import { OrderTypeEnum } from '@/lib/enum';
   import { SellerAdminStore } from '@/store/store';
   import type { Company } from '@/types';
   import axios from 'axios';
@@ -63,6 +65,14 @@
     bind:password
   />
   <div class="divider"></div>
+  <FieldTeamManagement
+    {client}
+    role="SELLER_ADMIN"
+    bind:companyId
+    title="Seller Admin Management"
+    store={SellerAdminStore}
+  />
+  <div class="divider"></div>
   <ProductManagement
     store={SellerAdminStore}
     {client}
@@ -85,11 +95,18 @@
     <div class="divider divider-horizontal"></div>
     <div class="card bg-base-300 rounded-box grid flex-grow w-2/5 h-fit">
       <BuyerCart
+        store={SellerAdminStore}
         {client}
         bind:userId={customerId}
+        orderType={OrderTypeEnum.OFFLINE}
       />
     </div>
   </div>
   <div class="divider"></div>
-  <OrderList {client} {companyId}/>
+  <OrderList
+    {client}
+    store={SellerAdminStore}
+    {companyId}
+    orderType={OrderTypeEnum.OFFLINE}
+  />
 </div>

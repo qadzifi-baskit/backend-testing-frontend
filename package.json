@@ -11,7 +11,9 @@
     "build:select": "tsx scripts/build.ts",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check:ts": "tsc --noEmit",
+    "check:svelte": "svelte-check --tsconfig ./tsconfig.json",
+    "check": "pnpm check:ts && pnpm check:svelte"
   },
   "devDependencies": {
     "@andypf/json-viewer": "^2.1.5",

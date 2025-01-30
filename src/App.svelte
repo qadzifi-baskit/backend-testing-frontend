@@ -1,5 +1,4 @@
 <script lang="ts">
-  import 'toastify-js/src/toastify.css';
   import type { Component } from 'svelte';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidAngleRight } from 'svelte-icons-pack/fa';
@@ -71,7 +70,7 @@
     </ul>
   </div>
 </div>
-<button class="btn btn-error fixed bottom-8 right-8" onclick={() => errorModal?.showModal()}>
+<button class="btn btn-error fixed bottom-8 right-8 z-10" onclick={() => errorModal?.showModal()}>
   <Icon src={BiError}/>
 </button>
 
