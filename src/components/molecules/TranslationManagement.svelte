@@ -4,12 +4,17 @@
   import type { AuthStore } from '@/types';
   import type { Translation } from '@/types/translation';
   import type { AxiosInstance } from 'axios';
+  import { Icon } from 'svelte-icons-pack';
+  import { FaSolidPencil } from 'svelte-icons-pack/fa';
+  import { LuFileJson } from 'svelte-icons-pack/lu';
   import type { Writable } from 'svelte/store';
+  import NoWrap from '../atoms/NoWrap.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
-  import NoWrap from '../atoms/NoWrap.svelte';
   import AddTranslationModal from './AddTranslationModal.svelte';
+  import ModifyTranslationModal from './ModifyTranslationModal.svelte';
+  import ViewTranslationObjectModal from './ViewTranslationObjectModal.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -45,10 +50,52 @@
   function showAddModal() {
     addTranslationDialog?.showModal();
   }
+
+  let modifyTranslationDialog:HTMLDialogElement|undefined = $state();
+  let selectedTranslation:Translation|undefined = $state();
+  function modifyTranslation(translation: Translation) {
+    return () => {
+      selectedTranslation = translation;
+      modifyTranslationDialog?.showModal();
+    };
+  }
+
+  let viewModal:HTMLDialogElement|undefined = $state();
+  function openViewModal() {
+    viewModal?.showModal();
+  }
 </script>
+
+{#snippet colgroup()}
+  <colgroup>
+    <col class="max-w-fit">
+    <col class="max-w-fit">
+    <col>
+    <col>
+    <col>
+    <col class="w-full">
+  </colgroup>
+{/snippet}
+
+{#snippet header()}
+  <th>Id</th>
+  <th></th>
+  <th>Language</th>
+  <th>Platform</th>
+  <th>Key</th>
+  <th>Value</th>
+{/snippet}
 
 {#snippet content(translation: Translation)}
   <td><NoWrap>{translation.id}</NoWrap></td>
+  <td>
+    <button
+      onclick={modifyTranslation(translation)}
+      class="btn bg-slate-600"
+    >
+      <Icon src={FaSolidPencil}/>
+    </button>
+  </td>
   <td><NoWrap>{translation.lang}</NoWrap></td>
   <td><NoWrap>{translation.platform}</NoWrap></td>
   <td><NoWrap>{translation.key}</NoWrap></td>
@@ -59,6 +106,15 @@
   bind:dialog={addTranslationDialog}
   {client}
   onsuccess={reloadData}
+/>
+<ModifyTranslationModal
+  {client}
+  bind:item={selectedTranslation}
+  bind:dialog={modifyTranslationDialog}
+/>
+<ViewTranslationObjectModal
+  {client}
+  bind:dialog={viewModal}
 />
 <Collapse5
   title="Translation Management"
@@ -71,8 +127,15 @@
     onreload={reloadData}
     onadd={showAddModal}
   />
+  <button class="btn bg-slate-600"
+    onclick={openViewModal}
+  >
+    <Icon src={LuFileJson}/>
+  </button>
   {#if translationList.length > 0}
     <Table5
+      {header}
+      {colgroup}
       itemList={translationList}
       {content}
     />

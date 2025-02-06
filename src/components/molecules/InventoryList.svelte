@@ -47,6 +47,7 @@
       $page: `${page}`,
       $order: 'createdAt',
       $sort: 'ASC',
+      noStockInBottom: 'true',
     });
     if (companyId && companyId !== '') {
       params.append('companyId', companyId);
@@ -84,6 +85,7 @@
   };
 
   const qtyMap:Record<string, number> = $state({});
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function changeQtyHandler(id: string) {
     return (e: MouseEvent) => {
       if (e.currentTarget) {
@@ -135,7 +137,7 @@
   {#if isOrder}
     <td>
       <input type="number" placeholder="qty" class="input input-bordered w-24 max-w-xs"
-        onclick={changeQtyHandler(item.id)}
+        bind:value={qtyMap[item.id]}
       />
     </td>
     <td>
