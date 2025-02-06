@@ -5,15 +5,20 @@
   import PostButton from '../atoms/PostButton.svelte';
   import type { Translation } from '@/types/translation';
   import FormWrapper from '../atoms/FormWrapper.svelte';
+  import InputAutoComplete from '../atoms/InputAutoComplete.svelte';
 
   type Props = {
     client: AxiosInstance,
+    langList?: string[],
+    platformList?: string[],
     onsuccess?: (data: Translation) => void,
     dialog?: HTMLDialogElement,
   };
 
   let {
     client,
+    langList = $bindable([]),
+    platformList = $bindable([]),
     onsuccess,
     dialog = $bindable(),
   }:Props = $props();
@@ -55,13 +60,22 @@
         <div class="label">
           <span class="label-text">Language</span>
         </div>
-        <input maxlength=2 type="text" placeholder="language" bind:value={data.lang} class="input input-bordered w-full max-w-xs" />
+        <InputAutoComplete
+          maxlength={2}
+          placeholder="language"
+          bind:value={data.lang}
+          suggestions={langList}
+        />
       </label>
       <label class="form-control w-full max-w-xs mb-2">
         <div class="label">
           <span class="label-text">Platform</span>
         </div>
-        <input type="text" placeholder="platform" bind:value={data.platform} class="input input-bordered w-full max-w-xs" />
+        <InputAutoComplete
+          placeholder="platform"
+          bind:value={data.platform}
+          suggestions={platformList}
+        />
       </label>
       <label class="form-control w-full max-w-xs mb-2">
         <div class="label">

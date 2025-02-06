@@ -25,6 +25,8 @@
     store = SuperAdminStore,
   }: Props = $props();
 
+  let langList:string[] = $state([]);
+  let platformList:string[] = $state([]);
   let translationList:Translation[] = $state([]);
   let search = $state(''); 
   let page = $state(1);
@@ -45,9 +47,19 @@
 
     translationList = response.data?.data ?? [];
   }
+  async function getLangList() {
+    const response = await client.get('/translation/lang');
+    langList = response.data?.data ?? [];
+  }
+  async function getPlatformList() {
+    const response = await client.get('/translation/platform');
+    platformList = response.data?.data ?? [];
+  }
 
   let addTranslationDialog:HTMLDialogElement|undefined = $state();
-  function showAddModal() {
+  async function showAddModal() {
+    await getLangList();
+    await getPlatformList();
     addTranslationDialog?.showModal();
   }
 
@@ -106,6 +118,8 @@
   bind:dialog={addTranslationDialog}
   {client}
   onsuccess={reloadData}
+  bind:langList
+  bind:platformList
 />
 <ModifyTranslationModal
   {client}
