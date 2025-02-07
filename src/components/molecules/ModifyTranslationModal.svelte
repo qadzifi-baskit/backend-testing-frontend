@@ -10,11 +10,13 @@
     client: AxiosInstance,
     dialog: HTMLDialogElement | undefined,
     item?: Translation,
+    onsuccess?: () => void,
   };
   let {
     client,
     dialog = $bindable(),
     item = $bindable(),
+    onsuccess,
   }: Props = $props();
 
   const newData:Partial<Translation> = $state({
@@ -70,8 +72,9 @@
       path={`/translation/${item?.id ?? ''}`}
       method="PATCH"
       {client}
-      {prehook}
       payload={newData}
+      {prehook}
+      {onsuccess}
     >
       <label class="form-control w-full max-w-xs mb-2">
         <div class="label">

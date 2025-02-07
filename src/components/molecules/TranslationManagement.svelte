@@ -71,6 +71,11 @@
       modifyTranslationDialog?.showModal();
     };
   }
+  function successModifyTranslation() {
+    stringToast('Translation modified');
+    modifyTranslationDialog?.close();
+    reloadData();
+  }
 
   let viewModal:HTMLDialogElement|undefined = $state();
   function openViewModal() {
@@ -125,6 +130,7 @@
   {client}
   bind:item={selectedTranslation}
   bind:dialog={modifyTranslationDialog}
+  onsuccess={successModifyTranslation}
 />
 <ViewTranslationObjectModal
   {client}
