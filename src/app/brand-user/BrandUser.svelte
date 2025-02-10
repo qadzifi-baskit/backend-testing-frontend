@@ -5,6 +5,7 @@
   import Config from '@/components/molecules/Config.svelte';
   import RegisterBrand from '@/components/molecules/RegisterBrand.svelte';
   import { listenAuthSuccess, listenDoAuth } from '@/event';
+  import { apiEnv } from '@/lib/config/env.svelte';
   import { BrandUserStore } from '@/store/store';
   import type { Company } from '@/types';
   import axios from 'axios';
@@ -15,7 +16,7 @@
   };
 
   let {
-    host = $bindable(import.meta.env.VITE_API_HOST),
+    host = $bindable(apiEnv.DEFAULT_API_HOST),
     showHost = true,
   }:Props = $props();
 

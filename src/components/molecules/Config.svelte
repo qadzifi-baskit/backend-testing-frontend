@@ -3,6 +3,7 @@
   import Collapse from '../Collapse.svelte';
   import Select from '../Select.svelte';
   import type { AxiosInstance } from 'axios';
+  import { apiEnv } from '@/lib/config/env.svelte';
 
   type Props = {
     host?: string,
@@ -12,7 +13,7 @@
     client?: AxiosInstance,
   };
   let {
-    host = $bindable('http://127.0.0.1'),
+    host = $bindable(apiEnv.DEFAULT_API_HOST),
     clientType = $bindable('BASKIT_SHOP'),
     showHost = true,
     showClient = true,
@@ -36,10 +37,7 @@
     <Select
       title="Host"
       showValue
-      options={[
-        ['http://127.0.0.1', 'Local Host'],
-        ['https://api-beta.baskit.app/v2', 'Beta'],
-      ]}
+      options={apiEnv.HOST_LIST}
       bind:value={host}
     />
   {/if}

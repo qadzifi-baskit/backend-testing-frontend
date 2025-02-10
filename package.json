@@ -8,6 +8,7 @@
     "start": "vite",
     "start:select": "tsx scripts/dev.ts",
     "start:beta": "vite --mode beta",
+    "start:prod": "vite --mode prod",
     "build:select": "tsx scripts/build.ts",
     "build": "vite build",
     "preview": "vite preview",

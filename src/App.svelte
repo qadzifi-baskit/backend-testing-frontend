@@ -11,8 +11,9 @@
   import SuperAdmin from './app/super-admin/SuperAdmin.svelte';
   import Config from './components/molecules/Config.svelte';
   import ErrorManagerModal from './components/molecules/ErrorManagerModal.svelte';
+  import { apiEnv } from './lib/config/env.svelte';
   let selected = $state(1);
-  let host = $state(import.meta.env.VITE_API_HOST);
+  let host = $state(apiEnv.DEFAULT_API_HOST);
 
   type PageComponent = Component<{ host: string, showHost: boolean }>;
   const tabs:{ label: string, component: PageComponent }[] = [

@@ -13,13 +13,14 @@
   import { GrosirSellerStore } from '@/store/store';
   import type { Company } from '@/types';
   import { createAxiosInstance } from '@/lib/helper/axios.svelte';
+  import { apiEnv } from '@/lib/config/env.svelte';
 
   type Props = {
     host?: string,
     showHost?: boolean,
   };
   let {
-    host = $bindable(import.meta.env.VITE_API_HOST),
+    host = $bindable(apiEnv.DEFAULT_API_HOST),
     showHost = $bindable(true),
   }:Props = $props();
   const client = createAxiosInstance({ baseURL: host });

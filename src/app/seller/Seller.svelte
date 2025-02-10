@@ -9,6 +9,7 @@
   import ProductManagement from '@/components/molecules/ProductManagement.svelte';
   import SellerRegister from '@/components/molecules/SellerRegister.svelte';
   import { listenAuthSuccess, listenDoAuth } from '@/event';
+  import { apiEnv } from '@/lib/config/env.svelte';
   import { OrderTypeEnum } from '@/lib/enum';
   import { SellerAdminStore } from '@/store/store';
   import type { Company } from '@/types';
@@ -19,7 +20,7 @@
     showHost?: boolean,
   };
   let {
-    host = $bindable(import.meta.env.VITE_API_HOST),
+    host = $bindable(apiEnv.DEFAULT_API_HOST),
     showHost = $bindable(true),
   }:Props = $props();
   const client = axios.create({ baseURL: host });

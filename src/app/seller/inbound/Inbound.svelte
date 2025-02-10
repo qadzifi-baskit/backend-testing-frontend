@@ -15,7 +15,6 @@
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPencil } from 'svelte-icons-pack/fa';
   let host = 'http://127.0.0.1';
-  // let host = 'https://api-beta.baskit.app/v2';
   let companyId:string|null = null;
   let inventory:Inventory[] = [];
   let paymentTypeList:PaymentType[] = [];
