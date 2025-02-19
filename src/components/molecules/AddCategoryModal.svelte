@@ -29,6 +29,10 @@
     parentId,
   });
 
+  $effect(() => {
+    data.parentId = parentId;
+  });
+
   function prehook(payload: Partial<Category>) {
     if (!$store.loggedIn) {
       stringToast('Not logged in');

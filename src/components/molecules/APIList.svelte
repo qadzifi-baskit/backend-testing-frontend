@@ -10,6 +10,7 @@
   import { FaSolidPlus } from 'svelte-icons-pack/fa';
   import AddApiModal from './AddAPIModal.svelte';
   import { SuperAdminStore } from '@/store/store';
+  import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -66,19 +67,13 @@
   class="w-full"
   onClick={getAPIList}
 >
-  <SearchField
-    bind:value={search}
-  />
-  <PaginationFancyButton
+  <PaginationNavigationPanel
+    bind:search
     bind:max
-    bind:value={page}
+    bind:page
+    onreload={getAPIList}
+    onadd={showAddAPI}
   />
-  <button
-    onclick={showAddAPI}
-    class="btn bg-slate-600"
-  >
-    <Icon src={FaSolidPlus}/>
-  </button>
   {#if apiList.length > 0}
     <Table itemList={apiList}>
     </Table>

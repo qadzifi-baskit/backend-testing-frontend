@@ -23,6 +23,7 @@
   }: Props = $props();
 
   let subCategoryList:Category[] = $state([]);
+
   async function reloadData() {
     if (!$store.loggedIn) {
       throw new Error('Not logged in');
@@ -40,6 +41,7 @@
 
   $effect(() => {
     if (parentId) {
+      subCategoryList = [];
       reloadData();
     }
   });

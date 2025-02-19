@@ -1,4 +1,5 @@
 <script lang="ts" generics="D, T">
+  import { cn } from '@/lib/helper/tailwind';
   import { stringToast } from '@/lib/helper/toast';
   import { isNil } from '@/lib/helper/util';
   import type { AuthStore } from '@/types';
@@ -17,6 +18,7 @@
     store?: Writable<AuthStore>,
     payload: DataType,
     path: string,
+    class?: string,
     method?: RequestMethod,
     prehook?: (data: DataType) => DataType|null|undefined,
     onsuccess?: (data: ResponseType) => void,
@@ -27,6 +29,7 @@
     store,
     path,
     method = 'POST',
+    class: clazz,
     children,
     prehook,
     onsuccess,
@@ -58,6 +61,6 @@
   }
 </script>
 
-<form {onsubmit}>
+<form {onsubmit} class={cn(clazz)}>
   {@render children()}
 </form>
