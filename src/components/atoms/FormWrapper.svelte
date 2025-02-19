@@ -1,5 +1,6 @@
 <script lang="ts" generics="D, T">
   import { stringToast } from '@/lib/helper/toast';
+  import { isNil } from '@/lib/helper/util';
   import type { AuthStore } from '@/types';
   import type { RequestMethod } from '@/types/http';
   import type { AxiosInstance, AxiosRequestConfig } from 'axios';
@@ -17,7 +18,7 @@
     payload: DataType,
     path: string,
     method?: RequestMethod,
-    prehook?: (data: DataType) => DataType,
+    prehook?: (data: DataType) => DataType|null|undefined,
     onsuccess?: (data: ResponseType) => void,
   };
   let {
@@ -38,7 +39,11 @@
     }
     let processedPayload = payload;
     if (prehook) {
-      processedPayload = prehook(payload);
+      const result = prehook(payload);
+      if (isNil(result)) {
+        return stringToast('Form prehook failed');
+      }
+      processedPayload = result;
     }
     const config:AxiosRequestConfig<DataType> = {
       url: path,

@@ -19,9 +19,10 @@
 
   function ontoggle() {
     if (dialog?.open) {
-      currentModalStore.set(dialog);
+      const pushedDialog = dialog;
+      currentModalStore.update((value) => [pushedDialog, ...value]);
     } else {
-      currentModalStore.set(null);
+      currentModalStore.update((value) => value.slice(1));
     }
   }
 </script>

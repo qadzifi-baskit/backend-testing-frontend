@@ -7,7 +7,10 @@ import Toastify from 'toastify-js';
 let selector:HTMLDialogElement|null = null;
 
 currentModalStore.subscribe((value) => {
-  selector = value;
+  if (value.length === 0) {
+    selector = null;
+  }
+  selector = value[0];
 });
 
 export function createAxiosInstance(
