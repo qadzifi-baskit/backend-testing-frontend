@@ -6,7 +6,7 @@
   import type { Writable } from 'svelte/store';
   import Modal from '../Modal.svelte';
   import FormWrapper from '../atoms/FormWrapper.svelte';
-  import PostButton from '../atoms/PostButton.svelte';
+  import SubmitButton from '../atoms/SubmitButton.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -78,7 +78,7 @@
           <input type="text" disabled placeholder="parent id" bind:value={parentId} class="input input-bordered w-full max-w-xs" />
         </label>
       {/if}
-      <PostButton>Add</PostButton>
+      <SubmitButton>Add</SubmitButton>
     </FormWrapper>
   </div>
 </Modal>

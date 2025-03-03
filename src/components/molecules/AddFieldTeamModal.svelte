@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { AxiosInstance } from 'axios';
   import Modal from '../Modal.svelte';
-  import PostButton from '../atoms/PostButton.svelte';
+  import SubmitButton from '../atoms/SubmitButton.svelte';
   import type { CreateFieldTeamResponse } from '@/types/user';
   import type { Writable } from 'svelte/store';
   import type { AuthStore, Role } from '@/types';
@@ -109,13 +109,13 @@
       </div>
       <input type="text" placeholder="email" bind:value={email} class="input input-bordered w-full max-w-xs" />
     </label>
-    <PostButton
+    <SubmitButton
       path="/users/field-team"
       bind:data
       {onsuccess}
       {client}
     >
       Add
-    </PostButton>
+    </SubmitButton>
   </div>
 </Modal>

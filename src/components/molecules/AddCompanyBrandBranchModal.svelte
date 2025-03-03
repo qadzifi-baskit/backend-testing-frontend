@@ -2,7 +2,7 @@
   import { DigitText, DigitTextID } from '@/consts/number';
   import type { CompanyType } from '@/types';
   import type { AxiosInstance } from 'axios';
-  import PostButton from '../atoms/PostButton.svelte';
+  import SubmitButton from '../atoms/SubmitButton.svelte';
   import Modal from '../Modal.svelte';
   import Select from '../Select.svelte';
   import { listenConfigChange } from '@/event';
@@ -166,12 +166,12 @@
     ])}
   />
   <div class="label"></div>
-  <PostButton
+  <SubmitButton
     {client}
     {data}
     path='/users/brand/branch'
     {onsuccess}
   >
     Register
-  </PostButton>
+  </SubmitButton>
 </Modal>

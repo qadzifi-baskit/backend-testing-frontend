@@ -69,5 +69,7 @@
 >
   {#if children}
     {@render children()}
+  {:else}
+    Submit
   {/if}
 </button>

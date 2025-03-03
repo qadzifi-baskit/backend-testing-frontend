@@ -4,7 +4,7 @@
   import type { AxiosInstance } from 'axios';
   import Collapse from '../Collapse.svelte';
   import Select from '../Select.svelte';
-  import PostButton from '../atoms/PostButton.svelte';
+  import SubmitButton from '../atoms/SubmitButton.svelte';
   import { listenConfigChange } from '@/event';
 
   type Props = {
@@ -280,12 +280,12 @@
     ])}
   />
   <div class="label"></div>
-  <PostButton
+  <SubmitButton
     {client}
     {data}
     path='/auth/register'
     {onsuccess}
   >
     Register
-  </PostButton>
+  </SubmitButton>
 </Collapse>

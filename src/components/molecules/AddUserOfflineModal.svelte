@@ -3,7 +3,7 @@
   import type { AxiosInstance } from 'axios';
   import type { Writable } from 'svelte/store';
   import Modal from '../Modal.svelte';
-  import PostButton from '../atoms/PostButton.svelte';
+  import SubmitButton from '../atoms/SubmitButton.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -64,13 +64,13 @@
       </div>
       <input type="text" placeholder="address" bind:value={data.address} class="input input-bordered w-full max-w-xs" />
     </label>
-    <PostButton
+    <SubmitButton
       {client}
       {store}
       path="/user-offline"
       bind:data
     >
       Add
-    </PostButton>
+    </SubmitButton>
   </div>
 </Modal>

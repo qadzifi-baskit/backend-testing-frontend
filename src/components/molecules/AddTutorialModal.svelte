@@ -6,7 +6,7 @@
   import Modal from '../Modal.svelte';
   import FormWrapper from '../atoms/FormWrapper.svelte';
   import { stringToast } from '@/lib/helper/toast';
-  import PostButton from '../atoms/PostButton.svelte';
+  import SubmitButton from '../atoms/SubmitButton.svelte';
 
   type Props = {
     client: AxiosInstance;
@@ -110,7 +110,7 @@
         </div>
         <input type="text" placeholder="parent id" bind:value={data.parentId} class="input input-bordered w-full max-w-xs" />
       </label>
-      <PostButton>Add</PostButton>
+      <SubmitButton>Add</SubmitButton>
     </FormWrapper>
   </div>
 </Modal>

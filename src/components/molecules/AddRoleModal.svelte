@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { AxiosInstance } from 'axios';
-  import PostButton from '../atoms/PostButton.svelte';
+  import SubmitButton from '../atoms/SubmitButton.svelte';
   import Modal from '../Modal.svelte';
 
   type Props = {
@@ -43,13 +43,13 @@
       <textarea placeholder="description" bind:value={data.description} class="textarea textarea-bordered h-24"></textarea>
     </label>
     <div class="label"></div>
-    <PostButton
+    <SubmitButton
       path="/role"
       {client}
       {data}
       {onsuccess}
     >
       Create
-    </PostButton>
+    </SubmitButton>
   </div>
 </Modal>

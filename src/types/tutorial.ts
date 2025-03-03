@@ -6,4 +6,5 @@ export type Tutorial = {
   description: string,
   number: number|null,
   parentId: string|null,
+  completed?: boolean,
 };

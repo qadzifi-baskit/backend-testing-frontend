@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { AxiosInstance } from 'axios';
   import Modal from '../Modal.svelte';
-  import PostButton from '../atoms/PostButton.svelte';
+  import SubmitButton from '../atoms/SubmitButton.svelte';
   import type { EventHandler } from 'svelte/elements';
 
   type Props = {
@@ -47,13 +47,13 @@
       </div>
       <input type="text" placeholder="type" bind:value={data.type} class="input input-bordered w-full max-w-xs" />
     </label>
-    <PostButton
+    <SubmitButton
       path="/company/type"
       {client}
       {data}
       {onsuccess}
     >
       Add
-    </PostButton>
+    </SubmitButton>
   </div>
 </Modal>

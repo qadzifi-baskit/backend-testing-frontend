@@ -2,7 +2,7 @@
   import type { AxiosInstance } from 'axios';
   import { nonLowerCaseRegexp } from '../../consts/regexp';
   import Modal from '../Modal.svelte';
-  import PostButton from '../atoms/PostButton.svelte';
+  import SubmitButton from '../atoms/SubmitButton.svelte';
   import type { Translation } from '@/types/translation';
   import FormWrapper from '../atoms/FormWrapper.svelte';
   import InputAutoComplete from '../atoms/InputAutoComplete.svelte';
@@ -89,9 +89,9 @@
         </div>
         <input type="text" placeholder="value" bind:value={data.value} class="input input-bordered w-full max-w-xs" />
       </label>
-      <PostButton>
+      <SubmitButton>
         Add
-      </PostButton>
+      </SubmitButton>
     </FormWrapper>
   </div>
 </Modal>

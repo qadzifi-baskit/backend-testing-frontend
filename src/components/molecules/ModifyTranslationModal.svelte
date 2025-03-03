@@ -4,7 +4,7 @@
   import type { Translation } from '@/types/translation';
   import FormWrapper from '../atoms/FormWrapper.svelte';
   import { isObjectEmpty } from '@/lib/helper/util';
-  import PostButton from '../atoms/PostButton.svelte';
+  import SubmitButton from '../atoms/SubmitButton.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -99,7 +99,7 @@
           <span class="label-text">Value</span>
         </div>
         <input type="text" placeholder="value" bind:value={newData.value} class="input input-bordered w-full max-w-xs" />
-        <PostButton class="mt-4">Save</PostButton>
+        <SubmitButton class="mt-4">Save</SubmitButton>
       </label>
     </FormWrapper>
   </div>
