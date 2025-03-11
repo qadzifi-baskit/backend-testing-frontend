@@ -83,42 +83,6 @@
   }
 </script>
 
-{#snippet colgroup()}
-  <colgroup>
-    <col class="max-w-fit">
-    <col class="max-w-fit">
-    <col>
-    <col>
-    <col>
-    <col class="w-full">
-  </colgroup>
-{/snippet}
-
-{#snippet header()}
-  <th>Id</th>
-  <th></th>
-  <th>Language</th>
-  <th>Platform</th>
-  <th>Key</th>
-  <th>Value</th>
-{/snippet}
-
-{#snippet content(translation: Translation)}
-  <td><NoWrap>{translation.id}</NoWrap></td>
-  <td>
-    <button
-      onclick={modifyTranslation(translation)}
-      class="btn bg-slate-600"
-    >
-      <Icon src={FaSolidPencil}/>
-    </button>
-  </td>
-  <td><NoWrap>{translation.lang}</NoWrap></td>
-  <td><NoWrap>{translation.platform}</NoWrap></td>
-  <td><NoWrap>{translation.key}</NoWrap></td>
-  <td><NoWrap>{translation.value}</NoWrap></td>
-{/snippet}
-
 <AddTranslationModal
   bind:dialog={addTranslationDialog}
   {client}
@@ -154,10 +118,43 @@
   </button>
   {#if translationList.length > 0}
     <Table5
-      {header}
-      {colgroup}
       itemList={translationList}
-      {content}
-    />
+    >
+      {#snippet colgroup()}
+        <colgroup>
+          <col class="max-w-fit">
+          <col class="max-w-fit">
+          <col>
+          <col>
+          <col>
+          <col class="w-full">
+        </colgroup>
+      {/snippet}
+
+      {#snippet header()}
+        <th>Id</th>
+        <th></th>
+        <th>Language</th>
+        <th>Platform</th>
+        <th>Key</th>
+        <th>Value</th>
+      {/snippet}
+
+      {#snippet content(translation: Translation)}
+        <td><NoWrap>{translation.id}</NoWrap></td>
+        <td>
+          <button
+            onclick={modifyTranslation(translation)}
+            class="btn bg-slate-600"
+          >
+            <Icon src={FaSolidPencil}/>
+          </button>
+        </td>
+        <td><NoWrap>{translation.lang}</NoWrap></td>
+        <td><NoWrap>{translation.platform}</NoWrap></td>
+        <td><NoWrap>{translation.key}</NoWrap></td>
+        <td><NoWrap>{translation.value}</NoWrap></td>
+      {/snippet}
+    </Table5>
   {/if}
 </Collapse5>
