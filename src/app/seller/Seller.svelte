@@ -8,6 +8,7 @@
   import OrderList from '@/components/molecules/OrderList.svelte';
   import ProductManagement from '@/components/molecules/ProductManagement.svelte';
   import SellerRegister from '@/components/molecules/SellerRegister.svelte';
+  import UserOFflineManagement from '@/components/molecules/UserOFflineManagement.svelte';
   import { listenAuthSuccess, listenDoAuth } from '@/event';
   import { apiEnv } from '@/lib/config/env.svelte';
   import { OrderTypeEnum } from '@/lib/enum';
@@ -81,6 +82,12 @@
   />
   <div class="divider"></div>
   <InventoryList {client} store={SellerAdminStore}/>
+  <div class="divider"></div>
+  <UserOFflineManagement
+    {client}
+    store={SellerAdminStore}
+    bind:companyId
+  />
   <div class="divider"></div>
   <ExternalSalesManagament {client}
     bind:companyId
