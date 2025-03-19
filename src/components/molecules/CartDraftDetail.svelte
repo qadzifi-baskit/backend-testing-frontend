@@ -9,6 +9,7 @@
   import SubmitButton from '../atoms/SubmitButton.svelte';
   import Modal from '../Modal.svelte';
   import BuyerCart from './BuyerCart.svelte';
+  import { stringToast } from '@/lib/helper/toast';
 
   type Props = {
     client: AxiosInstance,
@@ -17,6 +18,7 @@
     item?: CartParent,
     companyId?: string,
     onsuccess?: (data: CartParent) => void
+    ondelete?: (data: CartParent) => void
   };
   let {
     client,
@@ -25,6 +27,7 @@
     item = $bindable(),
     companyId = $bindable(),
     onsuccess,
+    ondelete,
   }: Props = $props();
 
   const newData:Partial<CartParent> = $state({
@@ -58,6 +61,21 @@
     }
     return newPayload;
   }
+
+  async function deleteDraft() {
+    if (!item) {
+      return stringToast('No item selected');
+    }
+    stringToast('Deleting...');
+    const response = await client.delete(`/cart/draft/${item.id}`);
+    if (response.status !== 200) {
+      return stringToast('Failed to delete');
+    }
+    if (ondelete) {
+      ondelete(item);
+    }
+    return stringToast('Deleted');
+  }
 </script>
 
 <Modal bind:dialog>
@@ -74,7 +92,7 @@
         <div class="label">
           <span class="label-text">Id</span>
         </div>
-        <input type="text" placeholder="id" bind:value={newData.id} class="input input-bordered w-full max-w-xs" />
+        <input readonly type="text" placeholder="id" bind:value={newData.id} class="input input-bordered w-full max-w-xs" />
       </label>
       <label class="form-control w-full max-w-xs mb-2">
         <div class="label">
@@ -83,6 +101,7 @@
         <input type="text" placeholder="sales id" bind:value={newData.salesId} class="input input-bordered w-full max-w-xs" />
       </label>
       <SubmitButton/>
+      <button class="btn bg-slate-600 my-2" onclick={deleteDraft}>Delete</button>
     </FormWrapper>
 
     {#if item?.id}

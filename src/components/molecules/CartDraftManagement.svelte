@@ -11,6 +11,7 @@
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import EditButton from '../atoms/EditButton.svelte';
   import CartDraftDetail from './CartDraftDetail.svelte';
+  import DeleteButton from '../atoms/DeleteButton.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -50,6 +51,23 @@
       modifyDraftDilaog?.showModal();
     };
   }
+  function onModifyDelete(data: CartParent) {
+    selectedDraft = undefined;
+    modifyDraftDilaog?.close();
+    reloadData();
+  }
+
+  function deleteDraft(cart: CartParent) {
+    return async () => {
+      stringToast('Deleting...');
+      const response = await client.delete(`/cart/draft/${cart.id}`);
+      if (response.status !== 200) {
+        return stringToast('Failed to delete');
+      }
+      reloadData();
+      return stringToast('Deleted');
+    };
+  }
 </script>
 
 <CartDraftDetail
@@ -57,6 +75,7 @@
   bind:dialog={modifyDraftDilaog}
   bind:item={selectedDraft}
   bind:companyId
+  ondelete={onModifyDelete}
 />
 <Collapse5 title="Cart Draft Management">
   <PaginationNavigationPanel
@@ -71,12 +90,14 @@
           <col>
           <col>
           <col>
+          <col>
           <col class="w-full">
         </colgroup>
       {/snippet}
       {#snippet header()}
         <td>Created At</td>
         <td>Id</td>
+        <td></td>
         <td></td>
         <td>Ref Code</td>
       {/snippet}
@@ -86,6 +107,9 @@
         <td><NoWrap>{cart.id}</NoWrap></td>
         <td>
           <EditButton onclick={modifyDraft(cart)}/>
+        </td>
+        <td>
+          <DeleteButton onclick={deleteDraft(cart)}/>
         </td>
         <td><NoWrap>{cart.refCode}</NoWrap></td>
       {/snippet}

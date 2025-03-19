@@ -107,6 +107,7 @@
         store={SellerAdminStore}
         {client}
         bind:userId={customerId}
+        bind:companyId
         orderType={OrderTypeEnum.OFFLINE}
       />
     </div>

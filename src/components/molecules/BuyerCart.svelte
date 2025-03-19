@@ -9,12 +9,14 @@
   import Collapse from '../Collapse.svelte';
   import Table5 from '../Table5.svelte';
   import type { Cart } from '@/types/cart';
+  import { stringToast } from '@/lib/helper/toast';
 
   type Props = {
     client: AxiosInstance,
     store?: Writable<AuthStore>,
     userId?: string,
     cartCode?: string,
+    companyId?: string,
     orderType?: OrderTypeEnum,
     clientType?: string,
     memberLevel?: string|null,
@@ -26,6 +28,7 @@
     store,
     userId = $bindable(),
     cartCode = $bindable(),
+    companyId = $bindable(),
     orderType = OrderTypeEnum.SHOP,
     clientType = 'BASKIT_SHOP',
     memberLevel = $bindable(null),
@@ -152,6 +155,18 @@
     getPaymentType();
     getCart();
   });
+
+  async function saveCart() {
+    if (!$store || !$store.loggedIn) return;
+    stringToast('Saving cart');
+    const response = await client.post(
+      '/cart/draft',
+      { companyId },
+    );
+    if (response.status === 200) {
+      stringToast('Cart saved');
+    }
+  }
 </script>
 
 {#snippet header()}
@@ -251,6 +266,8 @@
         <option value={value}>{label}</option>
       {/each}
     </select>
-    <button class="btn" onclick={createOrder} disabled={paymentTypeId === ''}>Create Order</button>
   </div>
+  <div class="label"></div>
+  <button class="btn bg-slate-600" onclick={createOrder} disabled={paymentTypeId === ''}>Create Order</button>
+  <button class="btn bg-slate-600" onclick={saveCart} disabled={!cartList.length}>Save Cart</button>
 </Collapse>
