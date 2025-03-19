@@ -1,30 +1,35 @@
 <script lang="ts">
   import { listenAuthSuccess } from '@/event';
   import { DeliveryTypeEnum, OrderTypeEnum } from '@/lib/enum';
-  import type { AuthStore, Cart, PaymentType, WarehouseDetail } from '@/types';
+  import type { AuthStore, PaymentType, WarehouseDetail } from '@/types';
   import type { AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaFloppyDisk, FaTrashCan } from 'svelte-icons-pack/fa';
   import type { Writable } from 'svelte/store';
   import Collapse from '../Collapse.svelte';
   import Table5 from '../Table5.svelte';
+  import type { Cart } from '@/types/cart';
 
   type Props = {
     client: AxiosInstance,
     store?: Writable<AuthStore>,
     userId?: string,
+    cartCode?: string,
     orderType?: OrderTypeEnum,
     clientType?: string,
     memberLevel?: string|null,
+    show?: boolean,
     onOrderCreated?: () => unknown,
   };
   let {
     client,
     store,
     userId = $bindable(),
+    cartCode = $bindable(),
     orderType = OrderTypeEnum.SHOP,
     clientType = 'BASKIT_SHOP',
     memberLevel = $bindable(null),
+    show = false,
     onOrderCreated = () => null,
   }:Props = $props();
 
@@ -79,6 +84,9 @@
     });
     if ($store.userId) {
       params.append('createdBy', $store.userId);
+    }
+    if (cartCode) {
+      params.append('cartCode', cartCode);
     }
     const response = await client.get('/order', { params });
     if (response.status !== 200) return;
@@ -192,7 +200,7 @@
   <td>{cart.fullName}</td>
 {/snippet}
 
-<Collapse class="overflow-x-auto" onClick={getCart} title="Order Summary">
+<Collapse class="overflow-auto" onClick={getCart} title="Order Summary" {show}>
   <button class="btn" onclick={getCart}>Get Cart</button>
   <Table5
     itemList={cartList}

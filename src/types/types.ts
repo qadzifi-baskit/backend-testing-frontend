@@ -1,5 +1,5 @@
 import type { OrderDetailStatusEnum } from '@/lib/enum';
-import type { MemberDiscountLevel } from '@/lib/enum/memberDiscount.enum';
+import type { Cart } from './cart';
 
 export type AuthStore = {
   userId: string,
@@ -61,22 +61,6 @@ export type ProductMaster = {
   fullName: string,
   image: string,
   isAdded: boolean,
-};
-
-export type Cart = {
-  id: string, // Cart ID
-  inventoryId: string,
-  productId: string,
-  companyId: string,
-  initialPrice: number,
-  tierPrice: number,
-  sellingPrice: number,
-  fullName: string,
-  name: string,
-  qty: number,
-  warehouse: number,
-  memberLevel: MemberDiscountLevel|null,
-  memberDiscountAmount: number|null,
 };
 
 export type Order = {

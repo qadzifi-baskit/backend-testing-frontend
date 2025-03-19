@@ -16,7 +16,7 @@
     endpoint?: string,
     client: AxiosInstance,
     userId?: string,
-    orderType?: string,
+    orderType?: string|string[],
     companyId?: string,
     store?: Writable<AuthStore>,
   };
@@ -35,20 +35,23 @@
 
   const getOrderList = async () => {
     if ($store && !$store.loggedIn) return;
-    const query:Record<string, string> = {
+    const params = new URLSearchParams({
       $order: 'createdAt',
       $sort: 'DESC',
       $limit: '10',
       $page: `${page}`,
-      orderType,
-    };
+    });
+    if (Array.isArray(orderType)) {
+      orderType.forEach((type) => params.append('orderType', type));
+    } else if (orderType) {
+      params.append('orderType', orderType);
+    }
     if (userId) {
-      query.userId = userId;
+      params.append('userId', userId);
     }
     if (companyId) {
-      query.companyId = companyId;
+      params.append('companyId', companyId);
     }
-    const params = new URLSearchParams(query);
     const response = await client.get(
       `/order/${endpoint}`,
       { params },

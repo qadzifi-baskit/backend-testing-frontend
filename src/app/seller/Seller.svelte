@@ -1,6 +1,7 @@
 <script lang="ts">
   import Auth from '@/components/molecules/Auth.svelte';
   import BuyerCart from '@/components/molecules/BuyerCart.svelte';
+  import CartDraftManagement from '@/components/molecules/CartDraftManagement.svelte';
   import Config from '@/components/molecules/Config.svelte';
   import ExternalSalesManagament from '@/components/molecules/ExternalSalesManagament.svelte';
   import FieldTeamManagement from '@/components/molecules/FieldTeamManagement.svelte';
@@ -111,10 +112,18 @@
     </div>
   </div>
   <div class="divider"></div>
+  <CartDraftManagement
+    {client}
+    bind:companyId
+  />
+  <div class="divider"></div>
   <OrderList
     {client}
     store={SellerAdminStore}
     {companyId}
-    orderType={OrderTypeEnum.OFFLINE}
+    orderType={[
+      OrderTypeEnum.OFFLINE,
+      OrderTypeEnum.SELLER_PURCHASE_ORDER,
+    ]}
   />
 </div>
