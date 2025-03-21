@@ -55,9 +55,11 @@
     if (method !== 'GET') {
       config.data = processedPayload;
     }
+    stringToast('Submitting...');
     const response = await client(config);
     if (response.status !== 200) return;
     if (onsuccess) onsuccess(response.data?.data);
+    stringToast('Success');
   }
 </script>
 

@@ -62,6 +62,7 @@
     const response = await client.post('/order', {
       paymentTypeId,
       deliveryType,
+      cartCode,
       orderType,
       product: cartList.map((value) => ({
         cartId: value.id,

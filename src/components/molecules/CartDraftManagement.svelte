@@ -51,7 +51,7 @@
       modifyDraftDilaog?.showModal();
     };
   }
-  function onModifyDelete(data: CartParent) {
+  function onModifyDelete() {
     selectedDraft = undefined;
     modifyDraftDilaog?.close();
     reloadData();
