@@ -15,6 +15,7 @@
   import AddTranslationModal from './AddTranslationModal.svelte';
   import ModifyTranslationModal from './ModifyTranslationModal.svelte';
   import ViewTranslationObjectModal from './ViewTranslationObjectModal.svelte';
+  import { debounce } from '@/lib/helper/util';
 
   type Props = {
     client: AxiosInstance,
@@ -39,7 +40,12 @@
 
     stringToast('Loading...');
 
-    const response = await client.get('/translation');
+    const params = new URLSearchParams({ search });
+
+    const response = await client.get(
+      '/translation',
+      { params },
+    );
     if (response.status !== 200) {
       return stringToast('Failed to load data');
     }
@@ -47,6 +53,20 @@
 
     translationList = response.data?.data ?? [];
   }
+
+  const debounceReloadData = debounce(reloadData);
+
+  $effect(() => {
+    search;
+    page = 1;
+  });
+
+  $effect(() => {
+    search;
+    page;
+    debounceReloadData();
+  });
+
   async function getLangList() {
     const response = await client.get('/translation/lang');
     langList = response.data?.data ?? [];
