@@ -201,7 +201,7 @@
       <div class="label"></div>
       {#if !isObjectEmpty(acls)}
         <Table5
-          class="flex-grow"
+          class="grow"
           itemList={item.acls.toSorted((first, second) => first.createdAt < second.createdAt ? -1 : 1)}
           {colgroup}
           {header}

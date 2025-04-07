@@ -44,7 +44,7 @@
 
 <details bind:open={open} class="dropdown">
   <summary class="btn m-1">Select Date</summary>
-  <div class="menu dropdown-content bg-base-100 rounded-box z-20 w-fit p-2 shadow border border-slate-500">
+  <div class="menu dropdown-content bg-base-100 rounded-box z-20 w-fit p-2 shadow-sm border border-slate-500">
     <div class="flex">
       <label class="form-control w-1/2 max-w-xs">
         <div class="label">
@@ -60,7 +60,7 @@
         options={Array.from({length: 12}, (_, i) => [i+1, `${i+1}`])}
       />
     </div>
-    <div class="p-2 rounded-lg grid grid-cols-7 w-max [&>*]:w-10 [&>*]:h-10">
+    <div class="p-2 rounded-lg grid grid-cols-7 w-max *:w-10 *:h-10">
       <div class="font-bold content-center text-center">Mon</div>
       <div class="font-bold content-center text-center">Tue</div>
       <div class="font-bold content-center text-center">Wed</div>

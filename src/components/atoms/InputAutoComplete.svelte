@@ -39,13 +39,13 @@
     {maxlength}
     bind:this={inputElement}
   >
-  <ul class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+  <ul class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-xs">
     {#each filtered as item, idx}
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
       <li
         tabindex={idx + 1}
         onfocusin={() => value = item}
-        class="!pointer-events-auto"
+        class="pointer-events-auto!"
       >
         <button
           onclick={() => {

@@ -121,14 +121,14 @@
   </Collapse>
   <div class="divider"></div>
   <div class="flex w-full rounded-box">
-    <div class="card bg-base-300 rounded-box grid flex-grow w-2/5 h-fit">
+    <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
       <ProductList
         {userId}
         {client}
       />
     </div>
     <div class="divider divider-horizontal"></div>
-    <div class="card bg-base-300 rounded-box grid flex-grow w-2/5 h-fit">
+    <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
       <BuyerCart
         {client}
         {userId}

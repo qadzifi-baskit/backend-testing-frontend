@@ -149,7 +149,7 @@
 {/snippet}
 
 {#snippet dropdownContainer(content: Snippet)}
-  <ul class="menu input-bordered border dropdown-content bg-base-100 rounded-box z-[1000] w-fit p-0 shadow right-0">
+  <ul class="menu input-bordered border dropdown-content bg-base-100 rounded-box z-1000 w-fit p-0 shadow-sm right-0">
     {@render content()}
   </ul>
 {/snippet}

@@ -101,7 +101,7 @@
           'first:rounded-t-[inherit] last:rounded-b-[inherit]',
           'active:hover:animate-none active:hover:transform-none',
           'active:focus:animate-none active:focus:transform-none',
-          'has-[:checked]:bg-slate-700',
+          'has-checked:bg-slate-700',
           'p-0',
         )
       }
@@ -149,7 +149,7 @@
   {#if dropdownContainer}
     {@render dropdownContainer(dropdownContent)}
   {:else}
-    <ul class="menu input-bordered border dropdown-content bg-base-100 rounded-box z-[1000] w-fit p-0 shadow">
+    <ul class="menu input-bordered border dropdown-content bg-base-100 rounded-box z-1000 w-fit p-0 shadow-sm">
       {@render dropdownContent()}
     </ul>
   {/if}

@@ -113,7 +113,7 @@
   />
   <div class="divider"></div>
   <div class="flex w-full rounded-box">
-    <div class="card bg-base-300 rounded-box grid flex-grow w-2/5 h-fit">
+    <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
       <InventoryList isOrder {client} store={GrosirSellerStore}
         {companyId}
         bind:memberLevel
@@ -121,7 +121,7 @@
       />
     </div>
     <div class="divider divider-horizontal"></div>
-    <div class="card bg-base-300 rounded-box grid flex-grow w-2/5 h-fit">
+    <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
       <BuyerCart store={GrosirSellerStore}
         {client}
         bind:memberLevel

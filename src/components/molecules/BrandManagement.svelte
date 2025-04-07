@@ -221,7 +221,7 @@
       <Icon src={FaSolidRotate}/>
     </button>
     <div class="flex">
-      <div class="card bg-base-300 rounded-box grid h-fit w-2/5 flex-grow bg-inherit">
+      <div class="card bg-base-300 rounded-box grid h-fit w-2/5 grow bg-inherit">
         <div class="overflow-x-auto">
           <PaginationNavigationPanel
             bind:search
@@ -239,7 +239,7 @@
         </div>
       </div>
       <div class="divider divider-horizontal"></div>
-      <div class="card bg-base-300 rounded-box grid h-fit w-2/5 flex-grow bg-inherit">
+      <div class="card bg-base-300 rounded-box grid h-fit w-2/5 grow bg-inherit">
         <div class="overflow-x-auto">
           <PaginationNavigationPanel
             bind:search
