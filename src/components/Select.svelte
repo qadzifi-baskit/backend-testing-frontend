@@ -4,7 +4,7 @@
   type ValueType = T;
 
   export let title = '';
-  export let showValue = false;
+  export let showvalue = false;
   export let options: [ValueType, string, boolean?][] = [];
   export let value:ValueType;
   export let containerClass = '';
@@ -22,7 +22,7 @@
       <option value={optionValue} {disabled}>{optionLabel}</option>
     {/each}
   </select>
-  {#if showValue}
+  {#if showvalue}
     <div class="label">
       <span class="label-text-alt">{value}</span>
     </div>

@@ -179,8 +179,8 @@
           <span>Delete</span>
           <DropdownSelect
             bind:search={roleSearch}
-            bind:selectValue={newACL.roleId}
-            showValue
+            bind:value={newACL.roleId}
+            showvalue
             options={roleList.map((role) => [role.id, role.roleName])}
             display="LABEL"
             placeholder="ROLE"

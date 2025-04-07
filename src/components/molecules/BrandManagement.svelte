@@ -209,9 +209,9 @@
   <div class="w-full collapse-content">
     <DropdownSelect
       bind:search={principalSearch}
-      bind:selectValue={selectedPrincipalId}
+      bind:value={selectedPrincipalId}
       options={principalList.map((principal) => [principal.id, principal.name])}
-      showValue
+      showvalue
       display="LABEL"
       placeholder="principal"
     />

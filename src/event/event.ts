@@ -40,3 +40,9 @@ export const [
   dispatchUpdateMemberLevel,
   listenUpdateMemberLevel,
 ] = createEventManager('on-update-member-level');
+
+export const [
+  eventOpenCartDraftDetail,
+  dispatchOpenCartDraftDetail,
+  listenOpenCartDraftDetail,
+] = createEventManager('on-open-cart-draft-detail');

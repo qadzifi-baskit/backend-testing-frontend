@@ -4,6 +4,8 @@
   import type { Snippet } from 'svelte';
   import type { DropdownReturnType } from '@/types/component';
   import NoWrap from './NoWrap.svelte';
+  import { Icon } from 'svelte-icons-pack';
+  import { BiReset } from 'svelte-icons-pack/bi';
   // eslint-disable-next-line no-undef
   type ValueType = VT;
   // eslint-disable-next-line no-undef
@@ -18,9 +20,11 @@
     options?: [ValueType, LabelType][],
     placeholder?: string|Snippet,
     search?: string,
-    selectValue?: ValueType,
+    value?: ValueType,
+    default?: ValueType,
     display?: Display,
-    showValue?: boolean,
+    showvalue?: boolean,
+    resetable?: boolean,
     onclick?: () => void,
     onselect?: (value: ValueType) => ReturnType|Promise<ReturnType>,
     dropdownContainer?: Snippet<[Snippet]>,
@@ -30,16 +34,18 @@
     options = [],
     placeholder = 'placeholder',
     search = $bindable(),
-    selectValue = $bindable(),
+    value: selectValue = $bindable(),
+    default: defaultValue,
     display = 'VALUE',
-    showValue,
+    showvalue,
+    resetable,
     onclick,
     onselect,
     dropdownContainer,
   }:Props = $props();
 
   let selectElement:HTMLDetailsElement|undefined;
-  const onSelect = () => {
+  function onSelect() {
     if (selectElement) {
       selectElement.open = false;
     }
@@ -58,16 +64,36 @@
       })();
     }
   });
+
+  function reset() {
+    selectValue = defaultValue;
+    onSelect();
+  }
 </script>
 
 {#snippet dropdownContent()}
   {#if search !== undefined}
-    <SearchField
-      bind:value={search}
-      class="m-0 rounded-b-none"
-    />
+    {#if !resetable}
+      <SearchField
+        bind:value={search}
+        class="m-0 rounded-b-none"
+      />
+    {:else}
+      <div class="join">
+        <SearchField
+          bind:value={search}
+          class="m-0 rounded-b-none join-item"
+        />
+        <button class="btn bg-slate-600 join-item"
+          type="button"
+          onclick={reset}
+        >
+          <Icon src={BiReset}/>
+        </button>
+      </div>
+    {/if}
   {/if}
-  {#each options as [value, label]}
+  {#each options as [optionValue, optionLabel]}
     <button
       class={
         cn(
@@ -79,11 +105,12 @@
           'p-0',
         )
       }
+      type="button"
       onclick={onSelect}
     >
       <label class="label cursor-pointer py-0 px-4 w-full h-full">
         <span class="label-text">
-          <NoWrap>{label}</NoWrap>
+          <NoWrap>{optionLabel}</NoWrap>
         </span>
         <input
           bind:group={selectValue}
@@ -91,7 +118,7 @@
           name="radio-10"
           hidden
           checked
-          {value}
+          value={optionValue}
         />
       </label>
     </button>
@@ -103,7 +130,7 @@
 >
   <summary class="btn input-bordered w-fit justify-start"
     {onclick}
-    title={showValue && selectValue ? `${selectValue}` : undefined}
+    title={showvalue && selectValue ? `${selectValue}` : undefined}
   >
     {#if selectValue}
       {#if display === 'VALUE'}

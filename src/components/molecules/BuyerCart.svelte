@@ -10,6 +10,7 @@
   import Table5 from '../Table5.svelte';
   import type { Cart } from '@/types/cart';
   import { stringToast } from '@/lib/helper/toast';
+  import CartDraftDetail from './CartDraftDetail.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -21,6 +22,7 @@
     clientType?: string,
     memberLevel?: string|null,
     show?: boolean,
+    draft?: boolean,
     onOrderCreated?: () => unknown,
   };
   let {
@@ -32,7 +34,8 @@
     orderType = OrderTypeEnum.SHOP,
     clientType = 'BASKIT_SHOP',
     memberLevel = $bindable(null),
-    show = false,
+    show,
+    draft,
     onOrderCreated = () => null,
   }:Props = $props();
 
@@ -47,18 +50,20 @@
 
   const getPaymentType = async () => {
     if (!$store || !$store.loggedIn) return;
-    const paymentResponse = await client.get('/payment-type', {
+    stringToast('Loading payment type...');
+    const response = await client.get('/payment-type', {
       headers: {
         'X-CLIENT': clientType,
       },
     });
-    if (paymentResponse.status === 200) {
-      paymentTypeList = paymentResponse.data.data;
-    }
+    if (response.status !== 200) return stringToast('Failed to load payment type');
+    paymentTypeList = response.data.data;
+    stringToast('Payment type loaded');
   };
 
   const createOrder = async () => {
     if (!$store || !$store.loggedIn) return;
+    stringToast('Creating order...');
     const response = await client.post('/order', {
       paymentTypeId,
       deliveryType,
@@ -76,13 +81,14 @@
       })),
       userId,
     });
-    if (response.status === 200) {
-      onOrderCreated();
-    }
+    if (response.status !== 200) return stringToast('Failed to create order');
+    onOrderCreated();
+    return stringToast('Order created');
   };
 
-  const getCart = async () => {
+  async function getCart() {
     if (!$store || !$store.loggedIn) return;
+    stringToast('Loading cart...');
     const params = new URLSearchParams({
       orderType,
     });
@@ -117,17 +123,20 @@
       ],
       <[number, number, number, Cart[]]>[0, 0, 0, []],
     );
+    stringToast('Cart loaded');
   };
 
   const updateCartQty = async (cartId: string, qty: number) => {
     if (!store || $store?.loggedIn === false) return;
+    stringToast('Updating cart...');
     const response = await client.patch(`/cart/${cartId}`, {
       qty,
     });
-    if (response.status !== 200) return;
+    if (response.status !== 200) return stringToast('Failed to update cart');
     for (const key in cartQtyMap) {
       delete cartQtyMap[key];
     }
+    stringToast('Cart updated');
     getCart();
   };
 
@@ -157,72 +166,75 @@
     getCart();
   });
 
+  let saveDraftDialog:HTMLDialogElement|undefined = $state();
   async function saveCart() {
-    if (!$store || !$store.loggedIn) return;
-    stringToast('Saving cart');
-    const response = await client.post(
-      '/cart/draft',
-      { companyId },
-    );
-    if (response.status === 200) {
-      stringToast('Cart saved');
-    }
+    saveDraftDialog?.showModal();
+  }
+  async function saveCartSuccess() {
+    saveDraftDialog?.close();
+    getCart();
   }
 </script>
 
-{#snippet header()}
-  <th>
-    Qty
-  </th>
-  <th></th>
-  <th></th>
-  <th>Initial Price</th>
-  <th>Tier Price</th>
-  <th>Selling Price</th>
-  <th>
-    Warehouse
-  </th>
-  <th>
-    Name
-  </th>
-{/snippet}
-
-{#snippet content(cart: Cart)}
-  <td>
-    <input type="number" value={cart.qty} class="input input-bordered w-24 max-w-xs"
-      onchange={(e) => { cartQtyMap[cart.id] = Number(e.currentTarget.value) }}
-    >
-  </td>
-  <td>
-    <button
-      onclick={() => updateCartQty(cart.id, cartQtyMap[cart.id])}
-      class="btn bg-slate-600"
-    >
-      <Icon src={FaFloppyDisk}/>
-    </button>
-  </td>
-  <td>
-    <button
-      onclick={() => updateCartQty(cart.id, 0)}
-      class="btn bg-slate-600"
-    >
-      <Icon src={FaTrashCan}/>
-    </button>
-  </td>
-  <td>{cart.initialPrice}</td>
-  <td>{cart.tierPrice}</td>
-  <td>{cart.sellingPrice}</td>
-  <td>{cart.warehouse}</td>
-  <td>{cart.fullName}</td>
-{/snippet}
-
+{#if !draft}
+  <CartDraftDetail
+    {client}
+    bind:dialog={saveDraftDialog}
+    bind:companyId
+    ondelete={saveCartSuccess}
+  />
+{/if}
 <Collapse class="overflow-auto" onClick={getCart} title="Order Summary" {show}>
   <button class="btn" onclick={getCart}>Get Cart</button>
   <Table5
     itemList={cartList}
-    {header}
-    {content}
-  />
+  >
+    {#snippet header()}
+      <th>
+        Qty
+      </th>
+      <th></th>
+      <th></th>
+      <th>Initial Price</th>
+      <th>Tier Price</th>
+      <th>Selling Price</th>
+      <th>
+        Warehouse
+      </th>
+      <th>
+        Name
+      </th>
+    {/snippet}
+
+    {#snippet content(cart: Cart)}
+      <td>
+        <input type="number" value={cart.qty} class="input input-bordered w-24 max-w-xs"
+          onchange={(e) => { cartQtyMap[cart.id] = Number(e.currentTarget.value) }}
+        >
+      </td>
+      <td>
+        <button
+          onclick={() => updateCartQty(cart.id, cartQtyMap[cart.id])}
+          class="btn bg-slate-600"
+        >
+          <Icon src={FaFloppyDisk}/>
+        </button>
+      </td>
+      <td>
+        <button
+          onclick={() => updateCartQty(cart.id, 0)}
+          class="btn bg-slate-600"
+        >
+          <Icon src={FaTrashCan}/>
+        </button>
+      </td>
+      <td>{cart.initialPrice}</td>
+      <td>{cart.tierPrice}</td>
+      <td>{cart.sellingPrice}</td>
+      <td>{cart.warehouse}</td>
+      <td>{cart.fullName}</td>
+    {/snippet}
+  </Table5>
   <div class="label"></div>
   <div class="overflow-x-auto">
     <table class="table">
@@ -270,5 +282,7 @@
   </div>
   <div class="label"></div>
   <button class="btn bg-slate-600" onclick={createOrder} disabled={paymentTypeId === ''}>Create Order</button>
-  <button class="btn bg-slate-600" onclick={saveCart} disabled={!cartList.length}>Save Cart</button>
+  {#if !draft}
+    <button class="btn bg-slate-600" onclick={saveCart} disabled={!cartList.length}>Save Cart</button>
+  {/if}
 </Collapse>

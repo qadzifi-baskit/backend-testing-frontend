@@ -43,7 +43,7 @@
   <DropdownSelect
     class="w-fit"
     placeholder="SORT"
-    bind:selectValue={sort}
+    bind:value={sort}
     display="LABEL"
     options={[
       [null, 'NONE'],
@@ -52,7 +52,7 @@
   />
   <DropdownSelect
     class="w-fit"
-    bind:selectValue={order}
+    bind:value={order}
     options={[
       ['ASC', 'Ascending'],
       ['DESC', 'Descending'],

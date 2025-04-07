@@ -36,7 +36,7 @@
   {#if showHost}
     <Select
       title="Host"
-      showValue
+      showvalue
       options={apiEnv.HOST_LIST}
       bind:value={host}
     />
@@ -44,7 +44,7 @@
   {#if showClient}
     <Select
       title="Client"
-      showValue
+      showvalue
       options={[
         ['BASKIT_SHOP', 'Baskit Shop'],
         ['BASKIT_APP', 'Baskit App'],

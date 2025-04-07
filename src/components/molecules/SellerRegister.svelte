@@ -93,7 +93,7 @@
         class="my-4"
         options={SubscriptionTypeOptions}
         placeholder="subscription type"
-        bind:selectValue={payload.subscriptionType}
+        bind:value={payload.subscriptionType}
       />
       <div>
         <button class="btn bg-slate-600" type="submit">Register</button>

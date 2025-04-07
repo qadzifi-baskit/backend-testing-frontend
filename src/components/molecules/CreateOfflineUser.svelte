@@ -40,7 +40,7 @@
   <div>&nbsp;</div>
   <input type="text" bind:value={phone} class="input input-bordered" placeholder="phone">
   <Select
-    showValue
+    showvalue
     options={companyTypeList.map((value) => [value.id, value.name])}
     bind:value={customerTypeId}
   />

@@ -16,16 +16,19 @@ export type Cart = {
   memberDiscountAmount: number|null,
 };
 
-export type CartDraftUserDTO = {
-  companyName?: string|null,
-  firstName?: string|null,
-  lastName?: string|null,
-  phone?: string|null,
+export type CartDraftUserAddress = {
   provinceId?: number|null,
   regencyId?: number|null,
-  districtId?: number|null,
   address?: string|null,
   postalCode?: string|null,
+};
+
+export type CartDraftUser = {
+  companyName?: string|null,
+  picName?: string|null,
+  phone?: string|null,
+  billingAddress?: CartDraftUserAddress|null,
+  deliveryAddress?: CartDraftUserAddress|null,
 };
 
 export type CartParent = {
@@ -45,6 +48,6 @@ export type CartParent = {
   shippingCost: number|null,
   tax: number|null,
   notes: string|null,
-  customerData: CartDraftUserDTO|null,
+  customerData: CartDraftUser|null,
   companyId?: string,
 };

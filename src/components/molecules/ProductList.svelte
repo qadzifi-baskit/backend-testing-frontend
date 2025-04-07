@@ -101,7 +101,7 @@
 
 <Collapse class="overflow-x-auto" onClick={getProduct} title="Product List">
   <Select
-    showValue
+    showvalue
     options={warehouseOptions}
     bind:value={companyId}
   />

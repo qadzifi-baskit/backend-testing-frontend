@@ -182,7 +182,7 @@
     onadd={showAddInventory}
   />
   <DropdownSelect
-    bind:selectValue={memberLevel}
+    bind:value={memberLevel}
     display="LABEL"
     placeholder="None"
     options={[

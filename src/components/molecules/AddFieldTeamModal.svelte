@@ -78,7 +78,7 @@
     <span>{roleName}</span>
   {:else}
     <DropdownSelect
-      bind:selectValue={selectedRole}
+      bind:value={selectedRole}
       options={roleName.map((role) => [role, role])}
     />
   {/if}

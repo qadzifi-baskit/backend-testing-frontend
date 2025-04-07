@@ -72,7 +72,7 @@
 
 <Select
   title='Status'
-  showValue
+  showvalue
   options={Object.entries(OrderStatusEnum)
     .filter(([, status]) => !excludedStatus.includes(status))
   }
@@ -84,7 +84,7 @@
 <div class="inline">
   <Select
     title="Reason"
-    showValue
+    showvalue
     options={cancelReasonList.map((val) => [val.id, val.name])}
     bind:value={selectedReasonId}
   />

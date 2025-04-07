@@ -189,7 +189,7 @@
   >
     <h3>{selectedItem?.fullName}</h3>
     <Select
-      showValue
+      showvalue
       options={paymentTypeList.map((val) => [val.id, val.name])}
       bind:value={paymentTypeId}
     />
@@ -200,7 +200,7 @@
       Create Supplier
     </button>
     <Select
-      showValue
+      showvalue
       options={supllierList.map((val) => [val.id, val.firstName])}
       bind:value={supplierId}
     />

@@ -210,7 +210,7 @@
   </label>
   <Select
     bind:value={data.companyTypeId}
-    showValue
+    showvalue
     title="Company Type"
     options={brandCompanyTypeList.map(({
       name,
@@ -267,7 +267,7 @@
   </label>
   <Select
     bind:value={data.branch.companyTypeId}
-    showValue
+    showvalue
     title="Company Type"
     options={brandBranchCompanyTypeList.map(({
       name,

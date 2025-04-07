@@ -44,6 +44,13 @@
   }
 
   let modifyDraftDilaog:HTMLDialogElement|undefined = $state();
+  $effect(() => {
+    if (modifyDraftDilaog) {
+      modifyDraftDilaog.onclose = () => {
+        selectedDraft = undefined;
+      };
+    }
+  });
   let selectedDraft:CartParent|undefined = $state();
   function modifyDraft(cart: CartParent) {
     return () => {
