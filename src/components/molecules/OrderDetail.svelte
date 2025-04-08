@@ -130,7 +130,7 @@
 </Table>
 <Table itemList={historyList}>
 </Table>
-<button class="btn bg-slate-600"
+<button class="btn btn-secondary"
   onclick={processUpdate}
 >
   Update

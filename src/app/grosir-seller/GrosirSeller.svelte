@@ -49,7 +49,7 @@
   let memberLevel = $state<string|null>(null);
 </script>
 
-<div class="p-6 bg-[#27303b]">
+<div class="p-6">
   <Config
     bind:host
     bind:clientType

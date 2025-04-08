@@ -46,7 +46,7 @@
   />
   <div class="divider"></div>
   <button
-    class="btn bg-slate-600"
+    class="btn btn-secondary"
     on:click={onCreateUser}
   >
     Create

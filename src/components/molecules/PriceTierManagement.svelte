@@ -103,7 +103,7 @@
 </div>
 <button
   onclick={savePriceTier}
-  class="btn bg-slate-600 mt-2"
+  class="btn btn-secondary mt-2"
 >
   {#if buttonSnippet}
     {#if typeof buttonSnippet === 'string'}

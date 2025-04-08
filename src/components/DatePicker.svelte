@@ -80,7 +80,7 @@
               selectedYear === selectedDateYear &&
               item === selectedDate ? '2px' : 0
           }"
-          class="btn p-0 min-h-[auto] min-w-[auto] hover:bg-slate-600 date-button"
+          class="btn p-0 min-h-[auto] min-w-[auto] hover:btn-secondary date-button"
         >
           {item}
         </button>

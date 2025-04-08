@@ -49,7 +49,7 @@
   <Table itemList={$orderList}>
   </Table>
 </dialog>
-<Collapse title='Order' onClick={onGetOrderList}>
+<Collapse title='Order' onclick={onGetOrderList}>
   <button class="btn" on:click={onGetOrderList}>Get Order</button>
   {#if $orderList.length > 0}
     <Table itemList={$orderList}>
@@ -66,7 +66,7 @@
         <td>
           <button
             on:click={toggleOrderDetail(index)}
-            class="btn bg-slate-600"
+            class="btn btn-secondary"
           >
             <Icon src={FaSolidList}/>
           </button>

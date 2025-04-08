@@ -63,7 +63,7 @@
 <Collapse
   title="Role Management"
   class="w-full"
-  onClick={getRoleList}
+  onclick={getRoleList}
 >
   <PaginationNavigationPanel
     bind:search

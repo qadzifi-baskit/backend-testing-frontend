@@ -89,7 +89,7 @@
   <td>
     <button
       onclick={modifyAcl(item)}
-      class="btn bg-slate-600"
+      class="btn btn-secondary"
     >
       <Icon src={FaSolidPencil}/>
     </button>
@@ -107,7 +107,7 @@
 <Collapse
   title="ACL List"
   class="w-full"
-  onClick={getACLList}
+  onclick={getACLList}
 >
   <PaginationNavigationPanel
     bind:max

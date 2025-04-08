@@ -19,6 +19,7 @@
     password: string,
     client: AxiosInstance,
     store?: Writable<AuthStore>,
+    element?: HTMLElement,
   };
 
   let {
@@ -26,6 +27,7 @@
     password = $bindable(),
     client,
     store,
+    element = $bindable(),
   }:Props = $props();
 
   let authStatus:AuthStatusEnum = $state(AuthStatusEnum.IDLE);
@@ -56,7 +58,7 @@
     authStatus = AuthStatusEnum.IDLE;
     client.defaults.headers.common = {};
     clearTimeout(authTimeout);
-    dispatchDoAuth();
+    dispatchDoAuth(undefined, element);
     const response = await client.post('/auth', {
       username,
       password,
@@ -75,28 +77,22 @@
         Authorization: response.data?.data?.accessToken,
       };
       client.defaults.headers.common = auth;
-      dispatchAuthSuccess(auth);
+      dispatchAuthSuccess(auth, element);
     }
   };
 </script>
 
 <Collapse title="Auth">
   <form onsubmit={doAuth}>
-    <label class="form-control w-full max-w-xs">
-      <div class="label">
-        <span class="label-text">Username</span>
-      </div>
+    <fieldset class="fieldset">
+      <span class="fieldset-label">Username</span>
       <input type="text" placeholder="username" bind:value={username} class="input input-bordered w-full max-w-xs" />
-    </label>
-    <label class="form-control w-full max-w-xs">
-      <div class="label">
-        <span class="label-text">Password</span>
-      </div>
+      <span class="fieldset-label">Password</span>
       <input type="password" placeholder="password" bind:value={password} class="input input-bordered w-full max-w-xs" />
-    </label>
+    </fieldset>
     <div class="label"></div>
     <div>
-      <button class="btn bg-slate-600" type="submit">Auth</button>
+      <button class="btn btn-secondary" type="submit">Auth</button>
       {#if authStatus === AuthStatusEnum.SUCCESS}
         <span class="text-lime-400">Login Success</span>
       {/if}

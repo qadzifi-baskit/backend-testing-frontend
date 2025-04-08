@@ -84,7 +84,7 @@
           bind:value={search}
           class="m-0 rounded-b-none join-item"
         />
-        <button class="btn bg-slate-600 join-item"
+        <button class="btn btn-secondary join-item"
           type="button"
           onclick={reset}
         >

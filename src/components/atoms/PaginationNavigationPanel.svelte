@@ -61,13 +61,13 @@
 {/if}
 <button
   onclick={onreload}
-  class="btn bg-slate-600"
+  class="btn btn-secondary"
 >
   <Icon src={FaSolidRotate}/>
 </button>
 <button
   onclick={onadd}
-  class="btn bg-slate-600"
+  class="btn btn-secondary"
 >
   <Icon src={FaSolidPlus}/>
 </button>

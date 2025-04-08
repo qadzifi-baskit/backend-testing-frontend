@@ -11,6 +11,8 @@ import tseslint from 'typescript-eslint';
  * @typedef {{ [K in keyof StylisticIssues as `@stylistic/${K}`]: StylisticIssues[K] }} StylisticRules
  * @typedef {import('eslint/rules/possible-errors').PossibleErrors} PossibleErrors
  * @typedef {import('eslint/rules/best-practices').BestPractices} BestPractices
+ * @typedef {PossibleErrors & BestPractices} JSRules
+ * @typedef {{ [K in keyof JSRules as `@typescript-eslint/${K}`]: JSRules[K] }} TSRUles
  * */
 
 /** @type{StylisticRules} */
@@ -21,16 +23,21 @@ const stylisticRules = {
   '@stylistic/no-multiple-empty-lines': ['error'],
   '@stylistic/indent': ['error', 2],
 };
-/** @type{PossibleErrors & BestPractices} */
+/** @type{JSRules} */
 const jsRules = {
   'no-empty': ['error'],
   'no-empty-function': ['error'],
+  'no-unused-expressions': 'off',
 };
 /** @type {SvelteRulesOptions} */
 const svelteRules = {
   'svelte/indent': ['error', {
     indent: 2,
   }],
+};
+/** @type {TSRUles} */
+const tsRules = {
+  '@typescript-eslint/no-unused-expressions': 'off',
 };
 
 export default [
@@ -58,5 +65,11 @@ export default [
         parser: tsparser,
       },
     },
+  },
+  {
+    plugins: {
+      '@typescript-eslint': tseslint.plugin,
+    },
+    rules: tsRules,
   },
 ];

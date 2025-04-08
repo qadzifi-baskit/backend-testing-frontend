@@ -116,7 +116,7 @@
     {client}
   />
 </Modal>
-<Collapse title='Order' onClick={getOrderList}>
+<Collapse title='Order' onclick={getOrderList}>
   <PaginationNavigationPanel
     bind:page
     onreload={getOrderList}
@@ -143,7 +143,7 @@
         <td>
           <button
             onclick={updateStatus(order.id)}
-            class="btn bg-slate-600"
+            class="btn btn-secondary"
           >
             <Icon src={FaSolidPencil}/>
           </button>
@@ -151,7 +151,7 @@
         <td>
           <button
             onclick={showDetail(order.id)}
-            class="btn bg-slate-600"
+            class="btn btn-secondary"
           >
             <Icon src={FaSolidList}/>
           </button>

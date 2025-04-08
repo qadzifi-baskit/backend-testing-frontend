@@ -81,7 +81,7 @@
 </div>
 <button
   onclick={saveDiscount}
-  class="btn bg-slate-600 mt-2"
+  class="btn btn-secondary mt-2"
 >
   Save Member Discount
 </button>

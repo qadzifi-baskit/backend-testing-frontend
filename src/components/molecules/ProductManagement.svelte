@@ -106,7 +106,7 @@
 {#snippet content(item: ProductMaster)}
   <td><NoWrap>{item.id}</NoWrap></td>
   <td>
-    <button class="btn bg-slate-600" disabled={item.isAdded}
+    <button class="btn btn-secondary" disabled={item.isAdded}
       onclick={onShowAddInventory(item.id)}
     >
       {#if item.isAdded}
@@ -137,7 +137,7 @@
 />
 <Collapse title="Product"
   class="w-full"
-  onClick={getProductList}
+  onclick={getProductList}
 >
   <PaginationNavigationPanel
     bind:search

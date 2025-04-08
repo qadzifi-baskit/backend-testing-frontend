@@ -29,11 +29,13 @@
 
 <dialog bind:this={dialog}
   class={cn(
-    'p-4 z-50 fixed h-full w-full bg-slate-800 bg-opacity-85 rounded-xl',
+    'modal p-4 h-full w-full bg-slate-800 bg-opacity-85 rounded-xl',
     clazz,
   )}
   {onclose}
   {ontoggle}
 >
-  {@render children?.()}
+  <div class="modal-box p-4 h-full w-full max-w-[unset]">
+    {@render children?.()}
+  </div>
 </dialog>

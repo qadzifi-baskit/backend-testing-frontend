@@ -68,7 +68,7 @@
 
 <Collapse title="Companies"
   class="w-full"
-  onClick={getCompanyList}
+  onclick={getCompanyList}
 >
   <SearchField
     bind:value={search}

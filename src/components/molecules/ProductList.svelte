@@ -99,7 +99,7 @@
   });
 </script>
 
-<Collapse class="overflow-x-auto" onClick={getProduct} title="Product List">
+<Collapse class="overflow-x-auto" onclick={getProduct} title="Product List">
   <Select
     showvalue
     options={warehouseOptions}
@@ -131,7 +131,7 @@
           />
         </td>
         <td>
-          <button class="btn bg-slate-600" onclick={onAddProduct(item)}>Add</button>
+          <button class="btn btn-secondary" onclick={onAddProduct(item)}>Add</button>
         </td>
         <td>{item.name}</td>
       </svelte:fragment>

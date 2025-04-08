@@ -141,7 +141,7 @@
       />
     </td>
     <td>
-      <button class="btn bg-slate-600"
+      <button class="btn btn-secondary"
         onclick={addItem(item)}
       >
         Add
@@ -149,7 +149,7 @@
     </td>
   {:else}
     <td>
-      <button class="btn bg-slate-600"
+      <button class="btn btn-secondary"
         onclick={showModifyInventory(item)}
       >
         <Icon src={FaSolidPencil}/>
@@ -172,7 +172,7 @@
 />
 <Collapse title="Inventory"
   class="w-full"
-  onClick={getInventoryList}
+  onclick={getInventoryList}
 >
   <PaginationNavigationPanel
     bind:max

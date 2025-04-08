@@ -126,7 +126,7 @@
     </label>
     <button
       onclick={onAddInventory}
-      class="btn bg-slate-600"
+      class="btn btn-secondary"
     >
       Add
     </button>

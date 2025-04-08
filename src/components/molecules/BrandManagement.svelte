@@ -181,7 +181,7 @@
   <td><NoWrap>{brand.id}</NoWrap></td>
   <td>
     <button
-      class="btn bg-slate-600"
+      class="btn btn-secondary"
       onclick={() => assignBrand(brand.id)}
     >
       <Icon src={FaSolidPlus}/>
@@ -195,7 +195,7 @@
   <td><NoWrap>{brand.id}</NoWrap></td>
   <td>
     <button
-      class="btn bg-slate-600"
+      class="btn btn-secondary"
       onclick={() => removeBrand(brand.id)}
     >
       <Icon src={FaSolidTrashCan}/>
@@ -215,7 +215,7 @@
       display="LABEL"
       placeholder="principal"
     />
-    <button class="btn bg-slate-600"
+    <button class="btn btn-secondary"
       onclick={() => selectedPrincipalId = ''}
     >
       <Icon src={FaSolidRotate}/>

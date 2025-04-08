@@ -173,7 +173,7 @@
               />
             </button>
           </span>
-          <button class="btn bg-slate-600">{role.roleName}</button>
+          <button class="btn btn-secondary">{role.roleName}</button>
         </div>
       {/each}
       <DropdownSelect

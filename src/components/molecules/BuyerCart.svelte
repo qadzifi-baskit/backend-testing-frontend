@@ -1,15 +1,16 @@
 <script lang="ts">
-  import { listenAuthSuccess } from '@/event';
   import { DeliveryTypeEnum, OrderTypeEnum } from '@/lib/enum';
+  import { Context } from '@/lib/helper/context';
+  import { stringToast } from '@/lib/helper/toast';
   import type { AuthStore, PaymentType, WarehouseDetail } from '@/types';
+  import type { Cart } from '@/types/cart';
   import type { AxiosInstance } from 'axios';
+  import type { Snippet } from 'svelte';
   import { Icon } from 'svelte-icons-pack';
   import { FaFloppyDisk, FaTrashCan } from 'svelte-icons-pack/fa';
   import type { Writable } from 'svelte/store';
   import Collapse from '../Collapse.svelte';
   import Table5 from '../Table5.svelte';
-  import type { Cart } from '@/types/cart';
-  import { stringToast } from '@/lib/helper/toast';
   import CartDraftDetail from './CartDraftDetail.svelte';
 
   type Props = {
@@ -32,13 +33,13 @@
     cartCode = $bindable(),
     companyId = $bindable(),
     orderType = OrderTypeEnum.SHOP,
-    clientType = 'BASKIT_SHOP',
     memberLevel = $bindable(null),
     show,
     draft,
     onOrderCreated = () => null,
   }:Props = $props();
 
+  const orderContext = Context.get('order');
   const cartQtyMap:Record<string, number> = {};
   let paymentTypeList:PaymentType[] = $state([]);
   let cartList:Cart[] = $state([]);
@@ -47,19 +48,6 @@
   let totalTierPrice = $state(0);
   let total = $state(0);
   let deliveryType:DeliveryTypeEnum = $state(DeliveryTypeEnum.SELLER_DELIVERY);
-
-  const getPaymentType = async () => {
-    if (!$store || !$store.loggedIn) return;
-    stringToast('Loading payment type...');
-    const response = await client.get('/payment-type', {
-      headers: {
-        'X-CLIENT': clientType,
-      },
-    });
-    if (response.status !== 200) return stringToast('Failed to load payment type');
-    paymentTypeList = response.data.data;
-    stringToast('Payment type loaded');
-  };
 
   const createOrder = async () => {
     if (!$store || !$store.loggedIn) return;
@@ -156,16 +144,6 @@
     updateCartMemberLevel();
   });
 
-  $effect(() => {
-    getPaymentType();
-    getCart();
-  });
-
-  listenAuthSuccess(() => {
-    getPaymentType();
-    getCart();
-  });
-
   let saveDraftDialog:HTMLDialogElement|undefined = $state();
   async function saveCart() {
     saveDraftDialog?.showModal();
@@ -173,6 +151,18 @@
   async function saveCartSuccess() {
     saveDraftDialog?.close();
     getCart();
+  }
+
+  $effect(() => {
+    if (show) {
+      getCart();
+    }
+  });
+
+  if (orderContext) {
+    orderContext.subscribe((value) => {
+      paymentTypeList = value.paymentTypeList ?? [];
+    });
   }
 </script>
 
@@ -184,7 +174,12 @@
     ondelete={saveCartSuccess}
   />
 {/if}
-<Collapse class="overflow-auto" onClick={getCart} title="Order Summary" {show}>
+<Collapse class="overflow-auto" title="Order Summary" bind:show>
+  {#snippet content(children?: Snippet)}
+    <div class="collapse-content overflow-x-auto *:mb-2">
+      {@render children?.()}
+    </div>
+  {/snippet}
   <button class="btn" onclick={getCart}>Get Cart</button>
   <Table5
     itemList={cartList}
@@ -215,7 +210,7 @@
       <td>
         <button
           onclick={() => updateCartQty(cart.id, cartQtyMap[cart.id])}
-          class="btn bg-slate-600"
+          class="btn btn-secondary"
         >
           <Icon src={FaFloppyDisk}/>
         </button>
@@ -223,7 +218,7 @@
       <td>
         <button
           onclick={() => updateCartQty(cart.id, 0)}
-          class="btn bg-slate-600"
+          class="btn btn-secondary"
         >
           <Icon src={FaTrashCan}/>
         </button>
@@ -235,7 +230,6 @@
       <td>{cart.fullName}</td>
     {/snippet}
   </Table5>
-  <div class="label"></div>
   <div class="overflow-x-auto">
     <table class="table">
       <tbody>
@@ -262,7 +256,6 @@
       </tbody>
     </table>
   </div>
-  <div class="label"></div>
   <div>
     <select bind:value={paymentTypeId} class="select select-bordered w-full max-w-xs">
       <option value="" disabled selected>Payment Type</option>
@@ -271,7 +264,6 @@
       {/each}
     </select>
   </div>
-  <div class="label"></div>
   <div>
     <select bind:value={deliveryType} class="select select-bordered w-full max-w-xs">
       <option value="" disabled selected>Delivery Type</option>
@@ -280,9 +272,8 @@
       {/each}
     </select>
   </div>
-  <div class="label"></div>
-  <button class="btn bg-slate-600" onclick={createOrder} disabled={paymentTypeId === ''}>Create Order</button>
+  <button class="btn btn-secondary" onclick={createOrder} disabled={paymentTypeId === ''}>Create Order</button>
   {#if !draft}
-    <button class="btn bg-slate-600" onclick={saveCart} disabled={!cartList.length}>Save Cart</button>
+    <button class="btn not-hover:bg-slate-600" onclick={saveCart} disabled={!cartList.length}>Save Cart</button>
   {/if}
 </Collapse>

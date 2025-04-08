@@ -138,7 +138,7 @@
       </th>
       <td><NoWrap>{tutorial.id}</NoWrap></td>
       <td>
-        <button class="btn bg-slate-600"
+        <button class="btn btn-secondary"
           onclick={modifyTutorial(tutorial)}
         >
           <Icon src={FaSolidPencil}/>
@@ -149,7 +149,7 @@
       <td><NoWrap>{tutorial.description}</NoWrap></td>
       <td><NoWrap>{tutorial.number}</NoWrap></td>
       <th>
-        <button class="btn bg-slate-600"
+        <button class="btn btn-secondary"
           onclick={() => deleteTutorial(tutorial.id)}
         >
           <Icon src={FaSolidTrash}/>

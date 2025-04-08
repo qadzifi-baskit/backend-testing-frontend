@@ -141,7 +141,7 @@
     <td>
       <button
         onclick={updateACL(acls[acl.id])}
-        class="btn bg-slate-600"
+        class="btn btn-secondary"
       >
         <Icon src={FaSolidPencil}/>
       </button>
@@ -162,7 +162,7 @@
     <div>
       <span class="badge badge-neutral">{item.endpoint}</span>
       <div class="label"></div>
-      <button class="btn bg-slate-600 w-fit"
+      <button class="btn btn-secondary w-fit"
         onclick={toggleAddingACL}
       >
         Add ACL
@@ -186,7 +186,7 @@
             placeholder="ROLE"
           />
           <button
-            class="btn bg-slate-600 w-fit"
+            class="btn btn-secondary w-fit"
             onclick={createACL}
           >
             <Icon src={FaSolidFloppyDisk}/>

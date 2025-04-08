@@ -65,7 +65,7 @@
 <button
   type={buttonType}
   {onclick}
-  class={cn('btn bg-slate-600', clazz)}
+  class={cn('btn btn-secondary', clazz)}
 >
   {#if children}
     {@render children()}

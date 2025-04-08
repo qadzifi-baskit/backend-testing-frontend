@@ -88,7 +88,7 @@
     </label>
     <button
       on:click={doTopUp}
-      class="btn bg-slate-600"
+      class="btn btn-secondary"
     >
       Top Up
     </button>
@@ -100,7 +100,7 @@
     ></iframe>
   </div>
 </Modal>
-<div id="root" class="p-6 bg-[#27303b]">
+<div id="root" class="p-6">
   <Config
     bind:host
     bind:clientType
@@ -115,9 +115,9 @@
   />
   <div class="divider"></div>
   <Collapse title="Profile">
-    <button on:click={getBalance} class="btn bg-slate-600">Get Balance</button>
+    <button on:click={getBalance} class="btn btn-secondary">Get Balance</button>
     <span>Balance: {balance}</span>
-    <button on:click={onTopUp} class="btn bg-slate-600">Top Up</button>
+    <button on:click={onTopUp} class="btn btn-secondary">Top Up</button>
   </Collapse>
   <div class="divider"></div>
   <div class="flex w-full rounded-box">

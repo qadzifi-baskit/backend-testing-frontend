@@ -142,7 +142,7 @@
       <td><NoWrap>{category.id}</NoWrap></td>
       <td><NoWrap>{category.code}</NoWrap></td>
       <td>
-        <button class="btn bg-slate-600"
+        <button class="btn btn-secondary"
           onclick={() => showSubCategoryModal(category.id)}
         >
           <Icon src={FaSolidList}/>
@@ -153,7 +153,7 @@
       </td>
       <td><NoWrap>{category.name}</NoWrap></td>
       <td>
-        <button class="btn bg-slate-600"
+        <button class="btn btn-secondary"
           onclick={() => deleteCategory(category.id)}
         >
           <Icon src={FaSolidTrash}/>

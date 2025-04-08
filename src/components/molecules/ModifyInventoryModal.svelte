@@ -134,7 +134,7 @@
     </label>
     <button
       onclick={modifyInventory}
-      class="btn bg-slate-600 mt-2"
+      class="btn btn-secondary mt-2"
     >
       Save
     </button>

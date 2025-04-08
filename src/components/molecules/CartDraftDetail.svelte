@@ -109,6 +109,9 @@
     if (payload.salesId) {
       newPayload.salesId = payload.salesId;
     }
+    if (payload.refCode) {
+      newPayload.refCode = payload.refCode;
+    }
     if (payload.customerData) {
       newPayload.customerData = customerDataPrehook(payload.customerData);
     }
@@ -160,7 +163,7 @@
 {/snippet}
 
 <Modal bind:dialog>
-  <div class="flex flex-col items-start w-full h-full">
+  <div class="flex flex-col items-start w-full min-h-full h-fit overflow-y-scroll">
     <FormWrapper
       {client}
       path={'/cart/draft' + (item?.id ? `/${item.id}` : '')}
@@ -174,13 +177,13 @@
       {/if}
       <FormInput type="text" placeholder="sales id" label="Sales Id" bind:value={newData.salesId}/>
       <FormInput type="text" placeholder="ref code" label="Ref Code" bind:value={newData.refCode}/>
-      <span class="label-text font-bold">Billing Address</span>
+      <span class="label-text font-bold mb-2">Billing Address</span>
       {@render addressForm(newData.customerData!.billingAddress!)}
-      <span class="label-text font-bold">Delivery Address</span>
+      <span class="label-text font-bold mb-2">Delivery Address</span>
       {@render addressForm(newData.customerData!.deliveryAddress!)}
       <SubmitButton/>
       {#if item?.id}
-        <button class="btn bg-slate-600" onclick={deleteDraft}>Delete</button>
+        <button class="btn btn-secondary" onclick={deleteDraft}>Delete</button>
       {/if}
       <div class="label"></div>
     </FormWrapper>

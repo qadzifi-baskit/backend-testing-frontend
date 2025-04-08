@@ -194,7 +194,7 @@
       bind:value={paymentTypeId}
     />
     <button
-      class="btn bg-slate-600"
+      class="btn btn-secondary"
       on:click={showCreateUserOffline}
     >
       Create Supplier
@@ -204,7 +204,7 @@
       options={supllierList.map((val) => [val.id, val.firstName])}
       bind:value={supplierId}
     />
-    <button class="btn bg-slate-600" on:click={getSupplier}>Get Supplier</button>
+    <button class="btn btn-secondary" on:click={getSupplier}>Get Supplier</button>
     <div class="divider"></div>
     <label for="">Qty</label>
     <input bind:value={inboundQty} type="number" class="input input-bordered" placeholder="qty" min="1" step="1">
@@ -217,7 +217,7 @@
     <label for="">Shipping Cost</label>
     <input bind:value={shippingCost} type="number" class="input input-bordered" placeholder="shipping cost" min="0">
     <div class="divider"></div>
-    <button class="btn bg-slate-600"
+    <button class="btn btn-secondary"
       on:click={onCreateInbound}
     >
       Create Inbound
@@ -265,7 +265,7 @@
   />
   <div class="divider"></div>
   <Collapse title="Inventory">
-    <button class="btn bg-slate-600"
+    <button class="btn btn-secondary"
       on:click={getInventory}
     >
       Get Inventory
@@ -283,7 +283,7 @@
         <svelte:fragment slot="item" let:item>
           <td>{item.id}</td>
           <td>
-            <button class="btn bg-slate-600"
+            <button class="btn btn-secondary"
               on:click={onShowCreateinbound(item)}
             >
               Inbound
@@ -297,7 +297,7 @@
   </Collapse>
   <div class="divider"></div>
   <Collapse title="Inbound">
-    <button class="btn bg-slate-600" on:click={onGetInbound}>Get Inbound</button>
+    <button class="btn btn-secondary" on:click={onGetInbound}>Get Inbound</button>
     <Table
       itemList={inboundList}
     >
@@ -308,7 +308,7 @@
         <td>{item.orderCode}</td>
         <td>
           <button
-            class="btn bg-slate-600"
+            class="btn btn-secondary"
             on:click={onShowUpdateStatus(item)}
           >
             <Icon src={FaSolidPencil}/>

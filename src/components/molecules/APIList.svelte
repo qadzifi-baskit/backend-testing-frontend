@@ -87,7 +87,7 @@
 <Collapse
   title="API List"
   class="w-full"
-  onClick={reloadData}
+  onclick={reloadData}
 >
   <PaginationNavigationPanel
     bind:search
@@ -123,7 +123,7 @@
         <td>
           <button
             onclick={modifyAPI(api)}
-            class="btn bg-slate-600"
+            class="btn btn-secondary"
           >
             <Icon src={FaSolidPencil}/>
           </button>

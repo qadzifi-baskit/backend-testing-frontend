@@ -58,7 +58,7 @@
       <input type="text" placeholder="person in charge" bind:value={company.detail.personInCharge} class="input input-bordered w-full max-w-xs" />
     </label>
     <div class="label"></div>
-    <button class="btn bg-slate-600"
+    <button class="btn btn-secondary"
       onclick={save}
     >
       Save

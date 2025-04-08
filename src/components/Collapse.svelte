@@ -1,20 +1,33 @@
 <script lang="ts">
   import { cn } from '@/lib/helper/tailwind';
+  import type { Snippet } from 'svelte';
   import type { MouseEventHandler } from 'svelte/elements';
-  let clazz = '';
-  export { clazz as class };
-
-  export let title:string;
-  export let show = false;
-  export let onClick:MouseEventHandler<HTMLInputElement> = () => null;
+  type Props = {
+    class?: string,
+    title?: string,
+    show?: boolean,
+    onclick?: MouseEventHandler<HTMLInputElement>,
+    children?: Snippet,
+    content?: Snippet<[Snippet?]>,
+  };
+  let {
+    class: clazz = '',
+    title = '',
+    show = $bindable(),
+    onclick,
+    children,
+    content,
+  }: Props = $props();
 </script>
 
 <div class={cn('collapse bg-base-200', clazz)}>
-  <input on:click={onClick} type="checkbox" bind:checked={show} />
+  <input {onclick} type="checkbox" bind:checked={show} />
   <div class="collapse-title text-xl font-medium">{title}</div>
-  <slot name="content">
+  {#if content}
+    {@render content(children)}
+  {:else}
     <div class="collapse-content overflow-x-auto">
-      <slot/>
+      {@render children?.()}
     </div>
-  </slot>
+  {/if}
 </div>

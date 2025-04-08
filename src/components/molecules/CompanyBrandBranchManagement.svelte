@@ -98,7 +98,7 @@
 {#snippet content(item: Company)}
   <td><NoWrap>{item.id}</NoWrap></td>
   <td>
-    <button class="btn bg-slate-600"
+    <button class="btn btn-secondary"
       onclick={() => modifyCompany(item)}
     >
       <Icon src={FaSolidPencil}/>
@@ -132,7 +132,7 @@
 />
 <Collapse
   title="Branch Management"
-  onClick={getBranchList}
+  onclick={getBranchList}
 >
   <PaginationNavigationPanel
     bind:search

@@ -78,11 +78,9 @@ export function getObjectDiff<T extends Record<string, unknown>>(a: T, b: T): Pa
   };
 
   // Recursively compare objects
-  // eslint-disable-next-line no-restricted-syntax, guard-for-in
   for (const key in a) {
     if (!(key in b)) {
       diff[key] = a[key];
-      // eslint-disable-next-line no-continue
       continue;
     }
 

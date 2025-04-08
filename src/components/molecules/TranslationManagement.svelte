@@ -131,7 +131,7 @@
     onreload={reloadData}
     onadd={showAddModal}
   />
-  <button class="btn bg-slate-600"
+  <button class="btn btn-secondary"
     onclick={openViewModal}
   >
     <Icon src={LuFileJson}/>
@@ -165,7 +165,7 @@
         <td>
           <button
             onclick={modifyTranslation(translation)}
-            class="btn bg-slate-600"
+            class="btn btn-secondary"
           >
             <Icon src={FaSolidPencil}/>
           </button>

@@ -1,20 +1,37 @@
 const createEventManager = (name: string): [
   string,
-  <T>(detail?: T) => boolean,
-  (listener: EventListenerOrEventListenerObject, options?: boolean|AddEventListenerOptions) => void,
-] => [
-  name,
-  <T>(detail?: T) =>
-    dispatchEvent(new CustomEvent(name, { detail })),
+  <T>(detail?: T, target?: HTMLElement) => boolean,
   (
     listener: EventListenerOrEventListenerObject,
     options?: boolean|AddEventListenerOptions,
-  ) =>
-    addEventListener(
+    target?: HTMLElement,
+  ) => void,
+] => [
+  name,
+  <T>(detail?: T, target?: HTMLElement): boolean => {
+    if (target) {
+      return target.dispatchEvent(new CustomEvent(name, { detail }));
+    }
+    return dispatchEvent(new CustomEvent(name, { detail }));
+  },
+  (
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean|AddEventListenerOptions,
+    target?: HTMLElement,
+  ): void => {
+    if (target) {
+      return target.addEventListener(
+        name,
+        listener,
+        options,
+      );
+    }
+    return addEventListener(
       name,
       listener,
       options,
-    ),
+    );
+  },
 ];
 
 export const [
@@ -46,3 +63,9 @@ export const [
   dispatchOpenCartDraftDetail,
   listenOpenCartDraftDetail,
 ] = createEventManager('on-open-cart-draft-detail');
+
+export const [
+  eventGetPaymentTypeList,
+  dispatchGetPaymentTypeList,
+  listenGetPaymentTypeList,
+] = createEventManager('on-get-payment-type-list');

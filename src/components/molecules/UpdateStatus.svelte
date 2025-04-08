@@ -1,10 +1,10 @@
 <script lang="ts">
+  import { listenAuthSuccess } from '@/event';
   import { DeliveryTypeEnum, OrderStatusEnum } from '@/lib/enum';
+  import type { OrderReason } from '@/types';
   import type { AxiosInstance } from 'axios';
   import DatePicker from '../DatePicker.svelte';
   import Select from '../Select.svelte';
-  import type { OrderReason } from '@/types';
-  import { listenDoAuth } from '@/event';
 
   export let onUpdateStatus:undefined|((status?: string) => void) = undefined;
   export let id:string;
@@ -26,7 +26,7 @@
     }
   };
 
-  listenDoAuth(() => {
+  listenAuthSuccess(() => {
     getCancelReason();
   });
 
@@ -90,7 +90,7 @@
   />
 </div>
 <button
-  class="btn bg-slate-600"
+  class="btn btn-secondary"
   on:click={updateStatus}>
   Update
 </button>

@@ -30,17 +30,15 @@
   }: Props = $props();
 </script>
 
-<label class={cn('form-control w-full max-w-xs mb-2', clazz)}>
-  <div class="label">
-    {#if typeof label === 'string'}
-      <span class="label-text">{label}</span>
-    {:else}
-      {@render label()}
-    {/if}
-  </div>
+<label class={cn('w-full max-w-xs mb-2', clazz)}>
+  {#if typeof label === 'string'}
+    <span class="fieldset-label mb-2">{label}</span>
+  {:else}
+    {@render label()}
+  {/if}
   {#if input}
     {@render input()}
   {:else}
-    <input {readonly} type={inputType} {min} {max} {placeholder} bind:value class="input input-bordered w-full max-w-xs" />
+    <input {readonly} type={inputType} {min} {max} {placeholder} bind:value class="input input-bordered mb-2 w-full max-w-xs" />
   {/if}
 </label>

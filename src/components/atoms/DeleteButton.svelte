@@ -8,7 +8,7 @@
   let { onclick }: Props = $props();
 </script>
 
-<button class="btn bg-slate-600"
+<button class="btn btn-secondary"
   {onclick}
 >
   <Icon src={FaSolidTrash}/>

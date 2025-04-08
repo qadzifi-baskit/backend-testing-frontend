@@ -38,7 +38,7 @@
   >
     <button
       onclick={getTranslationObjectList}
-      class="btn bg-slate-600"
+      class="btn btn-secondary"
     >
       <Icon src={FaSolidRotate}/>
     </button>

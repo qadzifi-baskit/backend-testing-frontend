@@ -96,7 +96,7 @@
         bind:value={payload.subscriptionType}
       />
       <div>
-        <button class="btn bg-slate-600" type="submit">Register</button>
+        <button class="btn btn-secondary" type="submit">Register</button>
       </div>
     </FormWrapper>
   </div>

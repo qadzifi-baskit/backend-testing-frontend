@@ -13,9 +13,13 @@
   import { listenAuthSuccess, listenDoAuth } from '@/event';
   import { apiEnv } from '@/lib/config/env.svelte';
   import { OrderTypeEnum } from '@/lib/enum';
+  import { Context } from '@/lib/helper/context';
+  import { stringToast } from '@/lib/helper/toast';
   import { SellerAdminStore } from '@/store/store';
   import type { Company } from '@/types';
+  import type { OrderContext } from '@/types/context';
   import axios from 'axios';
+  import { writable } from 'svelte/store';
 
   type Props = {
     host?: string,
@@ -25,7 +29,12 @@
     host = $bindable(apiEnv.DEFAULT_API_HOST),
     showHost = $bindable(true),
   }:Props = $props();
+  let element:HTMLElement|undefined = $state();
   const client = axios.create({ baseURL: host });
+  const orderContext = writable<OrderContext>({
+    paymentTypeList: [],
+  });
+  Context.set('order', orderContext);
 
   let clientType = $state('WEB_CMS');
   let username = $state('nagamas@testing.com');
@@ -43,13 +52,38 @@
 
   let customerId:string|undefined = $state();
 
-  listenDoAuth(() => {
-    companyId = '';
+  const getPaymentType = async () => {
+    if (!$SellerAdminStore.loggedIn) return;
+    stringToast('Loading payment type...');
+    const response = await client.get('/payment-type', {
+      headers: {
+        'X-CLIENT': clientType,
+      },
+    });
+    if (response.status !== 200) return stringToast('Failed to load payment type');
+    orderContext.update((value) => (
+      {
+        ...value,
+        paymentTypeList: response.data?.data ?? [],
+      }
+    ));
+    stringToast('Payment type loaded');
+  };
+
+  $effect(() => {
+    if (element) {
+      listenDoAuth(() => {
+        companyId = '';
+      }, {}, element);
+      listenAuthSuccess(() => {
+        getMyCompany();
+        getPaymentType();
+      }, {}, element);
+    }
   });
-  listenAuthSuccess(getMyCompany);
 </script>
 
-<div class="p-6 bg-[#27303b]">
+<div bind:this={element} class="p-6">
   <Config
     bind:host
     bind:clientType
@@ -66,6 +100,7 @@
     {client}
     bind:username
     bind:password
+    bind:element
   />
   <div class="divider"></div>
   <FieldTeamManagement

@@ -42,7 +42,7 @@
   listenAuthSuccess(getMyCompany);
 </script>
 
-<div id="root" class="p-6 bg-[#27303b]">
+<div id="root" class="p-6">
   <Config
     bind:host
     {showHost}
