@@ -2,9 +2,9 @@
   import type { AxiosInstance } from 'axios';
   import Modal from '../Modal.svelte';
   import SubmitButton from '../atoms/SubmitButton.svelte';
-  import type { CreateFieldTeamResponse } from '@/types/user';
+  import type { CreateFieldTeamResponse, Role } from '@/types/user';
   import type { Writable } from 'svelte/store';
-  import type { AuthStore, Role } from '@/types';
+  import type { AuthStore } from '@/types';
   import DropdownSelect from '../atoms/DropdownSelect.svelte';
 
   type Props = {
@@ -18,7 +18,7 @@
     client,
     roleName,
     store,
-    companyId,
+    companyId = $bindable(),
     dialog = $bindable(),
   }:Props = $props();
 

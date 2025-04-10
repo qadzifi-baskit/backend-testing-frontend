@@ -19,6 +19,7 @@
     orderType?: string|string[],
     companyId?: string,
     store?: Writable<AuthStore>,
+    show?: boolean,
   };
 
   let {
@@ -28,6 +29,7 @@
     orderType = 'SHOP',
     companyId,
     store,
+    show = $bindable(false),
   }:Props = $props();
 
   let orderList:Order[] = $state([]);
@@ -62,8 +64,10 @@
   };
 
   $effect(() => {
-    page;
-    getOrderList();
+    if (show) {
+      page;
+      getOrderList();
+    }
   });
 
   let selectedId = $state('');

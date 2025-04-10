@@ -9,7 +9,7 @@
   import OrderList from '@/components/molecules/OrderList.svelte';
   import ProductManagement from '@/components/molecules/ProductManagement.svelte';
   import SellerRegister from '@/components/molecules/SellerRegister.svelte';
-  import UserOFflineManagement from '@/components/molecules/UserOFflineManagement.svelte';
+  import UserOfflineManagement from '@/components/molecules/UserOfflineManagement.svelte';
   import { listenAuthSuccess, listenDoAuth } from '@/event';
   import { apiEnv } from '@/lib/config/env.svelte';
   import { OrderTypeEnum } from '@/lib/enum';
@@ -40,13 +40,11 @@
   let username = $state('nagamas@testing.com');
   let password = $state('12345678');
   let companyId = $state('');
-  let userId = $state('');
 
   async function getMyCompany() {
     if (!$SellerAdminStore.loggedIn) return;
     const response = await client.get('/users/me');
     if (response.status !== 200) return;
-    userId = (response.data?.data?.id)?.id ?? '';
     companyId = (<Company[]|undefined>response.data?.data?.companies)?.[0]?.id ?? '';
   }
 
@@ -102,64 +100,67 @@
     bind:password
     bind:element
   />
-  <div class="divider"></div>
-  <FieldTeamManagement
-    {client}
-    role="SELLER_ADMIN"
-    bind:companyId
-    title="Seller Admin Management"
-    store={SellerAdminStore}
-  />
-  <div class="divider"></div>
-  <ProductManagement
-    store={SellerAdminStore}
-    {client}
-    bind:companyId
-  />
-  <div class="divider"></div>
-  <InventoryList {client} store={SellerAdminStore}/>
-  <div class="divider"></div>
-  <UserOFflineManagement
-    {client}
-    store={SellerAdminStore}
-    bind:companyId
-  />
-  <div class="divider"></div>
-  <ExternalSalesManagament {client}
-    bind:companyId
-  />
-  <div class="divider"></div>
-  <div class="flex w-full rounded-box">
-    <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
-      <InventoryList {client} store={SellerAdminStore}
-        bind:userId
-        isOrder
-      />
+  {#if companyId}
+    <div class="divider"></div>
+    <FieldTeamManagement
+      {client}
+      role="SELLER_ADMIN"
+      {companyId}
+      title="Seller Admin Management"
+      store={SellerAdminStore}
+    />
+    <div class="divider"></div>
+    <ProductManagement
+      store={SellerAdminStore}
+      {client}
+      {companyId}
+    />
+    <div class="divider"></div>
+    <InventoryList {client} store={SellerAdminStore} {companyId} />
+    <div class="divider"></div>
+    <UserOfflineManagement
+      {client}
+      store={SellerAdminStore}
+      {companyId}
+    />
+    <div class="divider"></div>
+    <ExternalSalesManagament
+      {client}
+      {companyId}
+    />
+    <div class="divider"></div>
+    <div class="flex w-full rounded-box">
+      <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
+        <InventoryList {client} store={SellerAdminStore}
+          order
+          {companyId}
+        />
+      </div>
+      <div class="divider divider-horizontal"></div>
+      <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
+        <BuyerCart
+          store={SellerAdminStore}
+          {client}
+          bind:userId={customerId}
+          {companyId}
+          orderType={OrderTypeEnum.OFFLINE}
+        />
+      </div>
     </div>
-    <div class="divider divider-horizontal"></div>
-    <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
-      <BuyerCart
-        store={SellerAdminStore}
-        {client}
-        bind:userId={customerId}
-        bind:companyId
-        orderType={OrderTypeEnum.OFFLINE}
-      />
-    </div>
-  </div>
-  <div class="divider"></div>
-  <CartDraftManagement
-    {client}
-    bind:companyId
-  />
-  <div class="divider"></div>
-  <OrderList
-    {client}
-    store={SellerAdminStore}
-    {companyId}
-    orderType={[
-      OrderTypeEnum.OFFLINE,
-      OrderTypeEnum.SELLER_PURCHASE_ORDER,
-    ]}
-  />
+    <div class="divider"></div>
+    <CartDraftManagement
+      {client}
+      {companyId}
+    />
+    <div class="divider"></div>
+    <OrderList
+      {client}
+      store={SellerAdminStore}
+      {companyId}
+      orderType={[
+        OrderTypeEnum.OFFLINE,
+        OrderTypeEnum.SELLER_PURCHASE_ORDER,
+      ]}
+    />
+  {/if}
 </div>

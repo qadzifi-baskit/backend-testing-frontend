@@ -7,7 +7,7 @@
   import OrderList from '@/components/molecules/OrderList.svelte';
   import ProductManagement from '@/components/molecules/ProductManagement.svelte';
   import SellerRegister from '@/components/molecules/SellerRegister.svelte';
-  import UserOFflineManagement from '@/components/molecules/UserOFflineManagement.svelte';
+  import UserOfflineManagement from '@/components/molecules/UserOfflineManagement.svelte';
   import { listenAuthSuccess, listenDoAuth } from '@/event';
   import { OrderTypeEnum } from '@/lib/enum';
   import { GrosirSellerStore } from '@/store/store';
@@ -29,13 +29,11 @@
   let username = $state('nagamas@testing.com');
   let password = $state('12345678');
   let companyId = $state('');
-  let userId = $state('');
 
   async function getMyCompany() {
     if (!$GrosirSellerStore.loggedIn) return;
     const response = await client.get('/users/me');
     if (response.status !== 200) return;
-    userId = (response.data?.data?.id)?.id ?? '';
     companyId = (<Company[]|undefined>response.data?.data?.companies)?.[0]?.id ?? '';
   }
 
@@ -94,7 +92,7 @@
     store={GrosirSellerStore}
   />
   <div class="divider"></div>
-  <UserOFflineManagement
+  <UserOfflineManagement
     {client}
     store={GrosirSellerStore}
     bind:companyId
@@ -108,16 +106,14 @@
   <div class="divider"></div>
   <InventoryList {client} store={GrosirSellerStore}
     {companyId}
-    bind:userId
-    isGrosir
+    grosir
   />
   <div class="divider"></div>
   <div class="flex w-full rounded-box">
     <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
-      <InventoryList isOrder {client} store={GrosirSellerStore}
+      <InventoryList order {client} store={GrosirSellerStore}
         {companyId}
         bind:memberLevel
-        bind:userId
       />
     </div>
     <div class="divider divider-horizontal"></div>

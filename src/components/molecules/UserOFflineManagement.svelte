@@ -13,11 +13,13 @@
     client: AxiosInstance,
     store: Writable<AuthStore>,
     companyId: string,
+    show?: boolean,
   };
   let {
     client,
     store,
     companyId = $bindable(''),
+    show = $bindable(false),
   }:Props = $props();
   let userList:UserOffline[] = $state([]);
 
@@ -36,7 +38,16 @@
 
   let addUserOfflineModal: HTMLDialogElement|undefined = $state();
 
-  $inspect({ companyId });
+  function onsuccess() {
+    addUserOfflineModal?.close();
+    getCustomerOFflineList();
+  }
+
+  $effect(() => {
+    if (show) {
+      getCustomerOFflineList();
+    }
+  });
 </script>
 
 {#snippet header()}
@@ -62,9 +73,11 @@
   {store}
   bind:companyId
   bind:dialog={addUserOfflineModal}
+  {onsuccess}
 />
 <Collapse5
   title="User Offline Management"
+  bind:show
 >
   <PaginationNavigationPanel
     onreload={getCustomerOFflineList}

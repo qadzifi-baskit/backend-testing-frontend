@@ -154,3 +154,13 @@ export function searchStrings(arr: string[], query: string): string[] {
   // Return the sorted list of matching strings.
   return candidates.map(candidate => candidate.item);
 }
+
+export function isDateEqual(date1: Date | null | string, date2: Date | null | string) {
+  if (!date1 || !date2) {
+    if (date1 === date2) {
+      return true;
+    }
+    return false;
+  }
+  return new Date(date1).getTime() === new Date(date2).getTime();
+}

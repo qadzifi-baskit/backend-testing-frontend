@@ -3,7 +3,7 @@
   import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
   import type { AuthStore, PaymentType, WarehouseDetail } from '@/types';
-  import type { Cart } from '@/types/cart';
+  import type { Cart, CartParent } from '@/types/cart';
   import type { AxiosInstance } from 'axios';
   import type { Snippet } from 'svelte';
   import { Icon } from 'svelte-icons-pack';
@@ -24,6 +24,8 @@
     memberLevel?: string|null,
     show?: boolean,
     draft?: boolean,
+    draftData?: Partial<CartParent>,
+    prehook?: (cart: Cart[]) => Cart[]|Promise<Cart[]>,
     onOrderCreated?: () => unknown,
   };
   let {
@@ -34,8 +36,9 @@
     companyId = $bindable(),
     orderType = OrderTypeEnum.SHOP,
     memberLevel = $bindable(null),
-    show,
+    show = $bindable(false),
     draft,
+    prehook,
     onOrderCreated = () => null,
   }:Props = $props();
 
@@ -52,12 +55,14 @@
   const createOrder = async () => {
     if (!$store || !$store.loggedIn) return;
     stringToast('Creating order...');
+    const processedCart = prehook ? await prehook(cartList) : cartList;
     const response = await client.post('/order', {
+      companyId,
       paymentTypeId,
       deliveryType,
       cartCode,
       orderType,
-      product: cartList.map((value) => ({
+      product: processedCart.map((value) => ({
         cartId: value.id,
         inventoryId: value.inventoryId,
         productId: value.productId,
@@ -180,7 +185,7 @@
       {@render children?.()}
     </div>
   {/snippet}
-  <button class="btn" onclick={getCart}>Get Cart</button>
+  <button class="btn not-hover:bg-slate-600" onclick={getCart}>Get Cart</button>
   <Table5
     itemList={cartList}
   >
@@ -274,6 +279,6 @@
   </div>
   <button class="btn btn-secondary" onclick={createOrder} disabled={paymentTypeId === ''}>Create Order</button>
   {#if !draft}
-    <button class="btn not-hover:bg-slate-600" onclick={saveCart} disabled={!cartList.length}>Save Cart</button>
+    <button class="btn not-hover:bg-slate-600" onclick={saveCart}>Save Cart</button>
   {/if}
 </Collapse>

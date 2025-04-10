@@ -28,11 +28,12 @@
     onclick?: () => void,
     onselect?: (value: ValueType) => ReturnType|Promise<ReturnType>,
     dropdownContainer?: Snippet<[Snippet]>,
+    show?: boolean,
   };
   let {
     class: clazz = '',
     options = [],
-    placeholder = 'placeholder',
+    placeholder = $bindable('placeholder'),
     search = $bindable(),
     value: selectValue = $bindable(),
     default: defaultValue,
@@ -42,6 +43,7 @@
     onclick,
     onselect,
     dropdownContainer,
+    show = $bindable(false),
   }:Props = $props();
 
   let selectElement:HTMLDetailsElement|undefined;
@@ -127,12 +129,13 @@
 
 <details class={cn('dropdown w-full max-w-xs mb-4', clazz)}
   bind:this={selectElement}
+  bind:open={show}
 >
   <summary class="btn input-bordered w-fit justify-start"
     {onclick}
     title={showvalue && selectValue ? `${selectValue}` : undefined}
   >
-    {#if selectValue}
+    {#if options.length > 0 && selectValue}
       {#if display === 'VALUE'}
         {selectValue}
       {:else}

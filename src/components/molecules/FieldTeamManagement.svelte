@@ -1,15 +1,16 @@
 <script lang="ts">
-  import { listenAuthSuccess } from '@/event';
+  import { clamp } from '@/lib/helper/math';
+  import { debounce } from '@/lib/helper/util';
+  import type { AuthStore } from '@/types';
+  import type { PaginationOrder } from '@/types/pagination';
+  import type { User } from '@/types/user';
   import type { AxiosInstance } from 'axios';
+  import type { Writable } from 'svelte/store';
   import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
-  import { clamp } from '@/lib/helper/math';
-  import { debounce } from '@/lib/helper/util';
-  import type { AuthStore, User } from '@/types';
-  import type { Writable } from 'svelte/store';
   import AddFieldTeamModal from './AddFieldTeamModal.svelte';
-  import type { PaginationOrder } from '@/types/pagination';
+  import NoWrap from '../atoms/NoWrap.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -17,6 +18,7 @@
     title?: string,
     store?: Writable<AuthStore>,
     companyId?: string,
+    show?: boolean,
   };
   let {
     client,
@@ -24,6 +26,7 @@
     title = 'Field Team Management',
     store,
     companyId = $bindable(),
+    show = $bindable(false),
   }:Props = $props();
 
   let userList:User[] = $state([]);
@@ -76,10 +79,6 @@
     debounceGetFieldTeam();
   });
 
-  listenAuthSuccess(() => {
-    getFieldTeam();
-  });
-
   let addFieldTeamDialog:HTMLDialogElement|undefined = $state();
 
   function openAddFieldTeamDialog() {
@@ -91,39 +90,24 @@
       addFieldTeamDialog.onclose = getFieldTeam;
     }
   });
+
+  $effect(() => {
+    if (show) {
+      getFieldTeam();
+    }
+  });
 </script>
-
-{#snippet header()}
-  <th>Created At</th>
-  <th>Id</th>
-  <th>E-Mail</th>
-  <th>Phone</th>
-  <th>First Name</th>
-  <th>Last Name</th>
-  <th>Status</th>
-  <th>Last Access</th>
-{/snippet}
-
-{#snippet content(user: User)}
-  <td>{user.createdAt}</td>
-  <td>{user.id}</td>
-  <td>{user.email}</td>
-  <td>{user.phone}</td>
-  <td>{user.profile?.firstName ?? '-'}</td>
-  <td>{user.profile?.lastName ?? '-'}</td>
-  <td>{user.status}</td>
-  <td>{user.lastAccess ?? '-'}</td>
-{/snippet}
 
 <AddFieldTeamModal
   bind:dialog={addFieldTeamDialog}
   roleName={role}
   {store}
-  {companyId}
+  bind:companyId
   {client}
 />
 <Collapse5
   {title}
+  bind:show
 >
   <PaginationNavigationPanel
     onreload={getFieldTeam}
@@ -137,9 +121,27 @@
       ['createdAt', 'Created At'],
     ]}
   />
-  <Table5
-    itemList={userList}
-    {header}
-    {content}
-  />
+  <Table5 itemList={userList}>
+    {#snippet header()}
+      <th>Created At</th>
+      <th>Id</th>
+      <th>E-Mail</th>
+      <th>Phone</th>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Status</th>
+      <th>Last Access</th>
+    {/snippet}
+
+    {#snippet content(user: User)}
+      <td><NoWrap>{user.createdAt}</NoWrap></td>
+      <td><NoWrap>{user.id}</NoWrap></td>
+      <td>{user.email}</td>
+      <td>{user.phone}</td>
+      <td>{user.profile?.firstName ?? '-'}</td>
+      <td>{user.profile?.lastName ?? '-'}</td>
+      <td>{user.status}</td>
+      <td>{user.lastAccess ?? '-'}</td>
+    {/snippet}
+  </Table5>
 </Collapse5>

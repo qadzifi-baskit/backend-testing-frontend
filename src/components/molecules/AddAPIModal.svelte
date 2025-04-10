@@ -36,30 +36,18 @@
     class="flex flex-col items-start w-full h-full"
   >
     <FormWrapper
+      class="*:mb-2"
       path="/api"
       {client}
       {payload}
       onsuccess={onAdded}
     >
-      <label class="form-control w-full max-w-xs mb-2">
-        <div class="label">
-          <span class="label-text">API Name</span>
-        </div>
-        <input type="text" placeholder="api name" bind:value={payload.apiName} class="input input-bordered w-full max-w-xs" />
-      </label>
-      <label class="form-control w-full max-w-xs mb-2">
-        <div class="label">
-          <span class="label-text">API Group</span>
-        </div>
-        <input type="text" placeholder="api group" bind:value={payload.apiGroup} class="input input-bordered w-full max-w-xs" />
-      </label>
-      <label class="form-control w-full max-w-xs mb-2">
-        <div class="label">
-          <span class="label-text">Endpoint</span>
-        </div>
-        <input type="text" placeholder="group" bind:value={payload.endpoint} class="input input-bordered w-full max-w-xs" />
-      </label>
-      <div class="label"></div>
+      <span class="fieldset-label">API Name</span>
+      <input type="text" placeholder="api name" bind:value={payload.apiName} class="input input-bordered w-full max-w-xs" />
+      <span class="fieldset-label">API Group</span>
+      <input type="text" placeholder="api group" bind:value={payload.apiGroup} class="input input-bordered w-full max-w-xs" />
+      <span class="fieldset-label">Endpoint</span>
+      <input type="text" placeholder="group" bind:value={payload.endpoint} class="input input-bordered w-full max-w-xs" />
       <SubmitButton/>
     </FormWrapper>
   </div>

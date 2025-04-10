@@ -9,9 +9,7 @@ import tseslint from 'typescript-eslint';
  * @typedef {import('eslint/rules/stylistic-issues').StylisticIssues} StylisticIssues
  * @typedef {import('eslint-plugin-svelte/lib/rule-types').RuleOptions} SvelteRulesOptions
  * @typedef {{ [K in keyof StylisticIssues as `@stylistic/${K}`]: StylisticIssues[K] }} StylisticRules
- * @typedef {import('eslint/rules/possible-errors').PossibleErrors} PossibleErrors
- * @typedef {import('eslint/rules/best-practices').BestPractices} BestPractices
- * @typedef {PossibleErrors & BestPractices} JSRules
+ * @typedef {import('eslint/rules').ESLintRules} JSRules
  * @typedef {{ [K in keyof JSRules as `@typescript-eslint/${K}`]: JSRules[K] }} TSRUles
  * */
 
@@ -38,6 +36,7 @@ const svelteRules = {
 /** @type {TSRUles} */
 const tsRules = {
   '@typescript-eslint/no-unused-expressions': 'off',
+  '@typescript-eslint/no-unsafe-function-type': 'off',
 };
 
 export default [

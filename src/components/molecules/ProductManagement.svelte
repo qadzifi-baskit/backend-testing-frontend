@@ -18,12 +18,14 @@
     store: Writable<AuthStore>,
     companyId?: string,
     addOptions?: AddInventoryOptions,
+    show?: boolean,
   };
   let {
     client,
     store,
     companyId = $bindable(),
     addOptions = {},
+    show = $bindable(false),
   }:Props = $props();
   const {
     moq = 1,
@@ -66,7 +68,7 @@
   });
 
   $effect(() => {
-    if ($store.loggedIn) {
+    if (show && $store.loggedIn) {
       page;
       search;
       debounceGetProduct();
@@ -138,6 +140,7 @@
 <Collapse title="Product"
   class="w-full"
   onclick={getProductList}
+  bind:show
 >
   <PaginationNavigationPanel
     bind:search

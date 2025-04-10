@@ -17,11 +17,13 @@
     client: AxiosInstance,
     store?: Writable<AuthStore>,
     companyId?: string,
+    show?: boolean,
   };
   let {
     client,
     store = SellerAdminStore,
     companyId = $bindable(),
+    show = $bindable(false),
   }: Props = $props();
 
   let draftList:CartParent[] = $state([]);
@@ -75,6 +77,20 @@
       return stringToast('Deleted');
     };
   }
+
+  $effect(() => {
+    if (show) {
+      reloadData();
+    }
+  });
+
+  $effect(() => {
+    if (modifyDraftDilaog) {
+      modifyDraftDilaog.onclose = () => {
+        selectedDraft = undefined;
+      };
+    }
+  });
 </script>
 
 <CartDraftDetail
@@ -84,7 +100,7 @@
   bind:companyId
   ondelete={onModifyDelete}
 />
-<Collapse5 title="Cart Draft Management">
+<Collapse5 title="Cart Draft Management" bind:show>
   <PaginationNavigationPanel
     onreload={reloadData}
   />

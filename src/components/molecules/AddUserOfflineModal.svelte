@@ -10,12 +10,14 @@
     companyId: string,
     store: Writable<AuthStore>,
     dialog: HTMLDialogElement|undefined,
+    onsuccess?: (data: unknown) => unknown,
   };
   let {
     client,
     store,
     companyId = $bindable(''),
     dialog = $bindable(),
+    onsuccess,
   }:Props = $props();
 
   let data = $state({
@@ -25,6 +27,12 @@
     companyId,
     companyName: '',
     address: '',
+  });
+
+  $effect(() => {
+    if (companyId) {
+      data.companyId = companyId;
+    }
   });
 </script>
 
@@ -69,6 +77,7 @@
       {store}
       path="/user-offline"
       bind:data
+      {onsuccess}
     >
       Add
     </SubmitButton>

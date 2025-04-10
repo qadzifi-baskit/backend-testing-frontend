@@ -1,26 +1,32 @@
 <script lang="ts">
   import { cn } from '@/lib/helper/tailwind';
   import { currentModalStore } from '@/store/store';
+  import type { HTMLDialodToggleEvent } from '@/types/event';
   import type { Snippet } from 'svelte';
-  import type { EventHandler } from 'svelte/elements';
+  import type { EventHandler, ToggleEventHandler } from 'svelte/elements';
 
   type Props = {
     dialog?: HTMLDialogElement,
     class?: string,
+    onopen?: ToggleEventHandler<HTMLDialogElement>,
     onclose?: EventHandler<Event, HTMLDialogElement>,
     children?: Snippet,
   };
   let {
     dialog = $bindable(),
     class: clazz = '',
+    onopen,
     onclose = () => undefined,
     children,
   }: Props = $props();
 
-  function ontoggle() {
+  function ontoggle(event: HTMLDialodToggleEvent) {
     if (dialog?.open) {
       const pushedDialog = dialog;
       currentModalStore.update((value) => [pushedDialog, ...value]);
+      if (onopen) {
+        onopen(event);
+      }
     } else {
       currentModalStore.update((value) => value.slice(1));
     }

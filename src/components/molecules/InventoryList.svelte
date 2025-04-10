@@ -16,23 +16,26 @@
   type Props = {
     client: AxiosInstance,
     store: Writable<AuthStore>,
-    isGrosir?: boolean,
-    isOrder?: boolean,
+    grosir?: boolean,
+    order?: boolean,
     userId?: string,
+    cartCode?: string,
     companyId?: string,
     memberLevel?: string|null,
+    show?: boolean,
   };
   let {
     client,
     store,
-    isGrosir = false,
-    isOrder = false,
-    userId = $bindable(),
+    grosir = false,
+    order = false,
+    cartCode,
     companyId = $bindable(),
     memberLevel = $bindable(null),
+    show = $bindable(false),
   }:Props = $props();
 
-  const prefix = isGrosir ? '' : '';
+  const prefix = grosir ? '' : '';
 
   let inventoryList:Inventory[] = $state([]);
   let page = $state(1);
@@ -72,7 +75,7 @@
   });
 
   $effect(() => {
-    if ($store.loggedIn) {
+    if (show && $store.loggedIn) {
       page;
       search;
       debounceGetInventory();
@@ -103,6 +106,7 @@
       companyId: item.companyId,
       wareHouse: 0,
       memberLevel,
+      cartCode,
     });
   }
 
@@ -120,7 +124,7 @@
   <th>Status</th>
   <th>Base Price</th>
   <th>Customer Price</th>
-  {#if isOrder}
+  {#if order}
     <th>Qty</th>
     <th></th>
   {:else}
@@ -134,7 +138,7 @@
   <td>{item.isActive}</td>
   <td>{item.sellingPrice}</td>
   <td>{item.customerPrice}</td>
-  {#if isOrder}
+  {#if order}
     <td>
       <input type="number" placeholder="qty" class="input input-bordered w-24 max-w-xs"
         bind:value={qtyMap[item.id]}
@@ -168,11 +172,12 @@
   {client}
   bind:inventoryId={selectedInventoryId}
   onupdate={getInventoryList}
-  {isGrosir}
+  isGrosir={grosir}
 />
 <Collapse title="Inventory"
   class="w-full"
   onclick={getInventoryList}
+  bind:show
 >
   <PaginationNavigationPanel
     bind:max

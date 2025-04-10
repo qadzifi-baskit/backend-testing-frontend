@@ -34,6 +34,7 @@ export type CartDraftUser = {
 export type CartParent = {
   createdAt: string,
   id: string,
+  creationDate: Date|null,
   customerId: string|null,
   estimatedPickupDate: string|null,
   refCode: string|null,

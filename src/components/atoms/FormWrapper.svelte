@@ -35,6 +35,10 @@
     onsuccess,
   }:Props = $props();
 
+  export function trigger() {
+    console.log('trigger');
+  }
+
   async function onsubmit(e: SubmitEvent) {
     e.preventDefault();
     if ($store && !$store.loggedIn) {

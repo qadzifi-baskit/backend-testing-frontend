@@ -18,6 +18,7 @@
     parentId?: number|null,
     value?: number|null,
     default?: number|null,
+    show?: boolean,
   };
   let {
     type: areaType = AreaType.PROVINCE,
@@ -28,6 +29,7 @@
     parentId = $bindable(),
     value = $bindable(),
     default: defaultValue,
+    show = $bindable(false),
   }: Props = $props();
 
   let areaList:Area[] = $state([]);
@@ -45,25 +47,42 @@
     if (response.status !== 200) return stringToast('Failed to get area list');
     areaList = response.data.data ?? [];
   }
-  $effect(() => {
-    if ($store && $store.loggedIn) {
-      getAreaList();
-    }
-  });
+
   const debounceGetAreaList = debounce(getAreaList);
   $effect(() => {
-    search;
-    debounceGetAreaList();
+    if (show) {
+      search;
+      debounceGetAreaList();
+    }
+  });
+
+  let areaName = $state(placeholder);
+  async function getAreaName() {
+    if (!value) return;
+    const response = await client.get(`/area/${value}`);
+    if (response.status !== 200) return stringToast('Failed to get area name');
+    const area:Area = response.data.data;
+    areaName = area.name;
+  }
+  $effect(() => {
+    if (!show) {
+      if (value) {
+        getAreaName();
+      } else {
+        areaName = placeholder;
+      }
+    }
   });
 </script>
 
 <fieldset>
   {#if typeof label === 'string'}
-    <span class="label-text capitalize">{label}</span>
+    <span class="fieldset-label mb-2 capitalize">{label}</span>
   {:else}
     {@render label()}
   {/if}
   <DropdownSelect
+    bind:show
     bind:search
     bind:value
     options={areaList.map((province) => [province.id, province.name])}
@@ -71,6 +90,6 @@
     default={defaultValue}
     resetable
     display="LABEL"
-    {placeholder}
+    bind:placeholder={areaName}
   />
 </fieldset>

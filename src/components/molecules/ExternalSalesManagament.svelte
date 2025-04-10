@@ -6,15 +6,18 @@
   type Props = {
     client: AxiosInstance,
     companyId: string,
+    show?: boolean,
   };
   let {
     client,
     companyId = $bindable(''),
+    show = $bindable(false),
   }: Props = $props();
 </script>
 
 <FieldTeamManagement
   {client}
+  bind:show
   role="EXTERNAL_SALESMAN"
   bind:companyId
   store={SellerAdminStore}
