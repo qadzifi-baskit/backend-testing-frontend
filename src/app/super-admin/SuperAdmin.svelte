@@ -39,24 +39,26 @@
     bind:username
     bind:password
   />
-  <div class="divider"></div>
-  <ApiList
-    {client}
-  />
-  <div class="divider"></div>
-  <AclList
-    {client}
-  />
-  <div class="divider"></div>
-  <RoleManagement
-    {client}
-  />
-  <div class="divider"></div>
-  <UserManagement
-    {client}
-  />
-  <div class="divider"></div>
-  <TranslationManagement
-    {client}
-  />
+  {#if $SuperAdminStore.loggedIn}
+    <div class="divider"></div>
+    <ApiList
+      {client}
+    />
+    <div class="divider"></div>
+    <AclList
+      {client}
+    />
+    <div class="divider"></div>
+    <RoleManagement
+      {client}
+    />
+    <div class="divider"></div>
+    <UserManagement
+      {client}
+    />
+    <div class="divider"></div>
+    <TranslationManagement
+      {client}
+    />
+  {/if}
 </div>

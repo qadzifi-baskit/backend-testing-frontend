@@ -59,15 +59,19 @@
     ]}
   />
 {/if}
-<button
-  onclick={onreload}
-  class="btn btn-secondary"
->
-  <Icon src={FaSolidRotate}/>
-</button>
-<button
-  onclick={onadd}
-  class="btn btn-secondary"
->
-  <Icon src={FaSolidPlus}/>
-</button>
+{#if onreload}
+  <button
+    onclick={onreload}
+    class="btn btn-secondary"
+  >
+    <Icon src={FaSolidRotate}/>
+  </button>
+{/if}
+{#if onadd}
+  <button
+    onclick={onadd}
+    class="btn btn-secondary"
+  >
+    <Icon src={FaSolidPlus}/>
+  </button>
+{/if}

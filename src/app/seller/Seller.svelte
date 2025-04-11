@@ -3,6 +3,7 @@
   import BuyerCart from '@/components/molecules/BuyerCart.svelte';
   import CartDraftManagement from '@/components/molecules/CartDraftManagement.svelte';
   import Config from '@/components/molecules/Config.svelte';
+  import DocumentManagement from '@/components/molecules/DocumentManagement.svelte';
   import ExternalSalesManagament from '@/components/molecules/ExternalSalesManagament.svelte';
   import FieldTeamManagement from '@/components/molecules/FieldTeamManagement.svelte';
   import InventoryList from '@/components/molecules/InventoryList.svelte';
@@ -162,5 +163,7 @@
         OrderTypeEnum.SELLER_PURCHASE_ORDER,
       ]}
     />
+    <div class="divider"></div>
+    <DocumentManagement {client}/>
   {/if}
 </div>

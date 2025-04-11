@@ -21,6 +21,13 @@
   }
 }
 
+@utility table-pin-cols {
+  @apply table;
+}
+@utility table-pin-rows {
+  @apply table;
+}
+
 html {
   height: 100%;
   scrollbar-gutter: auto;

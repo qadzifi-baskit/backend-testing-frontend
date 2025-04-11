@@ -65,9 +65,7 @@
 <Modal
   bind:dialog
 >
-  <div
-    class="flex flex-col items-start w-full h-full"
-  >
+  <div class="flex flex-col items-start w-full h-full">
     <FormWrapper
       path={`/translation/${item?.id ?? ''}`}
       method="PATCH"

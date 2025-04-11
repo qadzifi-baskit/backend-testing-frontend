@@ -3,20 +3,23 @@
   import '@andypf/json-viewer';
   import type { Snippet } from 'svelte';
   // eslint-disable-next-line no-undef
-  type Key = keyof T;
+  type DataType = T;
+  type Key = keyof DataType;
   type Props = {
-    // eslint-disable-next-line no-undef
-    itemList?: T[],
+    itemList?: DataType[],
     class?: string,
     headerList?: string[],
     keyList?: Key[],
     table?: Snippet<[Snippet]>,
     colgroup?: Snippet,
     header?: Snippet,
+    content?: Snippet<[DataType, number]>,
     firstRow?: Snippet,
-    // eslint-disable-next-line no-undef
-    content?: Snippet<[T, number]>,
     lastRow?: Snippet,
+    firstColumn?: Snippet<[DataType, number]>,
+    lastColumn?: Snippet<[DataType, number]>,
+    firstHeader?: Snippet,
+    lastHeader?: Snippet,
   };
   let {
     class: clazz = '',
@@ -26,9 +29,13 @@
     table,
     colgroup,
     header,
-    firstRow,
     content,
+    firstRow,
     lastRow,
+    firstColumn,
+    lastColumn,
+    firstHeader,
+    lastHeader,
   }:Props = $props();
 
   $effect(() => {
@@ -43,6 +50,7 @@
   {@render colgroup?.()}
   <thead>
     <tr>
+      {@render firstHeader?.()}
       {#if header}
         {@render header()}
       {:else}
@@ -52,14 +60,14 @@
           </th>
         {/each}
       {/if}
+      {@render lastHeader?.()}
     </tr>
   </thead>
   <tbody>
-    {#if firstRow}
-      {@render firstRow()}
-    {/if}
+    {@render firstRow?.()}
     {#each itemList as item, index}
       <tr class="bg-base-100">
+        {@render firstColumn?.(item, index)}
         {#if content}
           {@render content(item, index)}
         {:else}
@@ -76,11 +84,10 @@
             </td>
           {/each}
         {/if}
+        {@render lastColumn?.(item, index)}
       </tr>
     {/each}
-    {#if lastRow}
-      {@render lastRow()}
-    {/if}
+    {@render lastRow?.()}
   </tbody>
 {/snippet}
 

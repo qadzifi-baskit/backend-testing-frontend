@@ -4,7 +4,7 @@
   import type { MouseEventHandler } from 'svelte/elements';
 
   type Props = {
-    title: string,
+    title: string|Snippet,
     class?: string,
     show?: boolean,
     onClick?: MouseEventHandler<HTMLInputElement>,
@@ -13,7 +13,7 @@
   };
   let {
     class: clazz = '',
-    title,
+    title = '',
     show = $bindable(false),
     onClick = () => undefined,
     content,
@@ -23,7 +23,11 @@
 
 <div class={cn('collapse bg-base-200', clazz)}>
   <input onclick={onClick} type="checkbox" bind:checked={show} />
-  <div class="collapse-title text-xl font-medium">{title}</div>
+  {#if typeof title === 'string'}
+    <div class="collapse-title text-xl font-medium">{title}</div>
+  {:else}
+    {@render title()}
+  {/if}
   {#if content}
     {@render content()}
   {:else if children}
