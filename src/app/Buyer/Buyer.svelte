@@ -11,6 +11,7 @@
   import './buyer.css';
   import { listenAuthSuccess } from '@/event';
   import { createAxiosInstance } from '@/lib/helper/axios.svelte';
+  import { BuyerStore } from '@/store/store';
 
   export let host = 'https://api-beta.baskit.app/v2';
   export let showHost = true;
@@ -110,35 +111,38 @@
   <div class="divider"></div>
   <Auth
     {client}
+    store={BuyerStore}
     bind:username
     bind:password
   />
-  <div class="divider"></div>
-  <Collapse title="Profile">
-    <button on:click={getBalance} class="btn btn-secondary">Get Balance</button>
-    <span>Balance: {balance}</span>
-    <button on:click={onTopUp} class="btn btn-secondary">Top Up</button>
-  </Collapse>
-  <div class="divider"></div>
-  <div class="flex w-full rounded-box">
-    <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
-      <ProductList
-        {userId}
-        {client}
-      />
+  {#if $BuyerStore.loggedIn}
+    <div class="divider"></div>
+    <Collapse title="Profile">
+      <button on:click={getBalance} class="btn btn-secondary">Get Balance</button>
+      <span>Balance: {balance}</span>
+      <button on:click={onTopUp} class="btn btn-secondary">Top Up</button>
+    </Collapse>
+    <div class="divider"></div>
+    <div class="flex w-full rounded-box">
+      <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
+        <ProductList
+          {userId}
+          {client}
+        />
+      </div>
+      <div class="divider divider-horizontal"></div>
+      <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
+        <BuyerCart
+          {client}
+          {userId}
+          onordercreated={resetQty}
+        />
+      </div>
     </div>
-    <div class="divider divider-horizontal"></div>
-    <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
-      <BuyerCart
-        {client}
-        {userId}
-        onOrderCreated={resetQty}
-      />
-    </div>
-  </div>
-  <div class="divider"></div>
-  <Order {client} userId={userId}/>
-  <div class="divider"></div>
+    <div class="divider"></div>
+    <Order {client} userId={userId}/>
+    <div class="divider"></div>
+  {/if}
 </div>
 
 <style></style>

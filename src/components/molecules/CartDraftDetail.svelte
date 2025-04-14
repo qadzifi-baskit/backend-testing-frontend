@@ -223,6 +223,12 @@
       dialog?.close();
     }
   }
+
+  function onordercreated(): void {
+    if (!item?.id) {
+      dialog?.close();
+    }
+  }
 </script>
 
 {#snippet addressForm(data: CartDraftUserAddress)}
@@ -295,7 +301,7 @@
         store={SellerAdminStore}
         order
         cartCode={item.id}
-        {companyId}
+        bind:companyId
       />
       <div class="mb-2"></div>
       <BuyerCart
@@ -306,7 +312,7 @@
         orderType={OrderTypeEnum.SELLER_PURCHASE_ORDER}
         prehook={saveDraft}
         bind:cartCode={item.id}
-        {companyId}
+        bind:companyId
       />
     {:else}
       <BuyerCart
@@ -315,6 +321,8 @@
         {store}
         {client}
         orderType={OrderTypeEnum.SELLER_PURCHASE_ORDER}
+        {onordercreated}
+        bind:companyId
       />
     {/if}
   </div>

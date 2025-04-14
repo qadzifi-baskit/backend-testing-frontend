@@ -19,14 +19,14 @@
     userId?: string,
     cartCode?: string,
     companyId?: string,
-    orderType?: OrderTypeEnum,
+    orderType?: OrderTypeEnum|OrderTypeEnum[],
     clientType?: string,
     memberLevel?: string|null,
     show?: boolean,
     draft?: boolean,
     draftData?: Partial<CartParent>,
     prehook?: (cart: Cart[]) => Cart[]|Promise<Cart[]>,
-    onOrderCreated?: () => unknown,
+    onordercreated?: () => unknown,
   };
   let {
     client,
@@ -34,16 +34,16 @@
     userId = $bindable(),
     cartCode = $bindable(),
     companyId = $bindable(),
-    orderType = OrderTypeEnum.SHOP,
+    orderType: orderTypeOptions = OrderTypeEnum.SHOP,
     memberLevel = $bindable(null),
     show = $bindable(false),
     draft,
     prehook,
-    onOrderCreated = () => null,
+    onordercreated: onOrderCreated = () => null,
   }:Props = $props();
 
   const orderContext = Context.get('order');
-  const cartQtyMap:Record<string, number> = {};
+  const cartData:Record<string, Partial<Cart>> = {};
   let paymentTypeList:PaymentType[] = $state([]);
   let cartList:Cart[] = $state([]);
   let paymentTypeId = $state('');
@@ -51,6 +51,7 @@
   let totalTierPrice = $state(0);
   let total = $state(0);
   let deliveryType:DeliveryTypeEnum = $state(DeliveryTypeEnum.SELLER_DELIVERY);
+  let orderType = $state(typeof orderTypeOptions === 'string' ? orderTypeOptions : orderTypeOptions[0]);
 
   const createOrder = async () => {
     if (!$store || !$store.loggedIn) return;
@@ -61,7 +62,7 @@
       paymentTypeId,
       deliveryType,
       cartCode,
-      orderType,
+      orderType: orderTypeOptions,
       product: processedCart.map((value) => ({
         cartId: value.id,
         inventoryId: value.inventoryId,
@@ -100,38 +101,66 @@
       wareHouse: WarehouseDetail,
       product: Cart[],
     }[] = response.data.data;
+    for (const key in cartData) {
+      delete cartData[key];
+    }
     [subTotal, totalTierPrice, total, cartList] = cartOrderList.reduce(
-      (prev, curr): [number, number, number, Cart[]] => [
-        prev[0] + curr.subTotal,
-        prev[1] + curr.totalTierPrice,
-        prev[2] + curr.total,
-        [
-          ...prev[3], ...(curr.product.map(
-            (cart) => ({
-              ...cart,
-              warehouse: curr.wareHouse.name,
-            }),
-          )),
-        ],
-      ],
+      (prev, curr): [number, number, number, Cart[]] => {
+        curr.product.forEach((cart) => cartData[cart.id] = cart);
+        return [
+          prev[0] + curr.subTotal,
+          prev[1] + curr.totalTierPrice,
+          prev[2] + curr.total,
+          [
+            ...prev[3], ...(curr.product.map(
+              (cart) => ({
+                ...cart,
+                warehouse: curr.wareHouse.name,
+              }),
+            )),
+          ],
+        ];
+      },
       <[number, number, number, Cart[]]>[0, 0, 0, []],
     );
     stringToast('Cart loaded');
   };
 
-  const updateCartQty = async (cartId: string, qty: number) => {
+  const updateCart = async (cartId: string) => {
     if (!store || $store?.loggedIn === false) return;
     stringToast('Updating cart...');
-    const response = await client.patch(`/cart/${cartId}`, {
-      qty,
-    });
-    if (response.status !== 200) return stringToast('Failed to update cart');
-    for (const key in cartQtyMap) {
-      delete cartQtyMap[key];
+    const data = cartData[cartId];
+    const payload:Partial<Cart> = {};
+    if (data.qty !== undefined) {
+      payload.qty = data.qty;
     }
+    if (orderType === OrderTypeEnum.SELLER_PURCHASE_ORDER) {
+      if (data.initialPrice) {
+        payload.startPrice = data.initialPrice;
+      }
+      if (data.discount) {
+        payload.discount = data.discount;
+      }
+      if (data.discountAmount) {
+        payload.discountAmount = data.discountAmount;
+      }
+      if (data.tax) {
+        payload.tax = data.tax;
+      }
+    }
+    const response = await client.patch(`/cart/${cartId}`, payload);
+    if (response.status !== 200) return stringToast('Failed to update cart');
     stringToast('Cart updated');
     getCart();
   };
+  async function deleteCart(cartId: string) {
+    if (!$store || !$store.loggedIn) return;
+    stringToast('Deleting cart...');
+    const response = await client.patch(`/cart/${cartId}`, { qty: 0 });
+    if (response.status !== 200) return stringToast('Failed to delete cart');
+    stringToast('Cart deleted');
+    getCart();
+  }
 
   const updateCartMemberLevel = async () => {
     if (!$store || !$store.loggedIn) return;
@@ -190,31 +219,48 @@
     itemList={cartList}
   >
     {#snippet header()}
-      <th>
-        Qty
-      </th>
+      <th>Qty</th>
+      {#if orderType === OrderTypeEnum.SELLER_PURCHASE_ORDER}
+        <th>Price</th>
+        <th>Discount</th>
+        <th>Discount Amount</th>
+        <th>Tax</th>
+      {/if}
       <th></th>
       <th></th>
-      <th>Initial Price</th>
-      <th>Tier Price</th>
-      <th>Selling Price</th>
-      <th>
-        Warehouse
-      </th>
-      <th>
-        Name
-      </th>
+      {#if orderType !== OrderTypeEnum.SELLER_PURCHASE_ORDER}
+        <th>Initial Price</th>
+        <th>Tier Price</th>
+        <th>Selling Price</th>
+      {/if}
+      <th>Warehouse</th>
+      <th>Name</th>
     {/snippet}
 
     {#snippet content(cart: Cart)}
       <td>
-        <input type="number" value={cart.qty} class="input input-bordered w-24 max-w-xs"
-          onchange={(e) => { cartQtyMap[cart.id] = Number(e.currentTarget.value) }}
-        >
+        <input type="number" bind:value={cartData[cart.id].qty} class="input input-bordered w-24 max-w-xs">
       </td>
+      {#if orderType === OrderTypeEnum.SELLER_PURCHASE_ORDER}
+        <td>
+          <input type="number" bind:value={cartData[cart.id].initialPrice} class="input input-bordered w-24 max-w-xs">
+        </td>
+        <td>
+          <input type="number" bind:value={cartData[cart.id].discount} class="input input-bordered w-24 max-w-xs">
+        </td>
+        <td>
+          <input type="number" bind:value={cartData[cart.id].discountAmount} class="input input-bordered w-24 max-w-xs">
+        </td>
+        <td>
+          <input type="number" bind:value={cartData[cart.id].tax} class="input input-bordered w-24 max-w-xs">
+        </td>
+        <td>
+          <input type="number" readonly bind:value={cartData[cart.id].sellingPrice} class="input input-bordered w-24 max-w-xs">
+        </td>
+      {/if}
       <td>
         <button
-          onclick={() => updateCartQty(cart.id, cartQtyMap[cart.id])}
+          onclick={() => updateCart(cart.id)}
           class="btn btn-secondary"
         >
           <Icon src={FaFloppyDisk}/>
@@ -222,15 +268,17 @@
       </td>
       <td>
         <button
-          onclick={() => updateCartQty(cart.id, 0)}
+          onclick={() => deleteCart(cart.id)}
           class="btn btn-secondary"
         >
           <Icon src={FaTrashCan}/>
         </button>
       </td>
-      <td>{cart.initialPrice}</td>
-      <td>{cart.tierPrice}</td>
-      <td>{cart.sellingPrice}</td>
+      {#if orderType !== OrderTypeEnum.SELLER_PURCHASE_ORDER}
+        <td>{cart.initialPrice}</td>
+        <td>{cart.tierPrice}</td>
+        <td>{cart.sellingPrice}</td>
+      {/if}
       <td>{cart.warehouse}</td>
       <td>{cart.fullName}</td>
     {/snippet}
@@ -261,6 +309,16 @@
       </tbody>
     </table>
   </div>
+  {#if Array.isArray(orderTypeOptions)}
+    <div>
+      <select bind:value={orderType} class="select select-bordered w-full max-w-xs">
+        <option value="" disabled selected>Payment Type</option>
+        {#each orderTypeOptions as options}
+          <option value={options}>{options}</option>
+        {/each}
+      </select>
+    </div>
+  {/if}
   <div>
     <select bind:value={paymentTypeId} class="select select-bordered w-full max-w-xs">
       <option value="" disabled selected>Payment Type</option>

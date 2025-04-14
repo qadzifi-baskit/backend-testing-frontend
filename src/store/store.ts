@@ -7,6 +7,8 @@ const createAuthStore = () => writable<AuthStore>({
   loggedIn: false,
 });
 
+export const BuyerStore = createAuthStore();
+
 export const BrandUserStore = createAuthStore();
 
 export const BaskitAdminStore = createAuthStore();

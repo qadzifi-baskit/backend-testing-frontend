@@ -144,7 +144,10 @@
           {client}
           bind:userId={customerId}
           {companyId}
-          orderType={OrderTypeEnum.OFFLINE}
+          orderType={[
+            OrderTypeEnum.OFFLINE,
+            OrderTypeEnum.SELLER_PURCHASE_ORDER,
+          ]}
         />
       </div>
     </div>

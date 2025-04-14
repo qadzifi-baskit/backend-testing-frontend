@@ -11,6 +11,7 @@
   import AddDocumentModal from './AddDocumentModal.svelte';
   import ModifyDocumentModal from './ModifyDocumentModal.svelte';
   import EditButton from '../atoms/EditButton.svelte';
+  import FormInput from '../atoms/FormInput.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -21,6 +22,7 @@
     show = $bindable(false),
   }: Props = $props();
 
+  let entityId = $state('');
   let search = $state(''); 
   let page = $state(1);
   let max = $state(1);
@@ -32,6 +34,9 @@
       search,
       $page: `${page}`,
     });
+    if (entityId) {
+      params.append('entityId', entityId);
+    }
     stringToast('Loading...');
     const response = await client.get('/document', { params });
     if (response.status !== 200) {
@@ -44,6 +49,7 @@
   const debounceReloadData = debounce(reloadData);
 
   $effect(() => {
+    entityId;
     search;
     page = 1;
     max = 1;
@@ -51,6 +57,7 @@
 
   $effect(() => {
     if (show) {
+      entityId;
       search;
       page;
       max;
@@ -90,6 +97,7 @@
   class="w-full"
   bind:show
 >
+  <FormInput bind:value={entityId}/>
   <PaginationNavigationPanel
     bind:search
     bind:page
@@ -103,6 +111,10 @@
         <table class="table table-zebra table-pin-cols">
           {@render tableContent()}
         </table>
+      {/snippet}
+      {#snippet lastHeader()}
+        <th></th>
+        <th></th>
       {/snippet}
       {#snippet lastColumn(item)}
         <th class="flex gap-2">
