@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { OrderTypeEnum } from '@/lib/enum';
+  import { DeliveryTypeEnum, OrderTypeEnum } from '@/lib/enum';
   import { stringToast } from '@/lib/helper/toast';
-  import { getObjectDiff } from '@/lib/helper/util';
+  import { getObjectDiff, isNil } from '@/lib/helper/util';
   import { SellerAdminStore } from '@/store/store';
   import type { AuthStore } from '@/types';
   import type { Cart, CartDraftUser, CartDraftUserAddress, CartParent } from '@/types/cart';
@@ -43,6 +43,10 @@
     salesId: '',
     refCode: '',
     creationDate: null,
+    paymentTypeId: '',
+    shippingCost: 0,
+    tax: 0,
+    deliveryType: DeliveryTypeEnum.SELLER_DELIVERY,
     customerData: {
       picName: '',
       billingAddress: {
@@ -174,6 +178,18 @@
     if (payload.creationDate) {
       newPayload.creationDate = payload.creationDate;
     }
+    if (payload.paymentTypeId) {
+      newPayload.paymentTypeId = payload.paymentTypeId;
+    }
+    if (payload.deliveryType) {
+      newPayload.deliveryType = payload.deliveryType;
+    }
+    if (!isNil(payload.shippingCost)) {
+      newPayload.shippingCost = payload.shippingCost;
+    }
+    if (!isNil(payload.tax)) {
+      newPayload.tax = payload.tax;
+    }
     if (payload.customerData) {
       newPayload.customerData = customerDataPrehook(payload.customerData);
     }
@@ -270,7 +286,11 @@
       <UserDropdownSelect
         {client}
         bind:value={newData.salesId!}
-        roleName="EXTERNAL_SALESMAN"
+        roleName={[
+          'EXTERNAL_SALESMAN',
+          'ADMIN',
+          'SELLER_ADMIN',
+        ]}
         label="Salesman"
         bind:placeholder={salesName}
         bind:sellerId={companyId}
@@ -284,11 +304,16 @@
         bind:companyId
       />
       <FormInput readonly type="text" placeholder="customer id" label="Customer Id" bind:value={newData.customerId}/>
+      {#if newData.orderCode}
+        <FormInput readonly type="text" label="Order Code" bind:value={newData.orderCode}/>
+      {/if}
       <FormInput type="text" placeholder="ref code" label="Ref Code" bind:value={newData.refCode}/>
       <span class="fieldset-label font-bold mb-2">Billing Address</span>
       {@render addressForm(newData.customerData!.billingAddress!)}
       <span class="fieldset-label font-bold mb-2">Delivery Address</span>
       {@render addressForm(newData.customerData!.deliveryAddress!)}
+      <FormInput type="number" placeholder="shipping cost" label="Shipping Cost" bind:value={newData.shippingCost}/>
+      <FormInput type="number" placeholder="tax" label="Tax" bind:value={newData.tax}/>
       <SubmitButton/>
       {#if item?.id}
         <button class="btn btn-secondary" onclick={deleteDraft}>Delete</button>
@@ -313,6 +338,8 @@
         prehook={saveDraft}
         bind:cartCode={item.id}
         bind:companyId
+        bind:paymentTypeId={newData.paymentTypeId!}
+        bind:deliveryType={newData.deliveryType!}
       />
     {:else}
       <BuyerCart
@@ -323,6 +350,8 @@
         orderType={OrderTypeEnum.SELLER_PURCHASE_ORDER}
         {onordercreated}
         bind:companyId
+        bind:paymentTypeId={newData.paymentTypeId!}
+        bind:deliveryType={newData.deliveryType!}
       />
     {/if}
   </div>

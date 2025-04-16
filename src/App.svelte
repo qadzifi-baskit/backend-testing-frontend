@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { Component } from 'svelte';
   import { Icon } from 'svelte-icons-pack';
-  import { FaSolidAngleRight } from 'svelte-icons-pack/fa';
   import { BiError } from 'svelte-icons-pack/bi';
+  import { FaSolidAngleRight } from 'svelte-icons-pack/fa';
+  import { VscOpenPreview } from 'svelte-icons-pack/vsc';
   import BaskitAdmin from './app/baskit-admin/BaskitAdmin.svelte';
   import BrandUser from './app/brand-user/BrandUser.svelte';
   import Buyer from './app/Buyer';
@@ -11,8 +12,9 @@
   import SuperAdmin from './app/super-admin/SuperAdmin.svelte';
   import Config from './components/molecules/Config.svelte';
   import ErrorManagerModal from './components/molecules/ErrorManagerModal.svelte';
+  import ResourceViewerModal from './components/molecules/ResourceViewerModal.svelte';
   import { apiEnv } from './lib/config/env.svelte';
-  let selected = $state(1);
+  let selected = $state(2);
   let host = $state(apiEnv.DEFAULT_API_HOST);
 
   type PageComponent = Component<{ host: string, showHost: boolean }>;
@@ -25,12 +27,12 @@
     { label: 'Super Admin', component: SuperAdmin },
   ];
 
-  let errorModal:HTMLDialogElement|undefined = $state();
+  let errorModal = $state<HTMLDialogElement>();
+  let resourceModal = $state<HTMLDialogElement>();
 </script>
 
-<ErrorManagerModal
-  bind:dialog={errorModal}
-/>
+<ErrorManagerModal bind:dialog={errorModal}/>
+<ResourceViewerModal bind:dialog={resourceModal}/>
 <Config
   bind:host
   showClient={false}
@@ -73,6 +75,9 @@
 </div>
 <button class="btn btn-error fixed bottom-8 right-8 z-10" onclick={() => errorModal?.showModal()}>
   <Icon src={BiError}/>
+</button>
+<button class="btn btn-info fixed bottom-20 right-8 z-10" onclick={() => resourceModal?.showModal()}>
+  <Icon src={VscOpenPreview}/>
 </button>
 
 <style lang="">

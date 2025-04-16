@@ -14,12 +14,12 @@
   import { listenAuthSuccess, listenDoAuth } from '@/event';
   import { apiEnv } from '@/lib/config/env.svelte';
   import { OrderTypeEnum } from '@/lib/enum';
+  import { createAxiosInstance } from '@/lib/helper/axios.svelte';
   import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
   import { SellerAdminStore } from '@/store/store';
   import type { Company } from '@/types';
   import type { OrderContext } from '@/types/context';
-  import axios from 'axios';
   import { writable } from 'svelte/store';
 
   type Props = {
@@ -31,7 +31,7 @@
     showHost = $bindable(true),
   }:Props = $props();
   let element:HTMLElement|undefined = $state();
-  const client = axios.create({ baseURL: host });
+  const client = createAxiosInstance({ baseURL: host });
   const orderContext = writable<OrderContext>({
     paymentTypeList: [],
   });

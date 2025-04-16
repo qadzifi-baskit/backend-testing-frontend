@@ -114,7 +114,6 @@
       {/snippet}
       {#snippet lastHeader()}
         <th></th>
-        <th></th>
       {/snippet}
       {#snippet lastColumn(item)}
         <th class="flex gap-2">

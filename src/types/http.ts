@@ -5,3 +5,9 @@ export type ErrorResponseData = {
   message: string,
   statusCode: number,
 };
+
+export type UploadFileResponseData = {
+  url: string,
+  mimeType: string,
+  fileName: string,
+};

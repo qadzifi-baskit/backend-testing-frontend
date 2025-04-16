@@ -1,12 +1,14 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-  import Select from './Select.svelte';
   import { cn } from '@/lib/helper/tailwind';
+  import type { Snippet } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import { Icon } from 'svelte-icons-pack';
   import { BiReset } from 'svelte-icons-pack/bi';
+  import Select from './Select.svelte';
 
   type Props = {
     open?: boolean,
+    label?: string|Snippet,
     value?: Date|string|null,
     current?: Date,
     selectedYear?: number,
@@ -16,6 +18,7 @@
   };
   let {
     open = $bindable(false),
+    label = 'Select Date',
     value = $bindable(null),
     current = $bindable(new Date()),
     selectedYear = $bindable(current.getFullYear()),
@@ -76,11 +79,17 @@
 
 <details bind:open={open} class="dropdown">
   <summary class="btn m-1">
-    {
-      typeof value === 'string' && value ||
-        value instanceof Date && value.toISOString() ||
-        'Select Date'
-    }
+    {#if typeof value === 'string'}
+      {value}
+    {:else if value instanceof Date}
+      {value.toLocaleDateString()}
+    {:else}
+      {#if typeof label === 'string'}
+        {label}
+      {:else}
+        {@render label()}
+      {/if}
+    {/if}
   </summary>
   <div class="menu dropdown-content bg-base-100 rounded-box z-20 w-fit p-2 shadow-sm border border-slate-500">
     <div class="flex">

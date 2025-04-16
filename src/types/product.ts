@@ -1,5 +1,10 @@
 import type { PriceTier } from './inventory';
 
+export type UOM = {
+  id: string,
+  name: string,
+};
+
 export type Product = {
   name: string,
   id: string, // Inventory ID

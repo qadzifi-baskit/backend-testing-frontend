@@ -55,9 +55,9 @@
         {@render header()}
       {:else}
         {#each headerList as header}
-          <th>
+          <td>
             <span class="capitalize">{header.split(/(?=[A-Z])/).join(' ')}</span>
-          </th>
+          </td>
         {/each}
       {/if}
       {@render lastHeader?.()}

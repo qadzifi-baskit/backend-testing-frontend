@@ -11,6 +11,8 @@
   import UpdateStatus from './UpdateStatus.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import type { Writable } from 'svelte/store';
+  import { stringToast } from '@/lib/helper/toast';
+  import DatePicker from '../DatePicker.svelte';
 
   type Props = {
     endpoint?: string,
@@ -34,8 +36,10 @@
 
   let orderList:Order[] = $state([]);
   let page = $state(1);
+  let max = $state(1);
+  let endDate:Date|null = $state(null);
 
-  const getOrderList = async () => {
+  async function getOrderList() {
     if ($store && !$store.loggedIn) return;
     const params = new URLSearchParams({
       $order: 'createdAt',
@@ -54,17 +58,29 @@
     if (companyId) {
       params.append('companyId', companyId);
     }
+    if (endDate) {
+      params.append('end', endDate.toISOString());
+    }
     const response = await client.get(
       `/order/${endpoint}`,
       { params },
     );
-    if (response.status === 200) {
-      orderList = response.data.data;
+    if (response.status !== 200) {
+      return stringToast('Failed to load order');
     }
+    orderList = response.data.data ?? [];
+    max = response.data.totalPage ?? 1;
   };
 
   $effect(() => {
+    endDate;
+    page = 1;
+    max = 1;
+  });
+
+  $effect(() => {
     if (show) {
+      endDate;
       page;
       getOrderList();
     }
@@ -120,20 +136,23 @@
     {client}
   />
 </Modal>
-<Collapse title='Order' onclick={getOrderList}>
+<Collapse title='Order' onclick={getOrderList} bind:show>
   <PaginationNavigationPanel
     bind:page
+    bind:max
     onreload={getOrderList}
   />
-  <button class="btn" onclick={getOrderList}>Get Order</button>
+  <DatePicker bind:value={endDate} label="End Date"/>
   {#if orderList.length > 0}
     <Table itemList={orderList}>
       <svelte:fragment slot="header">
         <th>Id</th>
         <th>Date</th>
+        <th>Order Type</th>
         <th>Order Code</th>
         <th></th>
         <th></th>
+        <th>Salesname</th>
         <th>Status</th>
         <th>Payment</th>
         <th>Payment Status</th>
@@ -143,6 +162,7 @@
       <svelte:fragment slot="item" let:item={order}>
         <td><NoWrap>{order.id}</NoWrap></td>
         <td><NoWrap>{order.createdAt}</NoWrap></td>
+        <td>{order.orderType}</td>
         <td>{order.orderCode}</td>
         <td>
           <button
@@ -160,6 +180,7 @@
             <Icon src={FaSolidList}/>
           </button>
         </td>
+        <td>{order.salesName}</td>
         <td>{order.deliveryType}</td>
         <td>{order.status}</td>
         <td><NoWrap>{order.paymentTerm}</NoWrap></td>

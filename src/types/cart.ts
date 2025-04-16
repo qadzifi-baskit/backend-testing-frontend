@@ -1,3 +1,4 @@
+import type { DeliveryTypeEnum } from '@/lib/enum';
 import type { MemberDiscountLevel } from '@/lib/enum/memberDiscount.enum';
 
 export type Cart = {
@@ -35,12 +36,18 @@ export type CartDraftUser = {
   deliveryAddress?: CartDraftUserAddress|null,
 };
 
+export type CartCustomerData = {
+  companyName: string|null,
+};
+
 export type CartParent = {
   createdAt: string,
   id: string,
   creationDate: Date|null,
   customerId: string|null,
+  customer: CartCustomerData|null,
   estimatedPickupDate: string|null,
+  orderCode: string|null,
   refCode: string|null,
   address: string|null,
   provinceId: number|null,
@@ -48,11 +55,12 @@ export type CartParent = {
   districtId: number|null,
   postalCode: string|null,
   salesId: string|null,
-  deliveryType: string|null,
+  deliveryType: DeliveryTypeEnum|null,
   paymentTypeId: string|null,
   shippingCost: number|null,
   tax: number|null,
   notes: string|null,
   customerData: CartDraftUser|null,
   companyId?: string,
+  salesName: string|null,
 };

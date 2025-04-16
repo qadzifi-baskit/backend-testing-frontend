@@ -114,6 +114,9 @@
           <col>
           <col>
           <col>
+          <col>
+          <col>
+          <col>
           <col class="w-full">
         </colgroup>
       {/snippet}
@@ -122,7 +125,10 @@
         <td>Id</td>
         <td></td>
         <td></td>
+        <td>Order Code</td>
         <td>Ref Code</td>
+        <td>Store Name</td>
+        <td>Sales Name</td>
       {/snippet}
 
       {#snippet content(cart: CartParent)}
@@ -134,7 +140,10 @@
         <td>
           <DeleteButton onclick={deleteDraft(cart)}/>
         </td>
+        <td><NoWrap>{cart.orderCode}</NoWrap></td>
         <td><NoWrap>{cart.refCode}</NoWrap></td>
+        <td><NoWrap>{cart.customer?.companyName ?? ''}</NoWrap></td>
+        <td><NoWrap>{cart.salesName}</NoWrap></td>
       {/snippet}
     </Table5>
   {/if}

@@ -27,6 +27,8 @@
     draftData?: Partial<CartParent>,
     prehook?: (cart: Cart[]) => Cart[]|Promise<Cart[]>,
     onordercreated?: () => unknown,
+    paymentTypeId?: string,
+    deliveryType?: DeliveryTypeEnum,
   };
   let {
     client,
@@ -40,17 +42,17 @@
     draft,
     prehook,
     onordercreated: onOrderCreated = () => null,
+    paymentTypeId = $bindable(''),
+    deliveryType = $bindable(DeliveryTypeEnum.SELLER_DELIVERY),
   }:Props = $props();
 
   const orderContext = Context.get('order');
   const cartData:Record<string, Partial<Cart>> = {};
   let paymentTypeList:PaymentType[] = $state([]);
   let cartList:Cart[] = $state([]);
-  let paymentTypeId = $state('');
   let subTotal = $state(0);
   let totalTierPrice = $state(0);
   let total = $state(0);
-  let deliveryType:DeliveryTypeEnum = $state(DeliveryTypeEnum.SELLER_DELIVERY);
   let orderType = $state(typeof orderTypeOptions === 'string' ? orderTypeOptions : orderTypeOptions[0]);
 
   const createOrder = async () => {
@@ -174,8 +176,10 @@
   };
 
   $effect(() => {
-    memberLevel;
-    updateCartMemberLevel();
+    if (show) {
+      memberLevel;
+      updateCartMemberLevel();
+    }
   });
 
   let saveDraftDialog:HTMLDialogElement|undefined = $state();

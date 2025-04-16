@@ -11,6 +11,7 @@
   type DataType = D;
   // eslint-disable-next-line no-undef
   type ResponseType = T;
+  type PrehookReturn = DataType|null|undefined;
 
   type Props = {
     children: Snippet,
@@ -20,8 +21,9 @@
     path: string,
     class?: string,
     method?: RequestMethod,
-    prehook?: (data: DataType) => DataType|null|undefined,
+    prehook?: (data: DataType) => PrehookReturn|Promise<PrehookReturn>,
     onsuccess?: (data: ResponseType) => void,
+    params?: URLSearchParams,
   };
   let {
     client,
@@ -33,6 +35,7 @@
     children,
     prehook,
     onsuccess,
+    params = $bindable(),
   }:Props = $props();
 
   export function trigger() {
@@ -46,7 +49,7 @@
     }
     let processedPayload = payload;
     if (prehook) {
-      const result = prehook(payload);
+      const result = await prehook(payload);
       if (isNil(result)) {
         return stringToast('Form prehook failed');
       }
@@ -58,6 +61,9 @@
     };
     if (method !== 'GET') {
       config.data = processedPayload;
+    }
+    if (params) {
+      config.params = params;
     }
     stringToast('Submitting...');
     const response = await client(config);

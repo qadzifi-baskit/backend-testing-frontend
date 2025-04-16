@@ -26,7 +26,7 @@
     showvalue?: boolean,
     resetable?: boolean,
     onclick?: () => void,
-    onselect?: (value: ValueType) => ReturnType|Promise<ReturnType>,
+    onselect?: (value: ValueType) => void|ReturnType|Promise<ReturnType>,
     dropdownContainer?: Snippet<[Snippet]>,
     show?: boolean,
   };
@@ -127,11 +127,11 @@
   {/each}
 {/snippet}
 
-<details class={cn('dropdown w-full max-w-xs mb-4', clazz)}
+<details class={cn('dropdown w-full max-w-xs', clazz)}
   bind:this={selectElement}
   bind:open={show}
 >
-  <summary class="btn input-bordered w-fit justify-start"
+  <summary class="btn not-hover:bg-slate-600 input-bordered w-fit justify-start"
     {onclick}
     title={showvalue && selectValue ? `${selectValue}` : undefined}
   >

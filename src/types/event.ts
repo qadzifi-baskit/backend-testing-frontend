@@ -6,10 +6,14 @@ export type BulkCreateInventoryMessage = {
   params?: Entry[],
 };
 
+export type HTMLInputEvent = Event & {
+  currentTarget: EventTarget & HTMLInputElement;
+};
+
 export type HTMLButtonEventHandler = MouseEvent & {
   currentTarget: EventTarget & HTMLButtonElement;
 };
 
-export type HTMLDialodToggleEvent = ToggleEvent & {
+export type HTMLDialogToggleEvent = ToggleEvent & {
   currentTarget: EventTarget & HTMLDialogElement;
 };

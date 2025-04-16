@@ -8,6 +8,7 @@
   import ProductManagement from '@/components/molecules/ProductManagement.svelte';
   import SellerList from '@/components/molecules/SellerList.svelte';
   import TutorialManagement from '@/components/molecules/TutorialManagement.svelte';
+  import { OrderTypeEnum } from '@/lib/enum';
   import { BaskitAdminStore } from '@/store/store';
   import axios from 'axios';
 
@@ -45,7 +46,11 @@
   <div class="divider"></div>
   <CategoryManagement {client} store={BaskitAdminStore}/>
   <div class="divider"></div>
-  <OrderList {client} store={BaskitAdminStore} />
+  <OrderList
+    {client}
+    store={BaskitAdminStore}
+    orderType={[OrderTypeEnum.SHOP, OrderTypeEnum.ONLINE]}
+  />
   <div class="divider"></div>
   <ProductManagement {client} store={BaskitAdminStore} />
   <div class="divider"></div>

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { cn } from '@/lib/helper/tailwind';
   import { currentModalStore } from '@/store/store';
-  import type { HTMLDialodToggleEvent } from '@/types/event';
+  import type { HTMLDialogToggleEvent } from '@/types/event';
   import type { Snippet } from 'svelte';
   import type { EventHandler, ToggleEventHandler } from 'svelte/elements';
 
@@ -20,7 +20,7 @@
     children,
   }: Props = $props();
 
-  function ontoggle(event: HTMLDialodToggleEvent) {
+  function ontoggle(event: HTMLDialogToggleEvent) {
     if (dialog?.open) {
       const pushedDialog = dialog;
       currentModalStore.update((value) => [pushedDialog, ...value]);

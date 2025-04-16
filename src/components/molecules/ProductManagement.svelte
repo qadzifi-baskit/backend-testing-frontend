@@ -126,6 +126,7 @@
 <AddProductModal
   bind:dialog={addProductDialog}
   {client}
+  {companyId}
 />
 <AddInventoryModal
   bind:dialog={addInventoryDialog}
