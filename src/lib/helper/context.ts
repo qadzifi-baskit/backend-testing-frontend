@@ -1,9 +1,10 @@
-import type { OrderContext } from '@/types/context';
+import type { OrderContext, UserContext } from '@/types/context';
 import { getContext, setContext } from 'svelte';
 import type { Writable } from 'svelte/store';
 
 type ContextMap = {
-  order?: Writable<OrderContext>;
+  order?: Writable<OrderContext>,
+  user?: Writable<UserContext>,
 };
 
 export const Context = {

@@ -16,6 +16,24 @@ export function debounce<
   };
 }
 
+export function cancelableDebounce<
+  ArgType extends unknown[],
+  ReturnType,
+>(
+  callback: (...args: ArgType) => ReturnType,
+  delay = 300,
+) {
+  let timeoutId: NodeJS.Timeout;
+  const cancelCallback = () => clearTimeout(timeoutId);
+  const debouncedCallback = (...args: ArgType) => {
+    cancelCallback();
+    timeoutId = setTimeout(() => {
+      callback(...args);
+    }, delay);
+  };
+  return [debouncedCallback, cancelCallback] as const;
+}
+
 export function toURLStringEntries(data: Record<string, unknown>): Entry[] {
   return Object.entries(data).reduce(
     (result, [key, value]) => {

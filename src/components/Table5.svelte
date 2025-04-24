@@ -20,6 +20,8 @@
     lastColumn?: Snippet<[DataType, number]>,
     firstHeader?: Snippet,
     lastHeader?: Snippet,
+    pincols?: boolean,
+    pinrows?: boolean,
   };
   let {
     class: clazz = '',
@@ -36,6 +38,8 @@
     lastColumn,
     firstHeader,
     lastHeader,
+    pincols: pinCols = false,
+    pinrows: pinRows = false,
   }:Props = $props();
 
   $effect(() => {
@@ -95,7 +99,13 @@
   {#if table}
     {@render table(tableContent)}
   {:else}
-    <table class="table table-zebra">
+    <table class={cn(
+      'table table-zebra',
+      {
+        'table-pin-cols': pinCols,
+        'table-pin-rows': pinRows,
+      },
+    )}>
       {@render tableContent()}
     </table>
   {/if}

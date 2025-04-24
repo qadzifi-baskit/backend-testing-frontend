@@ -1,18 +1,18 @@
 <script lang="ts">
+  import { stringToast } from '@/lib/helper/toast';
   import type { AuthStore, Order } from '@/types';
   import type { AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidList, FaSolidPencil } from 'svelte-icons-pack/fa';
+  import type { Writable } from 'svelte/store';
   import Collapse from '../Collapse.svelte';
+  import DatePicker from '../DatePicker.svelte';
   import Modal from '../Modal.svelte';
-  import Table from '../Table.svelte';
+  import Table5 from '../Table5.svelte';
   import NoWrap from '../atoms/NoWrap.svelte';
+  import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import OrderDetail from './OrderDetail.svelte';
   import UpdateStatus from './UpdateStatus.svelte';
-  import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
-  import type { Writable } from 'svelte/store';
-  import { stringToast } from '@/lib/helper/toast';
-  import DatePicker from '../DatePicker.svelte';
 
   type Props = {
     endpoint?: string,
@@ -144,8 +144,8 @@
   />
   <DatePicker bind:value={endDate} label="End Date"/>
   {#if orderList.length > 0}
-    <Table itemList={orderList}>
-      <svelte:fragment slot="header">
+    <Table5 itemList={orderList} pincols pinrows>
+      {#snippet header()}
         <th>Id</th>
         <th>Date</th>
         <th>Order Type</th>
@@ -153,13 +153,15 @@
         <th></th>
         <th></th>
         <th>Salesname</th>
+        <th>Delivery Type</th>
         <th>Status</th>
         <th>Payment</th>
         <th>Payment Status</th>
         <th>Payment Link Status</th>
         <th>Total</th>
-      </svelte:fragment>
-      <svelte:fragment slot="item" let:item={order}>
+      {/snippet}
+
+      {#snippet content(order)}
         <td><NoWrap>{order.id}</NoWrap></td>
         <td><NoWrap>{order.createdAt}</NoWrap></td>
         <td>{order.orderType}</td>
@@ -186,9 +188,9 @@
         <td><NoWrap>{order.paymentTerm}</NoWrap></td>
         <td><NoWrap>{order.paymentStatus}</NoWrap></td>
         <td><NoWrap>{order.paymentLinkStatus}</NoWrap></td>
-        <td>{order.grandTotal}</td>
-      </svelte:fragment>
-    </Table>
+        <th>{order.grandTotal}</th>
+      {/snippet}
+    </Table5>
   {/if}
 </Collapse>
 

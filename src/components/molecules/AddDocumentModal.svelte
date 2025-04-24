@@ -12,18 +12,20 @@
     client: AxiosInstance,
     dialog?: HTMLDialogElement,
     onsuccess?: (data?: Document) => void,
+    entityid?: string,
   };
   let {
     client,
     dialog = $bindable(),
     onsuccess: onSuccessParent,
+    entityid: entityId = $bindable(),
   }:Props = $props();
 
   const payload:Partial<Document> = $state({});
   let file = $state<FileList>();
 
   function resetData() {
-    Object.assign(payload, { entityId: '', type: '', name: '' });
+    Object.assign(payload, { entityId: entityId ?? '', type: '', name: '' });
   }
 
   function onsuccess(data: Document) {
@@ -74,7 +76,7 @@
       {prehook}
       {onsuccess}
     >
-      <FormInput label="Entity ID" placeholder="entity id" bind:value={payload.entityId!}/>
+      <FormInput readonly={!!entityId} label="Entity ID" placeholder="entity id" bind:value={payload.entityId!}/>
       <FormInput label="Type" placeholder="type" bind:value={payload.type!}/>
       <span class="fieldset-label">File</span>
       <input type="file" class="file-input" bind:files={file}>

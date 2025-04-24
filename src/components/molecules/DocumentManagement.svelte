@@ -1,31 +1,39 @@
 <script lang="ts">
   import { stringToast } from '@/lib/helper/toast';
-  import { debounce } from '@/lib/helper/util';
+  import { cancelableDebounce } from '@/lib/helper/util';
   import type { Document } from '@/types/document';
   import type { AxiosInstance } from 'axios';
   import type { Snippet } from 'svelte';
   import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
   import DeleteButton from '../atoms/DeleteButton.svelte';
+  import EditButton from '../atoms/EditButton.svelte';
+  import FormInput from '../atoms/FormInput.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import AddDocumentModal from './AddDocumentModal.svelte';
   import ModifyDocumentModal from './ModifyDocumentModal.svelte';
-  import EditButton from '../atoms/EditButton.svelte';
-  import FormInput from '../atoms/FormInput.svelte';
 
   type Props = {
     client: AxiosInstance,
     show?: boolean,
+    entityid?: string,
   };
   let {
     client,
     show = $bindable(false),
+    entityid: targetEntityId = $bindable(),
   }: Props = $props();
 
   let entityId = $state('');
   let search = $state(''); 
   let page = $state(1);
   let max = $state(1);
+
+  $effect(() => {
+    if (targetEntityId) {
+      entityId = targetEntityId;
+    }
+  });
 
   let documentList:Document[] = $state([]);
 
@@ -46,7 +54,7 @@
     max = response.data?.meta?.totalPage ?? 1;
   }
 
-  const debounceReloadData = debounce(reloadData);
+  const [debounceReloadData, cancelReloadData] = cancelableDebounce(reloadData);
 
   $effect(() => {
     entityId;
@@ -55,6 +63,12 @@
     max = 1;
   });
 
+  $effect(() => {
+    if (show) {
+      cancelReloadData();
+      reloadData();
+    }
+  });
   $effect(() => {
     if (show) {
       entityId;
@@ -90,14 +104,19 @@
   }
 </script>
 
-<AddDocumentModal bind:dialog={addDocumentDialog} {client} onsuccess={reloadData}/>
+<AddDocumentModal
+  bind:dialog={addDocumentDialog}
+  {client}
+  onsuccess={reloadData}
+  bind:entityid={targetEntityId}
+/>
 <ModifyDocumentModal bind:dialog={modifyDocumentDialog} bind:item={selectedDocument} {client} onsuccess={onSudcessModifyDocument}/>
 <Collapse5
   title="Document Management"
   class="w-full"
   bind:show
 >
-  <FormInput bind:value={entityId}/>
+  <FormInput disabled={!!targetEntityId} bind:value={entityId}/>
   <PaginationNavigationPanel
     bind:search
     bind:page

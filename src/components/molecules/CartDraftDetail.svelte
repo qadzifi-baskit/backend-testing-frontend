@@ -18,6 +18,8 @@
   import InventoryList from './InventoryList.svelte';
   import UserDropdownSelect from './UserDropdownSelect.svelte';
   import UserOfflineDropdownSelect from './UserOfflineDropdownSelect.svelte';
+  import { Context } from '@/lib/helper/context';
+  import DocumentManagement from './DocumentManagement.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -37,6 +39,7 @@
     onsuccess: onSuccessParent,
     ondelete,
   }: Props = $props();
+  const userContext = Context.get('user');
 
   const defaultData = {
     customerId: '',
@@ -67,6 +70,7 @@
   const newData:Partial<CartParent> = $state({ ...defaultData });
 
   let show = $state(false);
+  let sameAddress = $state(false);
 
   async function getCartDraftDetail() {
     if (!item) return;
@@ -86,6 +90,11 @@
     } else {
       Object.assign(newData, defaultData);
       delete newData.companyId;
+    }
+  });
+  $effect(() => {
+    if (sameAddress) {
+      newData.customerData!.deliveryAddress = { ...newData.customerData!.billingAddress };
     }
   });
 
@@ -247,21 +256,23 @@
   }
 </script>
 
-{#snippet addressForm(data: CartDraftUserAddress)}
-  <FormInput type="text" placeholder="address" label="Address" bind:value={data.address}/>
+{#snippet addressForm(data: CartDraftUserAddress, disabled = false)}
+  <FormInput {disabled} type="text" placeholder="address" label="Address" bind:value={data.address}/>
   <AreaSelectInput
+    {disabled}
     {client}
     {store}
     bind:value={data.provinceId}
   />
   <AreaSelectInput
+    {disabled}
     type="REGENCY"
     {client}
     {store}
     bind:parentId={data.provinceId}
     bind:value={data.regencyId}
   />
-  <FormInput type="text" placeholder="postal code" label="Postal Code" bind:value={data.postalCode}/>
+  <FormInput {disabled} type="text" placeholder="postal code" label="Postal Code" bind:value={data.postalCode}/>
 {/snippet}
 
 <Modal bind:dialog onopen={() => show = true}>
@@ -311,7 +322,11 @@
       <span class="fieldset-label font-bold mb-2">Billing Address</span>
       {@render addressForm(newData.customerData!.billingAddress!)}
       <span class="fieldset-label font-bold mb-2">Delivery Address</span>
-      {@render addressForm(newData.customerData!.deliveryAddress!)}
+      <label class="label">
+        <input type="checkbox" bind:checked={sameAddress} class="checkbox">
+        Same Address
+      </label>
+      {@render addressForm(newData.customerData!.deliveryAddress!, sameAddress)}
       <FormInput type="number" placeholder="shipping cost" label="Shipping Cost" bind:value={newData.shippingCost}/>
       <FormInput type="number" placeholder="tax" label="Tax" bind:value={newData.tax}/>
       <SubmitButton/>
@@ -353,6 +368,10 @@
         bind:paymentTypeId={newData.paymentTypeId!}
         bind:deliveryType={newData.deliveryType!}
       />
+    {/if}
+    {#if $userContext?.id}
+      <div class="mb-2"></div>
+      <DocumentManagement show bind:entityid={$userContext.id} {client}/>
     {/if}
   </div>
 </Modal>

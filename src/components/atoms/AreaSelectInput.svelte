@@ -19,6 +19,7 @@
     value?: number|null,
     default?: number|null,
     show?: boolean,
+    disabled?: boolean,
   };
   let {
     type: areaType = AreaType.PROVINCE,
@@ -30,6 +31,7 @@
     value = $bindable(),
     default: defaultValue,
     show = $bindable(false),
+    disabled = $bindable(false),
   }: Props = $props();
 
   let areaList:Area[] = $state([]);
@@ -91,5 +93,6 @@
     resetable
     display="LABEL"
     bind:placeholder={areaName}
+    bind:disabled
   />
 </fieldset>

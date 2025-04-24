@@ -19,7 +19,7 @@
   import { stringToast } from '@/lib/helper/toast';
   import { SellerAdminStore } from '@/store/store';
   import type { Company } from '@/types';
-  import type { OrderContext } from '@/types/context';
+  import type { OrderContext, UserContext } from '@/types/context';
   import { writable } from 'svelte/store';
 
   type Props = {
@@ -35,7 +35,9 @@
   const orderContext = writable<OrderContext>({
     paymentTypeList: [],
   });
+  const userContext = writable<UserContext>({});
   Context.set('order', orderContext);
+  Context.set('user', userContext);
 
   let clientType = $state('WEB_CMS');
   let username = $state('nagamas@testing.com');
@@ -44,6 +46,9 @@
 
   async function getMyCompany() {
     if (!$SellerAdminStore.loggedIn) return;
+    userContext.set({
+      id: $SellerAdminStore.userId,
+    });
     const response = await client.get('/users/me');
     if (response.status !== 200) return;
     companyId = (<Company[]|undefined>response.data?.data?.companies)?.[0]?.id ?? '';

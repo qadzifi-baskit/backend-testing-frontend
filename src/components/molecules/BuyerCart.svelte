@@ -52,6 +52,7 @@
   let cartList:Cart[] = $state([]);
   let subTotal = $state(0);
   let totalTierPrice = $state(0);
+  let totalSellingPrice = $state(0);
   let total = $state(0);
   let orderType = $state(typeof orderTypeOptions === 'string' ? orderTypeOptions : orderTypeOptions[0]);
 
@@ -99,6 +100,7 @@
     const cartOrderList:{
       subTotal: number,
       totalTierPrice: number,
+      totalSellingPrice: number,
       total: number,
       wareHouse: WarehouseDetail,
       product: Cart[],
@@ -106,15 +108,16 @@
     for (const key in cartData) {
       delete cartData[key];
     }
-    [subTotal, totalTierPrice, total, cartList] = cartOrderList.reduce(
-      (prev, curr): [number, number, number, Cart[]] => {
+    [subTotal, totalTierPrice, totalSellingPrice, total, cartList] = cartOrderList.reduce(
+      (prev, curr): [number, number, number, number, Cart[]] => {
         curr.product.forEach((cart) => cartData[cart.id] = cart);
         return [
           prev[0] + curr.subTotal,
           prev[1] + curr.totalTierPrice,
-          prev[2] + curr.total,
+          prev[2] + curr.totalSellingPrice,
+          prev[3] + curr.total,
           [
-            ...prev[3], ...(curr.product.map(
+            ...prev[4], ...(curr.product.map(
               (cart) => ({
                 ...cart,
                 warehouse: curr.wareHouse.name,
@@ -123,7 +126,7 @@
           ],
         ];
       },
-      <[number, number, number, Cart[]]>[0, 0, 0, []],
+      <[number, number, number, number, Cart[]]>[0, 0, 0, 0, []],
     );
     stringToast('Cart loaded');
   };
@@ -137,8 +140,8 @@
       payload.qty = data.qty;
     }
     if (orderType === OrderTypeEnum.SELLER_PURCHASE_ORDER) {
-      if (data.initialPrice) {
-        payload.startPrice = data.initialPrice;
+      if (data.tierPrice) {
+        payload.startPrice = data.tierPrice;
       }
       if (data.discount) {
         payload.discount = data.discount;
@@ -225,6 +228,7 @@
     {#snippet header()}
       <th>Qty</th>
       {#if orderType === OrderTypeEnum.SELLER_PURCHASE_ORDER}
+        <th>Initial Price</th>
         <th>Price</th>
         <th>Discount</th>
         <th>Discount Amount</th>
@@ -247,7 +251,10 @@
       </td>
       {#if orderType === OrderTypeEnum.SELLER_PURCHASE_ORDER}
         <td>
-          <input type="number" bind:value={cartData[cart.id].initialPrice} class="input input-bordered w-24 max-w-xs">
+          <input type="number" readonly value={cart.initialPrice} class="input input-bordered w-24 max-w-xs">
+        </td>
+        <td>
+          <input type="number" bind:value={cartData[cart.id].tierPrice} class="input input-bordered w-24 max-w-xs">
         </td>
         <td>
           <input type="number" bind:value={cartData[cart.id].discount} class="input input-bordered w-24 max-w-xs">
@@ -302,6 +309,12 @@
           </td>
           <td>{totalTierPrice}</td>
           <td>-{subTotal - totalTierPrice}</td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Total Selling Price</strong>
+          </td>
+          <td>{totalSellingPrice}</td>
         </tr>
         <tr>
           <td>

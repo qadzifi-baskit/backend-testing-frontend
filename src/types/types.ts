@@ -76,6 +76,7 @@ export type Order = {
   paymentTerm: string,
   paymentStatus: string,
   paymentLinkStatus?: string|null,
+  tax: number,
   total: number,
   grandTotal: number,
   product: Omit<Cart, 'warehouse'>,
@@ -84,6 +85,8 @@ export type Order = {
 export type OrderDetail = {
   id: string,
   qty: number,
+  basePrice: number,
+  startPrice: number,
   sellingPrice: number,
   margin: number,
   marginValue: number,

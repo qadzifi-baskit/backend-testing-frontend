@@ -29,6 +29,7 @@
     onselect?: (value: ValueType) => void|ReturnType|Promise<ReturnType>,
     dropdownContainer?: Snippet<[Snippet]>,
     show?: boolean,
+    disabled?: boolean,
   };
   let {
     class: clazz = '',
@@ -44,6 +45,7 @@
     onselect,
     dropdownContainer,
     show = $bindable(false),
+    disabled = $bindable(false),
   }:Props = $props();
 
   let selectElement:HTMLDetailsElement|undefined;
@@ -131,7 +133,14 @@
   bind:this={selectElement}
   bind:open={show}
 >
-  <summary class="btn not-hover:bg-slate-600 input-bordered w-fit justify-start"
+  <summary
+    class={cn(
+      'btn input-bordered w-fit justify-start',
+      {
+        'not-hover:bg-slate-600': !disabled,
+        'btn-disabled': disabled,
+      },
+    )}
     {onclick}
     title={showvalue && selectValue ? `${selectValue}` : undefined}
   >

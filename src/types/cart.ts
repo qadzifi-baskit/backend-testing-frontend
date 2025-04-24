@@ -63,4 +63,5 @@ export type CartParent = {
   customerData: CartDraftUser|null,
   companyId?: string,
   salesName: string|null,
+  total?: string|null,
 };

@@ -16,6 +16,7 @@
     placeholder?: string|null,
     label?: string|Snippet,
     input?: Snippet,
+    disabled?: boolean,
   };
   let {
     type: inputType,
@@ -27,6 +28,7 @@
     placeholder,
     label = '',
     input,
+    disabled = $bindable(false),
   }: Props = $props();
 </script>
 
@@ -39,6 +41,6 @@
   {#if input}
     {@render input()}
   {:else}
-    <input {readonly} type={inputType} {min} {max} {placeholder} bind:value class="input input-bordered mb-2 w-full max-w-xs" />
+    <input {disabled} {readonly} type={inputType} {min} {max} {placeholder} bind:value class="input input-bordered mb-2 w-full max-w-xs" />
   {/if}
 </label>

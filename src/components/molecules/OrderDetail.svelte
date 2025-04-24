@@ -4,8 +4,9 @@
   import { type AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidTrash } from 'svelte-icons-pack/fa';
-  import Table from '../Table.svelte';
   import type { Writable } from 'svelte/store';
+  import Table from '../Table.svelte';
+  import Table5 from '../Table5.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -101,22 +102,28 @@
   };
 </script>
 
-<Table itemList={detailList}>
-  <svelte:fragment slot="header">
+<Table5 itemList={detailList}>
+  {#snippet header()}
     <th>Name</th>
     <th>Qty</th>
+    <th>Base Price</th>
+    <th>Start Price</th>
+    <th>Selling Price</th>
     <th>Status</th>
     <th></th>
-  </svelte:fragment>
-  <svelte:fragment slot="item" let:item>
+  {/snippet}
+  {#snippet content(item)}
     <td>{item.fullName}</td>
     <td>
       <input type="number" placeholder="qty" bind:value={updateDataMap[item.id].qty} class="input input-bordered w-24 max-w-xs"
         onchange={(e) => { updateDataMap[item.id].qty = Number(e.currentTarget.value) }}
       />
     </td>
+    <td>{item.basePrice}</td>
+    <td>{item.startPrice}</td>
+    <td>{item.sellingPrice}</td>
     <td>{item.status}</td>
-    <td>
+    <th>
       <button
         onclick={onCancel(item.id)}
         class="btn"
@@ -125,9 +132,9 @@
           src={FaSolidTrash}
         />
       </button>
-    </td>
-  </svelte:fragment>
-</Table>
+    </th>
+  {/snippet}
+</Table5>
 <Table itemList={historyList}>
 </Table>
 <button class="btn btn-secondary"
