@@ -36,6 +36,9 @@
       $sort: 'DESC',
       $order: 'createdAt',
     });
+    if (companyId) {
+      params.append('companyId', companyId);
+    }
     stringToast('Loading...');
     const response = await client.get('/cart/draft', { params });
     if (response.status !== 200) {

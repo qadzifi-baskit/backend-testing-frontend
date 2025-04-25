@@ -161,7 +161,8 @@
   async function deleteCart(cartId: string) {
     if (!$store || !$store.loggedIn) return;
     stringToast('Deleting cart...');
-    const response = await client.patch(`/cart/${cartId}`, { qty: 0 });
+    // const response = await client.patch(`/cart/${cartId}`, { qty: 0 });
+    const response = await client.delete(`/cart/${cartId}`);
     if (response.status !== 200) return stringToast('Failed to delete cart');
     stringToast('Cart deleted');
     getCart();
