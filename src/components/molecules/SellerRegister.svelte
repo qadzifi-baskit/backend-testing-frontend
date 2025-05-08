@@ -4,6 +4,8 @@
   import Collapse5 from '../Collapse5.svelte';
   import DropdownSelect from '../atoms/DropdownSelect.svelte';
   import FormWrapper from '../atoms/FormWrapper.svelte';
+  import FormInput from '../atoms/FormInput.svelte';
+  import SubmitButton from '../atoms/SubmitButton.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -12,7 +14,7 @@
   };
   let {
     client,
-    showEmail = false,
+    showEmail = $bindable(false),
     helpGenerateEmail = false,
   }:Props = $props();
 
@@ -57,47 +59,25 @@
       {payload}
       path="/auth/register"
     >
-      <label class="form-control w-full max-w-xs">
-        <div class="label">
-          <span class="label-text">First Name</span>
-        </div>
-        <input type="text" placeholder="first name" bind:value={payload.firstName} class="input input-bordered w-full max-w-xs" />
-      </label>
-      <label class="form-control w-full max-w-xs">
-        <div class="label">
-          <span class="label-text">Last Name</span>
-        </div>
-        <input type="text" placeholder="last name" bind:value={payload.lastName} class="input input-bordered w-full max-w-xs" />
-      </label>
-      <label class="form-control w-full max-w-xs">
-        <div class="label">
-          <span class="label-text">Phone</span>
-        </div>
-        <input type="text" placeholder="phone" bind:value={payload.phone} class="input input-bordered w-full max-w-xs" />
+      <FormInput label="First Name" placeholder="first name" bind:value={payload.firstName}/>
+      <FormInput label="Last Name" placeholder="last name" bind:value={payload.lastName}/>
+      <FormInput label="Phone" placeholder="phone" bind:value={payload.phone}/>
+      <label class="label fieldset-label mb-2">
+        <input type="checkbox" bind:checked={showEmail} class="checkbox"/>
+        Show E-Mail
       </label>
       {#if showEmail}
-        <label class="form-control w-full max-w-xs">
-          <div class="label">
-            <span class="label-text">E-Mail</span>
-          </div>
-          <input type="text" placeholder="email" bind:value={payload.email} class="input input-bordered w-full max-w-xs" />
-        </label>
+        <FormInput label="E-Mail" placeholder="email" bind:value={payload.email}/>
       {/if}
-      <label class="form-control w-full max-w-xs">
-        <div class="label">
-          <span class="label-text">Company Name</span>
-        </div>
-        <input type="text" placeholder="company name" bind:value={payload.companyName} class="input input-bordered w-full max-w-xs" />
-      </label>
+      <FormInput label="Company Name" placeholder="company name" bind:value={payload.companyName}/>
+      <span class="fieldset-label">Subscription Type</span>
       <DropdownSelect
-        class="my-4"
         options={SubscriptionTypeOptions}
         placeholder="subscription type"
         bind:value={payload.subscriptionType}
       />
-      <div>
-        <button class="btn btn-secondary" type="submit">Register</button>
-      </div>
+      <div class="fieldset-label my-2"></div>
+      <SubmitButton/>
     </FormWrapper>
   </div>
 {/snippet}

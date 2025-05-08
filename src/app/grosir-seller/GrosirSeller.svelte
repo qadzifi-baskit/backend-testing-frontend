@@ -9,19 +9,20 @@
   import SellerRegister from '@/components/molecules/SellerRegister.svelte';
   import UserOfflineManagement from '@/components/molecules/UserOfflineManagement.svelte';
   import { listenAuthSuccess, listenDoAuth } from '@/event';
+  import { apiEnv } from '@/lib/config/env.svelte';
   import { OrderTypeEnum } from '@/lib/enum';
+  import { createAxiosInstance } from '@/lib/helper/axios.svelte';
   import { GrosirSellerStore } from '@/store/store';
   import type { Company } from '@/types';
-  import { createAxiosInstance } from '@/lib/helper/axios.svelte';
-  import { apiEnv } from '@/lib/config/env.svelte';
+  import type { AppConfig } from '@/types/app';
 
   type Props = {
     host?: string,
-    showHost?: boolean,
+    config?: AppConfig,
   };
   let {
     host = $bindable(apiEnv.DEFAULT_API_HOST),
-    showHost = $bindable(true),
+    config = 'host',
   }:Props = $props();
   const client = createAxiosInstance({ baseURL: host });
 
@@ -51,7 +52,7 @@
   <Config
     bind:host
     bind:clientType
-    {showHost}
+    show={config}
     {client}
   />
   <div class="divider"></div>

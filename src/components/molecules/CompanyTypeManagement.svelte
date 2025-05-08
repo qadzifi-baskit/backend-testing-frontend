@@ -1,14 +1,14 @@
 <script lang="ts">
   import { listenAuthSuccess } from '@/event';
+  import { cancelableDebounce } from '@/lib/helper/util';
+  import { BaskitAdminStore } from '@/store/store';
   import type { CompanyType } from '@/types';
   import type { AxiosInstance } from 'axios';
+  import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import Collapse from '../Collapse.svelte';
   import Table5 from '../Table5.svelte';
-  import SearchField from '../atoms/SearchField.svelte';
-  import { debounce } from '@/lib/helper/util';
-  import PaginationFancyButton from '../atoms/PaginationFancyButton.svelte';
   import AddCompanyTypeModal from './AddCompanyTypeModal.svelte';
-  import { BaskitAdminStore } from '@/store/store';
+  import FormInput from '../atoms/FormInput.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -44,7 +44,12 @@
     max = response.data?.totalPage ?? 1;
   };
 
-  const debounceGetCompanyType = debounce(getCompanyType);
+  const [debounceGetCompanyType, cancelDebounce] = cancelableDebounce(getCompanyType);
+
+  function reloadData() {
+    cancelDebounce();
+    getCompanyType();
+  }
 
   listenAuthSuccess(() => {
     getCompanyType();
@@ -94,27 +99,14 @@
 <Collapse
   title="Company Type List"
 >
-  <PaginationFancyButton
-    bind:value={page}
+  <FormInput label="Name" placeholder="name"/>
+  <PaginationNavigationPanel
     bind:max
+    bind:page
+    bind:search
+    onadd={showAddCompannyTypeModal}
+    onreload={reloadData}
   />
-  <label class="form-control w-full max-w-xs mb-2">
-    <div class="label">
-      <span class="label-text">Name</span>
-    </div>
-    <input type="text" placeholder="name" bind:value={name} class="input input-bordered w-full max-w-xs" />
-  </label>
-  <div class="label">
-    <span class="label-text">Search</span>
-  </div>
-  <SearchField
-    bind:value={search}
-  />
-  <button class="btn bordered input-bordered"
-    onclick={showAddCompannyTypeModal}
-  >
-    Add Company Type
-  </button>
   {#if companyTypeList.length > 0}
     <Table5
       itemList={companyTypeList}

@@ -4,21 +4,33 @@
   import Select from '../Select.svelte';
   import type { AxiosInstance } from 'axios';
   import { apiEnv } from '@/lib/config/env.svelte';
+  import type { AppConfig, AppConfigKey } from '@/types/app';
+  import { AppConfigKeyList } from '@/consts/app';
 
   type Props = {
     host?: string,
     clientType?: string,
-    showHost?: boolean,
-    showClient?: boolean,
     client?: AxiosInstance,
+    show?: AppConfig,
   };
   let {
     host = $bindable(apiEnv.DEFAULT_API_HOST),
     clientType = $bindable('BASKIT_SHOP'),
-    showHost = true,
-    showClient = true,
+    show = AppConfigKeyList.map((key) => key),
     client,
   }:Props = $props();
+  function getConfig(key: AppConfigKey) {
+    if (typeof show === 'string') {
+      return show === key;
+    }
+    if (Array.isArray(show)) {
+      return show.includes(key);
+    }
+    if (show) {
+      return show[key] ?? false;
+    }
+    return false;
+  }
 
   $effect(() => {
     if (client) {
@@ -33,15 +45,15 @@
 </script>
 
 <Collapse title="Config">
-  {#if showHost}
+  {#if getConfig('host')}}
     <Select
       title="Host"
       showvalue
-      options={apiEnv.HOST_LIST}
+      options={apiEnv.API_HOST_LIST}
       bind:value={host}
     />
   {/if}
-  {#if showClient}
+  {#if getConfig('client')}}
     <Select
       title="Client"
       showvalue

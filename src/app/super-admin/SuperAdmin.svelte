@@ -8,14 +8,15 @@
   import UserManagement from '@/components/molecules/UserManagement.svelte';
   import { createAxiosInstance } from '@/lib/helper/axios.svelte';
   import { SuperAdminStore } from '@/store/store';
+  import type { AppConfig } from '@/types/app';
 
   type Props = {
     host?: string,
-    showHost?: boolean,
+    config?: AppConfig,
   };
   let {
     host = $bindable('https://api-beta.baskit.app/v2'),
-    showHost = true,
+    config = 'host',
   }: Props = $props();
 
   const client = createAxiosInstance({ baseURL: host });
@@ -29,7 +30,7 @@
   <Config
     bind:host
     bind:clientType
-    {showHost}
+    show={config}
     {client}
   />
   <div class="divider"></div>

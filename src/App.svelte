@@ -14,10 +14,12 @@
   import ErrorManagerModal from './components/molecules/ErrorManagerModal.svelte';
   import ResourceViewerModal from './components/molecules/ResourceViewerModal.svelte';
   import { apiEnv } from './lib/config/env.svelte';
-  let selected = $state(2);
+  import { cn } from './lib/helper/tailwind';
+  import type { AppConfig } from './types/app';
+  let selected = $state(apiEnv.DEFAULT_APP);
   let host = $state(apiEnv.DEFAULT_API_HOST);
 
-  type PageComponent = Component<{ host: string, showHost: boolean }>;
+  type PageComponent = Component<{ host: string, config: AppConfig }>;
   const tabs:{ label: string, component: PageComponent }[] = [
     { label: 'Buyer', component: Buyer },
     { label: 'Seller', component: Seller },
@@ -35,13 +37,13 @@
 <ResourceViewerModal bind:dialog={resourceModal}/>
 <Config
   bind:host
-  showClient={false}
+  show='host'
 />
 <div style="--amount:{tabs.length}" role="tablist" class="tabs tabs-bordered w-full">
   {#each tabs as { component: Component }, index }
-    <input checked={selected === index + 1} type="radio" name="my_tabs_1" role="tab" class="tab hidden" aria-label={`Tab ${index + 1}`}/>
+    <input checked={selected === index} type="radio" name="app-tab" role="tab" class="tab hidden" aria-label={`Tab ${index + 1}`}/>
     <div role="tabpanel" class="tab-content">
-      <Component bind:host showHost={false}/>
+      <Component bind:host config='client'/>
     </div>
   {/each}
 </div>
@@ -59,15 +61,17 @@
       <!-- Sidebar content here -->
       {#each tabs as { label }, index }
         <li>
-          {#if selected === index + 1}
-            <button class="btn bg-slate-800" onclick={() => selected = index + 1}>
-              {label}
-            </button>
-          {:else}
-            <button class="btn" onclick={() => selected = index + 1}>
-              {label}
-            </button>
-          {/if}
+          <button
+            class={cn(
+              'btn',
+              {
+                'bg-slate-800': selected === index,
+              },
+            )}
+            onclick={() => selected = index}
+          >
+            {label}
+          </button>
         </li>
       {/each}
     </ul>

@@ -10,16 +10,17 @@
   import TutorialManagement from '@/components/molecules/TutorialManagement.svelte';
   import { OrderTypeEnum } from '@/lib/enum';
   import { BaskitAdminStore } from '@/store/store';
+  import type { AppConfig } from '@/types/app';
   import axios from 'axios';
 
   type Props = {
     host?: string,
-    showHost?: boolean,
+    config?: AppConfig,
   };
 
   let {
     host = $bindable('https://api-beta.baskit.app/v2'),
-    showHost = true,
+    config = 'host',
   }: Props = $props();
 
   let clientType = $state('WEB_CMS');
@@ -33,7 +34,7 @@
   <Config
     bind:host
     bind:clientType
-    {showHost}
+    show={config}
     {client}
   />
   <div class="divider"></div>
@@ -43,22 +44,24 @@
     bind:username
     bind:password
   />
-  <div class="divider"></div>
-  <CategoryManagement {client} store={BaskitAdminStore}/>
-  <div class="divider"></div>
-  <OrderList
-    {client}
-    store={BaskitAdminStore}
-    orderType={[OrderTypeEnum.SHOP, OrderTypeEnum.ONLINE]}
-  />
-  <div class="divider"></div>
-  <ProductManagement {client} store={BaskitAdminStore} />
-  <div class="divider"></div>
-  <InventoryList {client} store={BaskitAdminStore}/>
-  <div class="divider"></div>
-  <SellerList {client}/>
-  <div class="divider"></div>
-  <CompanyTypeManagement {client}/>
-  <div class="divider"></div>
-  <TutorialManagement {client} store={BaskitAdminStore}/>
+  {#if $BaskitAdminStore.loggedIn}
+    <div class="divider"></div>
+    <CategoryManagement {client} store={BaskitAdminStore}/>
+    <div class="divider"></div>
+    <OrderList
+      {client}
+      store={BaskitAdminStore}
+      orderType={[OrderTypeEnum.SHOP, OrderTypeEnum.ONLINE]}
+    />
+    <div class="divider"></div>
+    <ProductManagement {client} store={BaskitAdminStore} />
+    <div class="divider"></div>
+    <InventoryList {client} store={BaskitAdminStore}/>
+    <div class="divider"></div>
+    <SellerList {client}/>
+    <div class="divider"></div>
+    <CompanyTypeManagement {client}/>
+    <div class="divider"></div>
+    <TutorialManagement {client} store={BaskitAdminStore}/>
+  {/if}
 </div>

@@ -19,16 +19,17 @@
   import { stringToast } from '@/lib/helper/toast';
   import { SellerAdminStore } from '@/store/store';
   import type { Company } from '@/types';
+  import type { AppConfig } from '@/types/app';
   import type { OrderContext, UserContext } from '@/types/context';
   import { writable } from 'svelte/store';
 
   type Props = {
     host?: string,
-    showHost?: boolean,
+    config?: AppConfig,
   };
   let {
     host = $bindable(apiEnv.DEFAULT_API_HOST),
-    showHost = $bindable(true),
+    config = 'host',
   }:Props = $props();
   let element:HTMLElement|undefined = $state();
   const client = createAxiosInstance({ baseURL: host });
@@ -91,7 +92,7 @@
   <Config
     bind:host
     bind:clientType
-    {showHost}
+    show={config}
     {client}
   />
   <div class="divider"></div>

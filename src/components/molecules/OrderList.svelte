@@ -146,18 +146,18 @@
   {#if orderList.length > 0}
     <Table5 itemList={orderList} pincols pinrows>
       {#snippet header()}
-        <th>Id</th>
-        <th>Date</th>
-        <th>Order Type</th>
-        <th>Order Code</th>
-        <th></th>
-        <th></th>
-        <th>Salesname</th>
-        <th>Delivery Type</th>
-        <th>Status</th>
-        <th>Payment</th>
-        <th>Payment Status</th>
-        <th>Payment Link Status</th>
+        <td>Id</td>
+        <td>Date</td>
+        <td>Order Type</td>
+        <td>Order Code</td>
+        <td></td>
+        <td></td>
+        <td>Salesname</td>
+        <td>Delivery Type</td>
+        <td>Status</td>
+        <td>Payment</td>
+        <td>Payment Status</td>
+        <td>Payment Link Status</td>
         <th>Total</th>
       {/snippet}
 
@@ -165,7 +165,7 @@
         <td><NoWrap>{order.id}</NoWrap></td>
         <td><NoWrap>{order.createdAt}</NoWrap></td>
         <td>{order.orderType}</td>
-        <td>{order.orderCode}</td>
+        <td><NoWrap>{order.orderCode}</NoWrap></td>
         <td>
           <button
             onclick={updateStatus(order.id)}

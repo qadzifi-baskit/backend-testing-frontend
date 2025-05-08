@@ -8,7 +8,7 @@
   import type { PaginationPanelProps } from '@/types/pagination';
 
   let {
-    search = $bindable(''),
+    search = $bindable(),
     max = $bindable(1),
     page = $bindable(1),
     sort = $bindable(null),
@@ -32,9 +32,12 @@
   });
 </script>
 
-<SearchField
-  bind:value={search}
-/>
+{#if search !== undefined}
+  <SearchField
+    class="mb-4"
+    bind:value={search}
+  />
+{/if}
 <PaginationFancyButton
   bind:max
   bind:value={page}

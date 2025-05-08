@@ -41,6 +41,6 @@
   {#if input}
     {@render input()}
   {:else}
-    <input {disabled} {readonly} type={inputType} {min} {max} {placeholder} bind:value class="input input-bordered mb-2 w-full max-w-xs" />
+    <input {disabled} {readonly} type={inputType} {min} {max} {placeholder} bind:value class="input input-bordered flex mb-2 w-full max-w-xs" />
   {/if}
 </label>

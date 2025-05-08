@@ -12,19 +12,26 @@
   import { listenAuthSuccess } from '@/event';
   import { createAxiosInstance } from '@/lib/helper/axios.svelte';
   import { BuyerStore } from '@/store/store';
+  import type { AppConfig } from '@/types/app';
 
-  export let host = 'https://api-beta.baskit.app/v2';
-  export let showHost = true;
+  type Props = {
+    host?: string,
+    config?: AppConfig,
+  };
+  let {
+    host = $bindable('https://api-beta.baskit.app/v2'),
+    config = 'host',
+  }:Props = $props();
   const client = createAxiosInstance({ baseURL: host });
 
   const qtyMap:Record<string, number> = {};
   const warehouseList = writable(<Warehouse[]>[]);
   let userId = '';
   let walletId = '';
-  let clientType = 'BASKIT_SHOP';
-  let balance = 0;
-  let username = 'eight.one@gmail.com';
-  let password = '12345678';
+  let clientType = $state('BASKIT_SHOP');
+  let balance = $state(0);
+  let username = $state('eight.one@gmail.com');
+  let password = $state('12345678');
   let warehouseOptions = [<[string, string]>['', 'All']];
 
   warehouseList.subscribe((value) => {
@@ -58,12 +65,12 @@
     getWarehouse();
   });
 
-  let topUpDialog:HTMLDialogElement;
-  let topUpAmount = 0;
+  let topUpDialog = $state<HTMLDialogElement>();
+  let topUpAmount = $state(0);
   const onTopUp = () => {
     topUpDialog?.showModal();
   };
-  let topUpPageURL = '';
+  let topUpPageURL = $state('');
   const doTopUp = async () => {
     const response = await client.post('/wallet/topup/request', {
       id: walletId,
@@ -88,7 +95,7 @@
       <input type="number" placeholder="amount" bind:value={topUpAmount} class="input input-bordered w-full max-w-xs" />
     </label>
     <button
-      on:click={doTopUp}
+      onclick={doTopUp}
       class="btn btn-secondary"
     >
       Top Up
@@ -105,7 +112,7 @@
   <Config
     bind:host
     bind:clientType
-    {showHost}
+    show={config}
     {client}
   />
   <div class="divider"></div>
@@ -118,9 +125,9 @@
   {#if $BuyerStore.loggedIn}
     <div class="divider"></div>
     <Collapse title="Profile">
-      <button on:click={getBalance} class="btn btn-secondary">Get Balance</button>
+      <button onclick={getBalance} class="btn btn-secondary">Get Balance</button>
       <span>Balance: {balance}</span>
-      <button on:click={onTopUp} class="btn btn-secondary">Top Up</button>
+      <button onclick={onTopUp} class="btn btn-secondary">Top Up</button>
     </Collapse>
     <div class="divider"></div>
     <div class="flex w-full rounded-box">

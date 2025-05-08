@@ -8,16 +8,17 @@
   import { apiEnv } from '@/lib/config/env.svelte';
   import { BrandUserStore } from '@/store/store';
   import type { Company } from '@/types';
+  import type { AppConfig } from '@/types/app';
   import axios from 'axios';
 
   type Props = {
     host?: string,
-    showHost?: boolean,
+    config?: AppConfig,
   };
 
   let {
     host = $bindable(apiEnv.DEFAULT_API_HOST),
-    showHost = true,
+    config = 'host',
   }:Props = $props();
 
   const client = axios.create({ baseURL: host });
@@ -45,7 +46,7 @@
 <div id="root" class="p-6">
   <Config
     bind:host
-    {showHost}
+    show={config}
     {client}
   />
   <div class="divider"></div>
