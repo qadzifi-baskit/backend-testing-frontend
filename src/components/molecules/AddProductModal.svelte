@@ -103,8 +103,6 @@
       productData.principal = '';
     }
   });
-
-  $inspect(productData);
 </script>
 
 <Modal

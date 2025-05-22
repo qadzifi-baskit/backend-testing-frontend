@@ -56,10 +56,8 @@
       payload={data}
       onsuccess={onTranslationAdded}
     >
-      <label class="form-control w-full max-w-xs mb-2">
-        <div class="label">
-          <span class="label-text">Language</span>
-        </div>
+      <label class="w-full max-w-xs mb-2">
+        <span class="fieldset-label">Language</span>
         <InputAutoComplete
           maxlength={2}
           placeholder="language"
@@ -67,29 +65,23 @@
           suggestions={langList}
         />
       </label>
-      <label class="form-control w-full max-w-xs mb-2">
-        <div class="label">
-          <span class="label-text">Platform</span>
-        </div>
+      <label class="w-full max-w-xs mb-2">
+        <span class="fieldset-label">Platform</span>
         <InputAutoComplete
           placeholder="platform"
           bind:value={data.platform}
           suggestions={platformList}
         />
       </label>
-      <label class="form-control w-full max-w-xs mb-2">
-        <div class="label">
-          <span class="label-text">Key</span>
-        </div>
+      <label class="w-full max-w-xs mb-2">
+        <span class="fieldset-label">Key</span>
         <input type="text" placeholder="key" bind:value={data.key} class="input input-bordered w-full max-w-xs" />
       </label>
-      <label class="form-control w-full max-w-xs mb-2">
-        <div class="label">
-          <span class="label-text">Value</span>
-        </div>
+      <label class="w-full max-w-xs mb-2">
+        <span class="fieldset-label">Value</span>
         <input type="text" placeholder="value" bind:value={data.value} class="input input-bordered w-full max-w-xs" />
       </label>
-      <SubmitButton>
+      <SubmitButton class="mt-4">
         Add
       </SubmitButton>
     </FormWrapper>

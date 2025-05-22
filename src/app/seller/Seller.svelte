@@ -37,11 +37,14 @@
     paymentTypeList: [],
   });
   const userContext = writable<UserContext>({});
+
   Context.set('order', orderContext);
   Context.set('user', userContext);
+  Context.set('client', client);
+  Context.set('auth', SellerAdminStore);
 
   let clientType = $state('WEB_CMS');
-  let username = $state('nagamas@testing.com');
+  let username = $state('david@gmail.com');
   let password = $state('12345678');
   let companyId = $state('');
 

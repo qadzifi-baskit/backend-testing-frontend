@@ -182,7 +182,7 @@
             <Icon src={FaSolidList}/>
           </button>
         </td>
-        <td>{order.salesName}</td>
+        <td><NoWrap>{order.salesName}</NoWrap></td>
         <td>{order.deliveryType}</td>
         <td>{order.status}</td>
         <td><NoWrap>{order.paymentTerm}</NoWrap></td>

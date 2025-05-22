@@ -8,18 +8,22 @@
 
   type Props = {
     type?: HTMLInputTypeAttribute|null,
-    min?: string|number|null,
-    max?: string|number|null,
+    pattern?: string|null,
+    min?: number|null,
+    max?: number|null,
     readonly?: boolean,
     value?: ValueType,
     class?: string,
     placeholder?: string|null,
     label?: string|Snippet,
+    error?: string|Snippet,
     input?: Snippet,
     disabled?: boolean,
+    required?: boolean,
   };
   let {
     type: inputType,
+    pattern,
     min,
     max,
     readonly,
@@ -27,8 +31,10 @@
     class: clazz = '',
     placeholder,
     label = '',
+    error = '',
     input,
     disabled = $bindable(false),
+    required = $bindable(false),
   }: Props = $props();
 </script>
 
@@ -41,6 +47,27 @@
   {#if input}
     {@render input()}
   {:else}
-    <input {disabled} {readonly} type={inputType} {min} {max} {placeholder} bind:value class="input input-bordered flex mb-2 w-full max-w-xs" />
+    <input
+      {disabled}
+      {required}
+      {readonly}
+      type={inputType}
+      minlength={min}
+      maxlength={max}
+      {placeholder}
+      bind:value
+      {pattern}
+      class={cn(
+        'input input-bordered flex mb-2 w-full max-w-xs',
+        {
+          'validator': Boolean(error),
+        },
+      )}
+    />
+  {/if}
+  {#if typeof error === 'string'}
+    <p class="validator-hint">{error}</p>
+  {:else}
+    {@render error()}
   {/if}
 </label>

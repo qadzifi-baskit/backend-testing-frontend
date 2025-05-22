@@ -26,7 +26,7 @@
     phone: '',
     firstName: '',
     lastName: '',
-    roleName,
+    roleName: '',
     email: <string|undefined>undefined,
   });
   let selectedRole = $state('');
@@ -36,6 +36,10 @@
   } else {
     selectedRole = roleName[0];
   }
+
+  $effect(() => {
+    data.roleName = selectedRole;
+  });
   $effect(() => {
     if (email !== '') {
       data.email = email;

@@ -9,6 +9,7 @@ export const OrderTypeEnum = {
   MANUAL_OUTBOUND: 'MANUAL_OUTBOUND',
   PARTICIPATE_SURVEY: 'PARTICIPATE_SURVEY',
   MERCHANT_SALES: 'MERCHANT_SALES',
+  SELLER_SALES_ORDER: 'SELLER_SALES_ORDER',
   SELLER_PURCHASE_ORDER: 'SELLER_PURCHASE_ORDER',
 } as const;
 export type OrderTypeEnum = (typeof OrderTypeEnum)[keyof typeof OrderTypeEnum];

@@ -120,14 +120,26 @@ export function getObjectDiff<T extends Record<string, unknown>>(a: T, b: T): Pa
   return diff;
 }
 
-export function searchStrings(arr: string[], query: string): string[] {
+type SearchStringsOptions = {
+  caseSensitive?: boolean;
+};
+
+export function searchStrings(
+  arr: string[],
+  query: string,
+  {
+    caseSensitive = false,
+  }: SearchStringsOptions = {},
+): string[] {
   // Returns an array of indices where each query character is found in order in `str`,
   // or null if the query is not a subsequence of the string.
   function getMatchPositions(str: string, query: string): number[] | null {
+    const fixedStr = caseSensitive ? str : str.toUpperCase();
+    const fixedQuery = caseSensitive ? query : query.toUpperCase();
     const positions: number[] = [];
     let pos = 0;
-    for (let i = 0; i < query.length; i++) {
-      pos = str.indexOf(query[i], pos);
+    for (let i = 0; i < fixedQuery.length; i++) {
+      pos = fixedStr.indexOf(fixedQuery[i], pos);
       if (pos === -1) {
         return null; // Character not found: query is not a subsequence.
       }

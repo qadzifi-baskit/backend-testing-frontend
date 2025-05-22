@@ -12,6 +12,7 @@
   import Collapse from '../Collapse.svelte';
   import Table5 from '../Table5.svelte';
   import CartDraftDetail from './CartDraftDetail.svelte';
+  import { OvereStockOrderTypeList } from '@/consts/order';
 
   type Props = {
     client: AxiosInstance,
@@ -53,6 +54,8 @@
   let subTotal = $state(0);
   let totalTierPrice = $state(0);
   let totalSellingPrice = $state(0);
+  let totalDiscount = $state(0);
+  let totalDiscountedPrice = $state(0);
   let total = $state(0);
   let orderType = $state(typeof orderTypeOptions === 'string' ? orderTypeOptions : orderTypeOptions[0]);
 
@@ -65,7 +68,7 @@
       paymentTypeId,
       deliveryType,
       cartCode,
-      orderType: orderTypeOptions,
+      orderType,
       product: processedCart.map((value) => ({
         cartId: value.id,
         inventoryId: value.inventoryId,
@@ -101,6 +104,8 @@
       subTotal: number,
       totalTierPrice: number,
       totalSellingPrice: number,
+      totalDiscount: number,
+      totalDiscountedPrice: number,
       total: number,
       wareHouse: WarehouseDetail,
       product: Cart[],
@@ -108,16 +113,38 @@
     for (const key in cartData) {
       delete cartData[key];
     }
-    [subTotal, totalTierPrice, totalSellingPrice, total, cartList] = cartOrderList.reduce(
-      (prev, curr): [number, number, number, number, Cart[]] => {
+    type Summary = [number, number, number, number, number, number, Cart[]];
+    [
+      subTotal,
+      totalTierPrice,
+      totalSellingPrice,
+      totalDiscount,
+      totalDiscountedPrice,
+      total,
+      cartList,
+    ] = cartOrderList.reduce(
+      (
+        [
+          accSubTotal,
+          accTotalTierPrice,
+          accTotalSellingPrice,
+          accTotalDiscount,
+          accTotalDiscountedPrice,
+          accTotal,
+          accCartList,
+        ],
+        curr,
+      ): Summary => {
         curr.product.forEach((cart) => cartData[cart.id] = cart);
         return [
-          prev[0] + curr.subTotal,
-          prev[1] + curr.totalTierPrice,
-          prev[2] + curr.totalSellingPrice,
-          prev[3] + curr.total,
+          accSubTotal + curr.subTotal,
+          accTotalTierPrice + curr.totalTierPrice,
+          accTotalSellingPrice + curr.totalSellingPrice,
+          accTotalDiscount + curr.totalDiscount,
+          accTotalDiscountedPrice + curr.totalDiscountedPrice,
+          accTotal + curr.total,
           [
-            ...prev[4], ...(curr.product.map(
+            ...accCartList, ...(curr.product.map(
               (cart) => ({
                 ...cart,
                 warehouse: curr.wareHouse.name,
@@ -126,7 +153,7 @@
           ],
         ];
       },
-      <[number, number, number, number, Cart[]]>[0, 0, 0, 0, []],
+      <Summary>[0, 0, 0, 0, 0, 0, []],
     );
     stringToast('Cart loaded');
   };
@@ -139,7 +166,10 @@
     if (data.qty !== undefined) {
       payload.qty = data.qty;
     }
-    if (orderType === OrderTypeEnum.SELLER_PURCHASE_ORDER) {
+    if (
+      orderType === OrderTypeEnum.SELLER_SALES_ORDER ||
+      orderType === OrderTypeEnum.SELLER_PURCHASE_ORDER
+    ) {
       if (data.tierPrice) {
         payload.startPrice = data.tierPrice;
       }
@@ -148,6 +178,11 @@
       }
       if (data.discountAmount) {
         payload.discountAmount = data.discountAmount;
+      }
+      if (data.taxType) {
+        payload.taxType = data.taxType;
+      } else if (data.taxType !== undefined) {
+        payload.taxType = null;
       }
       if (data.tax) {
         payload.tax = data.tax;
@@ -161,7 +196,6 @@
   async function deleteCart(cartId: string) {
     if (!$store || !$store.loggedIn) return;
     stringToast('Deleting cart...');
-    // const response = await client.patch(`/cart/${cartId}`, { qty: 0 });
     const response = await client.delete(`/cart/${cartId}`);
     if (response.status !== 200) return stringToast('Failed to delete cart');
     stringToast('Cart deleted');
@@ -210,7 +244,6 @@
 
 {#if !draft}
   <CartDraftDetail
-    {client}
     bind:dialog={saveDraftDialog}
     bind:companyId
     ondelete={saveCartSuccess}
@@ -228,16 +261,18 @@
   >
     {#snippet header()}
       <th>Qty</th>
-      {#if orderType === OrderTypeEnum.SELLER_PURCHASE_ORDER}
+      {#if OvereStockOrderTypeList.includes(orderType)}
         <th>Initial Price</th>
         <th>Price</th>
         <th>Discount</th>
         <th>Discount Amount</th>
+        <th>Tax Type</th>
         <th>Tax</th>
+        <th>Selling Price</th>
       {/if}
       <th></th>
       <th></th>
-      {#if orderType !== OrderTypeEnum.SELLER_PURCHASE_ORDER}
+      {#if !OvereStockOrderTypeList.includes(orderType)}
         <th>Initial Price</th>
         <th>Tier Price</th>
         <th>Selling Price</th>
@@ -262,6 +297,9 @@
         </td>
         <td>
           <input type="number" bind:value={cartData[cart.id].discountAmount} class="input input-bordered w-24 max-w-xs">
+        </td>
+        <td>
+          <input bind:value={cartData[cart.id].taxType} class="input input-bordered w-24 max-w-xs">
         </td>
         <td>
           <input type="number" bind:value={cartData[cart.id].tax} class="input input-bordered w-24 max-w-xs">
@@ -309,20 +347,28 @@
             <strong>Total Tier Price</strong>
           </td>
           <td>{totalTierPrice}</td>
-          <td>-{subTotal - totalTierPrice}</td>
+          <td>{totalTierPrice - subTotal}</td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Total Discounted Price</strong>
+          </td>
+          <td>{totalDiscountedPrice}</td>
+          <td>{-totalDiscount}</td>
         </tr>
         <tr>
           <td>
             <strong>Total Selling Price</strong>
           </td>
           <td>{totalSellingPrice}</td>
+          <td>{totalSellingPrice - totalDiscountedPrice}</td>
         </tr>
         <tr>
           <td>
             <strong>Total</strong>
           </td>
           <td>{total}</td>
-          <td>-{totalTierPrice - total}</td>
+          <td></td>
         </tr>
       </tbody>
     </table>

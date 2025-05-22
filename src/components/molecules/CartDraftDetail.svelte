@@ -1,13 +1,11 @@
 <script lang="ts">
   import { DeliveryTypeEnum, OrderTypeEnum } from '@/lib/enum';
+  import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
   import { getObjectDiff, isNil } from '@/lib/helper/util';
   import { SellerAdminStore } from '@/store/store';
-  import type { AuthStore } from '@/types';
   import type { Cart, CartDraftUser, CartDraftUserAddress, CartParent } from '@/types/cart';
   import type { User, UserOffline } from '@/types/user';
-  import type { AxiosInstance } from 'axios';
-  import type { Writable } from 'svelte/store';
   import AreaSelectInput from '../atoms/AreaSelectInput.svelte';
   import FormInput from '../atoms/FormInput.svelte';
   import FormWrapper from '../atoms/FormWrapper.svelte';
@@ -15,15 +13,12 @@
   import DatePicker from '../DatePicker.svelte';
   import Modal from '../Modal.svelte';
   import BuyerCart from './BuyerCart.svelte';
+  import DocumentManagement from './DocumentManagement.svelte';
   import InventoryList from './InventoryList.svelte';
   import UserDropdownSelect from './UserDropdownSelect.svelte';
   import UserOfflineDropdownSelect from './UserOfflineDropdownSelect.svelte';
-  import { Context } from '@/lib/helper/context';
-  import DocumentManagement from './DocumentManagement.svelte';
 
   type Props = {
-    client: AxiosInstance,
-    store?: Writable<AuthStore>,
     dialog: HTMLDialogElement | undefined,
     item?: CartParent,
     companyId?: string,
@@ -31,15 +26,16 @@
     ondelete?: (data: CartParent) => void
   };
   let {
-    client,
-    store = SellerAdminStore,
     dialog = $bindable(),
     item = $bindable(),
     companyId = $bindable(),
     onsuccess: onSuccessParent,
     ondelete,
   }: Props = $props();
+
   const userContext = Context.get('user');
+  const client = Context.getStrict('client');
+  const store = Context.getStrict('auth');
 
   const defaultData = {
     customerId: '',
@@ -52,6 +48,8 @@
     deliveryType: DeliveryTypeEnum.SELLER_DELIVERY,
     customerData: {
       picName: '',
+      email: '',
+      phone: '+62',
       billingAddress: {
         address: '',
         provinceId: 0,
@@ -67,6 +65,7 @@
     },
   };
 
+  const oldData:Partial<CartParent> = $state({ ...defaultData });
   const newData:Partial<CartParent> = $state({ ...defaultData });
 
   let show = $state(false);
@@ -80,18 +79,23 @@
       return stringToast('Failed to load cart draft detail');
     }
     Object.assign(newData, response.data.data);
+    newData.companyId = companyId;
+    Object.assign(oldData, response.data.data);
+    oldData.companyId = companyId;
     return stringToast('Cart draft detail loaded');
   }
 
   $effect(() => {
     if (item) {
       getCartDraftDetail();
-      newData.companyId = companyId;
     } else {
       Object.assign(newData, defaultData);
       delete newData.companyId;
+      Object.assign(oldData, defaultData);
+      delete oldData.companyId;
     }
   });
+
   $effect(() => {
     if (sameAddress) {
       newData.customerData!.deliveryAddress = { ...newData.customerData!.billingAddress };
@@ -162,6 +166,9 @@
     if (payload.picName) {
       newPayload.picName = payload.picName;
     }
+    if (payload.email) {
+      newPayload.email = payload.email;
+    }
     if (payload.billingAddress) {
       newPayload.billingAddress = addressPrehook(payload.billingAddress);
     }
@@ -207,8 +214,9 @@
 
   function prehook(payload: Partial<CartParent>): Partial<CartParent> {
     if (!item) return savePrehook(payload);
-    const newPayload: Partial<CartParent> = getObjectDiff(payload, item);
+    const newPayload: Partial<CartParent> = getObjectDiff(payload, oldData);
     newPayload.customerData = payload.customerData;
+    newPayload.companyId = companyId;
     return newPayload;
   }
 
@@ -241,6 +249,10 @@
   }
 
   function onsuccess(data: CartParent): void {
+    Object.assign(newData, data);
+    newData.companyId = companyId;
+    Object.assign(oldData, data);
+    oldData.companyId = companyId;
     if (onSuccessParent) {
       onSuccessParent(data);
     }
@@ -319,6 +331,7 @@
         <FormInput readonly type="text" label="Order Code" bind:value={newData.orderCode}/>
       {/if}
       <FormInput type="text" placeholder="ref code" label="Ref Code" bind:value={newData.refCode}/>
+      <FormInput type="text" placeholder="e-mail" label="E-Mail" bind:value={newData.customerData!.email}/>
       <span class="fieldset-label font-bold mb-2">Billing Address</span>
       {@render addressForm(newData.customerData!.billingAddress!)}
       <span class="fieldset-label font-bold mb-2">Delivery Address</span>

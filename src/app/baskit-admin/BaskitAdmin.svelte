@@ -3,12 +3,14 @@
   import CategoryManagement from '@/components/molecules/CategoryManagement.svelte';
   import CompanyTypeManagement from '@/components/molecules/CompanyTypeManagement.svelte';
   import Config from '@/components/molecules/Config.svelte';
+  import EntityCategoryManagement from '@/components/molecules/EntityCategoryManagement.svelte';
   import InventoryList from '@/components/molecules/InventoryList.svelte';
   import OrderList from '@/components/molecules/OrderList.svelte';
   import ProductManagement from '@/components/molecules/ProductManagement.svelte';
   import SellerList from '@/components/molecules/SellerList.svelte';
   import TutorialManagement from '@/components/molecules/TutorialManagement.svelte';
   import { OrderTypeEnum } from '@/lib/enum';
+  import { Context } from '@/lib/helper/context';
   import { BaskitAdminStore } from '@/store/store';
   import type { AppConfig } from '@/types/app';
   import axios from 'axios';
@@ -28,6 +30,9 @@
   let password = $state('12345678');
 
   const client = axios.create({ baseURL: host });
+
+  Context.set('auth', BaskitAdminStore);
+  Context.set('client', client);
 </script>
 
 <div id="root" class="p-6">
@@ -63,5 +68,7 @@
     <CompanyTypeManagement {client}/>
     <div class="divider"></div>
     <TutorialManagement {client} store={BaskitAdminStore}/>
+    <div class="divider"></div>
+    <EntityCategoryManagement addcategory modify/>
   {/if}
 </div>

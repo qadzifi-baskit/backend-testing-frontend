@@ -127,6 +127,7 @@
       <th>Id</th>
       <th>E-Mail</th>
       <th>Phone</th>
+      <th>Role</th>
       <th>First Name</th>
       <th>Last Name</th>
       <th>Status</th>
@@ -138,6 +139,7 @@
       <td><NoWrap>{user.id}</NoWrap></td>
       <td>{user.email}</td>
       <td>{user.phone}</td>
+      <td>{user.roles?.[0]?.roleName}</td>
       <td>{user.profile?.firstName ?? '-'}</td>
       <td>{user.profile?.lastName ?? '-'}</td>
       <td>{user.status}</td>

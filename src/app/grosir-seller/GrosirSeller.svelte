@@ -12,6 +12,7 @@
   import { apiEnv } from '@/lib/config/env.svelte';
   import { OrderTypeEnum } from '@/lib/enum';
   import { createAxiosInstance } from '@/lib/helper/axios.svelte';
+  import { Context } from '@/lib/helper/context';
   import { GrosirSellerStore } from '@/store/store';
   import type { Company } from '@/types';
   import type { AppConfig } from '@/types/app';
@@ -30,6 +31,9 @@
   let username = $state('nagamas@testing.com');
   let password = $state('12345678');
   let companyId = $state('');
+
+  Context.set('client', client);
+  Context.set('auth', GrosirSellerStore);
 
   async function getMyCompany() {
     if (!$GrosirSellerStore.loggedIn) return;

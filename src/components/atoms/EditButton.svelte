@@ -1,15 +1,9 @@
 <script lang="ts">
-  import { Icon } from 'svelte-icons-pack';
+  import type { IconButtonProps } from '@/types/component';
   import { FaSolidPencil } from 'svelte-icons-pack/fa';
+  import IconButton from './IconButton.svelte';
 
-  type Props = {
-    onclick?: (e: MouseEvent) => void;
-  };
-  let { onclick }: Props = $props();
+  let props: Omit<IconButtonProps, 'icon'> = $props();
 </script>
 
-<button class="btn btn-secondary"
-  {onclick}
->
-  <Icon src={FaSolidPencil}/>
-</button>
+<IconButton {...props} icon={FaSolidPencil}/>

@@ -5,6 +5,7 @@
   import { FaSolidAngleRight } from 'svelte-icons-pack/fa';
   import { VscOpenPreview } from 'svelte-icons-pack/vsc';
   import BaskitAdmin from './app/baskit-admin/BaskitAdmin.svelte';
+  import BaskitSuperCompany from './app/baskit-super-company/BaskitSuperCompany.svelte';
   import BrandUser from './app/brand-user/BrandUser.svelte';
   import Buyer from './app/Buyer';
   import GrosirSeller from './app/grosir-seller';
@@ -16,7 +17,8 @@
   import { apiEnv } from './lib/config/env.svelte';
   import { cn } from './lib/helper/tailwind';
   import type { AppConfig } from './types/app';
-  let selected = $state(apiEnv.DEFAULT_APP);
+  // let selected = $state(apiEnv.DEFAULT_APP);
+  let selected = $state(1);
   let host = $state(apiEnv.DEFAULT_API_HOST);
 
   type PageComponent = Component<{ host: string, config: AppConfig }>;
@@ -27,6 +29,7 @@
     { label: 'Baskit Admin', component: BaskitAdmin },
     { label: 'Brand User', component: BrandUser },
     { label: 'Super Admin', component: SuperAdmin },
+    { label: 'Baskit Super Company', component: BaskitSuperCompany },
   ];
 
   let errorModal = $state<HTMLDialogElement>();

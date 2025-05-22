@@ -2,7 +2,7 @@ import type { AuthStore } from '@/types';
 import type { AxiosError } from 'axios';
 import { writable } from 'svelte/store';
 
-const createAuthStore = () => writable<AuthStore>({
+export const createAuthStore = () => writable<AuthStore>({
   userId: '',
   loggedIn: false,
 });

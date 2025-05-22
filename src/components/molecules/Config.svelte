@@ -45,7 +45,7 @@
 </script>
 
 <Collapse title="Config">
-  {#if getConfig('host')}}
+  {#if getConfig('host')}
     <Select
       title="Host"
       showvalue
@@ -53,7 +53,7 @@
       bind:value={host}
     />
   {/if}
-  {#if getConfig('client')}}
+  {#if getConfig('client')}
     <Select
       title="Client"
       showvalue

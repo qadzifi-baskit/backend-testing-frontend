@@ -10,6 +10,7 @@ export type Cart = {
   startPrice: number|null,
   discount: number|null,
   discountAmount: number|null,
+  taxType: string|null,
   tax: number|null,
   tierPrice: number,
   sellingPrice: number,
@@ -32,6 +33,7 @@ export type CartDraftUser = {
   companyName?: string|null,
   picName?: string|null,
   phone?: string|null,
+  email?: string|null,
   billingAddress?: CartDraftUserAddress|null,
   deliveryAddress?: CartDraftUserAddress|null,
 };

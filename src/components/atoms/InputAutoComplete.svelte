@@ -6,6 +6,7 @@
     value?: string,
     placeholder?: string,
     suggestions?: string[],
+    casesensitive?: boolean,
   };
   let {
     maxlength,
