@@ -23,12 +23,8 @@
     childManagemntComponent?.open();
     parentManagementComponent?.open();
   }}
+  bind:title
 >
-  {#if title}
-    <div class="sticky z-10 h-0 float-right top-0">
-      <div class="badge badge-primary">{title}</div>
-    </div>
-  {/if}
   <div class="w-full h-full">
     <EntityCategoryHierarchyManagement
       bind:this={childManagemntComponent}

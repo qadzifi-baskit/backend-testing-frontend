@@ -1,6 +1,7 @@
 export type Role = {
   id: string,
   roleName: string,
+  description: string,
 };
 
 export type Profile = {

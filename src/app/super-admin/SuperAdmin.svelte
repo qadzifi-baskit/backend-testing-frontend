@@ -7,6 +7,7 @@
   import TranslationManagement from '@/components/molecules/TranslationManagement.svelte';
   import UserManagement from '@/components/molecules/UserManagement.svelte';
   import { createAxiosInstance } from '@/lib/helper/axios.svelte';
+  import { Context } from '@/lib/helper/context';
   import { SuperAdminStore } from '@/store/store';
   import type { AppConfig } from '@/types/app';
 
@@ -20,6 +21,8 @@
   }: Props = $props();
 
   const client = createAxiosInstance({ baseURL: host });
+
+  Context.set('client', client);
 
   let clientType = $state('WEB_CMS');
   let username = $state('super.admin@testing.com');
@@ -46,13 +49,9 @@
       {client}
     />
     <div class="divider"></div>
-    <AclList
-      {client}
-    />
+    <AclList/>
     <div class="divider"></div>
-    <RoleManagement
-      {client}
-    />
+    <RoleManagement/>
     <div class="divider"></div>
     <UserManagement
       {client}

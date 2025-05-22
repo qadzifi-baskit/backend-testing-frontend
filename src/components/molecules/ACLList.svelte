@@ -1,8 +1,8 @@
 <script lang="ts">
+  import { Context } from '@/lib/helper/context';
   import { debounce } from '@/lib/helper/util';
   import { SuperAdminStore } from '@/store/store';
   import type { APIACLItem } from '@/types';
-  import type { AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPencil } from 'svelte-icons-pack/fa';
   import NoWrap from '../atoms/NoWrap.svelte';
@@ -10,13 +10,21 @@
   import Collapse from '../Collapse.svelte';
   import Table5 from '../Table5.svelte';
   import ModifyAclModal from './ModifyACLModal.svelte';
+  import Modal from '../Modal.svelte';
+  import FormWrapper from '../atoms/FormWrapper.svelte';
+  import FormInput from '../atoms/FormInput.svelte';
 
   type Props = {
-    client: AxiosInstance,
+    roleid?:string|string[],
+    show?: boolean,
   };
   let {
-    client,
+    roleid: roleId = $bindable(),
+    show = $bindable(),
   }:Props = $props();
+
+  const client = Context.getStrict('client');
+  const showMethod = $derived(typeof roleId === 'string' || roleId?.length === 1);
 
   let aclList:APIACLItem[] = $state([]);
   let page = $state(1);
@@ -34,6 +42,15 @@
     params.append('$limit', '10');
     params.append('$order', 'createdAt');
     params.append('search', search);
+    if (roleId) {
+      if (typeof roleId === 'string') {
+        params.append('roleId', roleId);
+      } else {
+        roleId.forEach((id) => {
+          params.append('roleId', id);
+        });
+      }
+    }
     const response = await client.get(
       '/acls',
       { params },
@@ -52,76 +69,132 @@
     debounceGetACLList();
   });
 
-  let dialog:HTMLDialogElement|undefined = $state();
+  $effect(() => {
+    if (show && (typeof roleId === 'string' || roleId?.length === 1)) {
+      getACLList();
+    }
+  });
+
+  let modifyDialog:HTMLDialogElement|undefined = $state();
 
   const modifyAcl = (item:APIACLItem) => () => {
     selectedAclItem = item;
-    dialog?.showModal();
+    modifyDialog?.showModal();
   };
 
   $effect(() => {
-    if (dialog) {
-      dialog.onclose = getACLList;
+    if (modifyDialog) {
+      modifyDialog.onclose = getACLList;
+    }
+  });
+
+  let addDialog = $state<HTMLDialogElement>();
+  const newACL = $state({
+    roleId: '',
+    apiId: '',
+    methodPost: false,
+    methodGet: false,
+    methodPatch: false,
+    methodDelete: false,
+    methodFind: false,
+  });
+  function showAddAcl() {
+    addDialog?.showModal();
+  }
+
+  $effect(() => {
+    if (showMethod && roleId) {
+      if (typeof roleId === 'string') {
+        newACL.roleId = roleId;
+      } else {
+        newACL.roleId = roleId[0];
+      }
+    } else {
+      newACL.roleId = '';
     }
   });
 </script>
 
-{#snippet colgroup()}
-  <colgroup>
-    <col class="max-w-fit">
-    <col class="max-w-fit">
-    <col>
-    <col>
-    <col class="w-full">
-  </colgroup>
-{/snippet}
-
-{#snippet header()}
-  <th><span>Id</span></th>
-  <th></th>
-  <th><span>API Name</span></th>
-  <th><span>API Group</span></th>
-  <th><span>Endpoint</span></th>
-{/snippet}
-
-{#snippet content(item: APIACLItem)}
-  <td><NoWrap>{item.id}</NoWrap></td>
-  <td>
-    <button
-      onclick={modifyAcl(item)}
-      class="btn btn-secondary"
+<Modal bind:dialog={addDialog} title="Add ACL">
+  <div>
+    <FormWrapper
+      {client}
+      payload={newACL}
+      path="/acls"
     >
-      <Icon src={FaSolidPencil}/>
-    </button>
-  </td>
-  <td><NoWrap>{item.apiName}</NoWrap></td>
-  <td><NoWrap>{item.apiGroup}</NoWrap></td>
-  <td><NoWrap>{item.endpoint}</NoWrap></td>
-{/snippet}
-
+      <FormInput disabled label="Role Id" bind:value={newACL.roleId}/>
+    </FormWrapper>
+  </div>
+</Modal>
 <ModifyAclModal
   bind:item={selectedAclItem}
-  bind:dialog
+  bind:dialog={modifyDialog}
   {client}
 />
 <Collapse
   title="ACL List"
   class="w-full"
   onclick={getACLList}
+  bind:show
 >
   <PaginationNavigationPanel
     bind:max
     bind:page
     bind:search
     onreload={getACLList}
+    onadd={showMethod ? showAddAcl : undefined}
   />
   {#if aclList.length > 0}
     <Table5
       itemList={aclList}
-      {header}
-      {colgroup}
-      {content}
     >
+      {#snippet colgroup()}
+        <colgroup>
+          <col class="max-w-fit">
+          <col class="max-w-fit">
+          <col>
+          <col>
+          <col class="w-full">
+        </colgroup>
+      {/snippet}
+
+      {#snippet header()}
+        <td><span>Id</span></td>
+        <td></td>
+        <td><span>API Name</span></td>
+        <td><span>API Group</span></td>
+        <td><span>Endpoint</span></td>
+        {#if showMethod}
+          <td>Get</td>
+          <td>Find</td>
+          <td>Post</td>
+          <td>Patch</td>
+          <td>Delete</td>
+        {/if}
+      {/snippet}
+
+      {#snippet content(item: APIACLItem)}
+        <td><NoWrap>{item.id}</NoWrap></td>
+        <td>
+          <button
+            onclick={modifyAcl(item)}
+            class="btn btn-secondary"
+          >
+            <Icon src={FaSolidPencil}/>
+          </button>
+        </td>
+        <td><NoWrap>{item.apiName}</NoWrap></td>
+        <td><NoWrap>{item.apiGroup}</NoWrap></td>
+        <td><NoWrap>{item.endpoint}</NoWrap></td>
+        {#if showMethod}
+          {@const acl = item.acls[0]}
+          <td><input disabled type="checkbox" checked={acl.methodGet} class="checkbox"></td>
+          <td><input disabled type="checkbox" checked={acl.methodFind} class="checkbox"></td>
+          <td><input disabled type="checkbox" checked={acl.methodPost} class="checkbox"></td>
+          <td><input disabled type="checkbox" checked={acl.methodPatch} class="checkbox"></td>
+          <td><input disabled type="checkbox" checked={acl.methodDelete} class="checkbox"></td>
+        {/if}
+      {/snippet}
     </Table5>
   {/if}
 </Collapse>

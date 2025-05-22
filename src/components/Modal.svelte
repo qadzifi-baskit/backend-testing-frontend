@@ -6,6 +6,7 @@
   import type { EventHandler, ToggleEventHandler } from 'svelte/elements';
 
   type Props = {
+    title?: string,
     dialog?: HTMLDialogElement,
     class?: string,
     onopen?: ToggleEventHandler<HTMLDialogElement>,
@@ -13,6 +14,7 @@
     children?: Snippet,
   };
   let {
+    title = $bindable(),
     dialog = $bindable(),
     class: clazz = '',
     onopen,
@@ -42,6 +44,11 @@
   {ontoggle}
 >
   <div class="modal-box p-4 h-full w-full max-w-[unset]">
+    {#if title}
+      <div class="sticky z-10 h-0 float-right top-0">
+        <div class="badge badge-primary">{title}</div>
+      </div>
+    {/if}
     {@render children?.()}
   </div>
 </dialog>

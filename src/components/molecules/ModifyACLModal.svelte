@@ -1,7 +1,8 @@
 <script lang="ts">
   import { debounce, isObjectEmpty } from '@/lib/helper/util';
   import { SuperAdminStore } from '@/store/store';
-  import type { ACLItem, APIACLItem, Role } from '@/types';
+  import type { ACLItem, APIACLItem } from '@/types';
+  import type { Role } from '@/types/user';
   import type { AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidFloppyDisk, FaSolidPencil } from 'svelte-icons-pack/fa';
@@ -124,14 +125,14 @@
 {/snippet}
 
 {#snippet header()}
-  <th>Id</th>
-  <th>Role Name</th>
-  <th></th>
-  <th>Get</th>
-  <th>Find</th>
-  <th>Post</th>
-  <th>Patch</th>
-  <th>Delete</th>
+  <td>Id</td>
+  <td>Role Name</td>
+  <td></td>
+  <td>Get</td>
+  <td>Find</td>
+  <td>Post</td>
+  <td>Patch</td>
+  <td>Delete</td>
 {/snippet}
 
 {#snippet content(acl: ACLItem)}
