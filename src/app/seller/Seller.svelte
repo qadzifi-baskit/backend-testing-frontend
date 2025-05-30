@@ -37,6 +37,11 @@
     paymentTypeList: [],
   });
   const userContext = writable<UserContext>({});
+  const orderTypeList:OrderTypeEnum[] = [
+    OrderTypeEnum.OFFLINE,
+    OrderTypeEnum.SELLER_SALES_ORDER,
+    OrderTypeEnum.SELLER_PURCHASE_ORDER,
+  ];
 
   Context.set('order', orderContext);
   Context.set('user', userContext);
@@ -47,6 +52,7 @@
   let username = $state('david@gmail.com');
   let password = $state('12345678');
   let companyId = $state('');
+  let selectedOrderType = $state(OrderTypeEnum.OFFLINE);
 
   async function getMyCompany() {
     if (!$SellerAdminStore.loggedIn) return;
@@ -126,7 +132,7 @@
       {companyId}
     />
     <div class="divider"></div>
-    <InventoryList {client} store={SellerAdminStore} {companyId} />
+    <InventoryList {companyId}/>
     <div class="divider"></div>
     <UserOfflineManagement
       {client}
@@ -141,9 +147,11 @@
     <div class="divider"></div>
     <div class="flex w-full rounded-box">
       <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
-        <InventoryList {client} store={SellerAdminStore}
+        <InventoryList
           order
+          ordertype={orderTypeList}
           {companyId}
+          bind:selectedOrderType
         />
       </div>
       <div class="divider divider-horizontal"></div>
@@ -153,10 +161,8 @@
           {client}
           bind:userId={customerId}
           {companyId}
-          orderType={[
-            OrderTypeEnum.OFFLINE,
-            OrderTypeEnum.SELLER_PURCHASE_ORDER,
-          ]}
+          ordertype={orderTypeList}
+          bind:selectedOrderType
         />
       </div>
     </div>
@@ -170,10 +176,7 @@
       {client}
       store={SellerAdminStore}
       {companyId}
-      orderType={[
-        OrderTypeEnum.OFFLINE,
-        OrderTypeEnum.SELLER_PURCHASE_ORDER,
-      ]}
+      orderType={orderTypeList}
     />
     <div class="divider"></div>
     <DocumentManagement {client}/>

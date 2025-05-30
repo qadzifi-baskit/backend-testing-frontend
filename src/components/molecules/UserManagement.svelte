@@ -2,17 +2,17 @@
   import { listenAuthSuccess } from '@/event';
   import { debounce } from '@/lib/helper/util';
   import { SuperAdminStore } from '@/store/store';
-  import type { Role, User } from '@/types';
+  import type { DropdownReturnType } from '@/types/component';
+  import type { Role, User } from '@/types/user';
   import type { AxiosInstance } from 'axios';
   import type { Snippet } from 'svelte';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPlus, FaSolidXmark } from 'svelte-icons-pack/fa';
   import DropdownSelect from '../atoms/DropdownSelect.svelte';
+  import NoWrap from '../atoms/NoWrap.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
-  import NoWrap from '../atoms/NoWrap.svelte';
-  import type { DropdownReturnType } from '@/types/component';
 
   type Props = {
     client: AxiosInstance,

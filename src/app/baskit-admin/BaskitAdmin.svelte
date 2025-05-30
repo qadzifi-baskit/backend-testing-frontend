@@ -61,7 +61,7 @@
     <div class="divider"></div>
     <ProductManagement {client} store={BaskitAdminStore} />
     <div class="divider"></div>
-    <InventoryList {client} store={BaskitAdminStore}/>
+    <InventoryList/>
     <div class="divider"></div>
     <SellerList {client}/>
     <div class="divider"></div>

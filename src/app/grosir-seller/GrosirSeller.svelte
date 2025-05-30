@@ -109,17 +109,11 @@
     bind:companyId
   />
   <div class="divider"></div>
-  <InventoryList {client} store={GrosirSellerStore}
-    {companyId}
-    grosir
-  />
+  <InventoryList {companyId} grosir/>
   <div class="divider"></div>
   <div class="flex w-full rounded-box">
     <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
-      <InventoryList order {client} store={GrosirSellerStore}
-        {companyId}
-        bind:memberLevel
-      />
+      <InventoryList order {companyId} bind:memberLevel/>
     </div>
     <div class="divider divider-horizontal"></div>
     <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
@@ -127,7 +121,7 @@
         {client}
         bind:memberLevel
         bind:userId={customerId}
-        orderType={OrderTypeEnum.GROSIR_OFFLINE}
+        ordertype={OrderTypeEnum.GROSIR_OFFLINE}
       />
     </div>
   </div>

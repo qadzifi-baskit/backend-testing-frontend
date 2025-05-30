@@ -1,4 +1,4 @@
-import type { DeliveryTypeEnum } from '@/lib/enum';
+import type { DeliveryTypeEnum, OrderTypeEnum } from '@/lib/enum';
 import type { MemberDiscountLevel } from '@/lib/enum/memberDiscount.enum';
 
 export type Cart = {
@@ -17,9 +17,14 @@ export type Cart = {
   fullName: string,
   name: string,
   qty: number,
+  neededQty: number,
   warehouse: number,
   memberLevel: MemberDiscountLevel|null,
   memberDiscountAmount: number|null,
+};
+
+export type CartUpdatePayload = Partial<Cart> & {
+  orderType?: OrderTypeEnum,
 };
 
 export type CartDraftUserAddress = {

@@ -97,7 +97,6 @@
 </script>
 
 <CartDraftDetail
-  {client}
   bind:dialog={modifyDraftDilaog}
   bind:item={selectedDraft}
   bind:companyId

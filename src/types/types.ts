@@ -80,6 +80,7 @@ export type Order = {
   total: number,
   grandTotal: number,
   product: Omit<Cart, 'warehouse'>,
+  linkedOrder: Order[],
 };
 
 export type OrderDetail = {

@@ -3,7 +3,7 @@
   import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
   import type { AuthStore, PaymentType, WarehouseDetail } from '@/types';
-  import type { Cart, CartParent } from '@/types/cart';
+  import type { Cart, CartParent, CartUpdatePayload } from '@/types/cart';
   import type { AxiosInstance } from 'axios';
   import type { Snippet } from 'svelte';
   import { Icon } from 'svelte-icons-pack';
@@ -13,6 +13,7 @@
   import Table5 from '../Table5.svelte';
   import CartDraftDetail from './CartDraftDetail.svelte';
   import { OvereStockOrderTypeList } from '@/consts/order';
+  import FormInput from '../atoms/FormInput.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -20,7 +21,8 @@
     userId?: string,
     cartCode?: string,
     companyId?: string,
-    orderType?: OrderTypeEnum|OrderTypeEnum[],
+    ordertype?: OrderTypeEnum|OrderTypeEnum[],
+    selectedOrderType?: OrderTypeEnum,
     clientType?: string,
     memberLevel?: string|null,
     show?: boolean,
@@ -37,7 +39,8 @@
     userId = $bindable(),
     cartCode = $bindable(),
     companyId = $bindable(),
-    orderType: orderTypeOptions = OrderTypeEnum.SHOP,
+    ordertype: orderTypeOptions = OrderTypeEnum.SHOP,
+    selectedOrderType = $bindable(),
     memberLevel = $bindable(null),
     show = $bindable(false),
     draft,
@@ -57,23 +60,35 @@
   let totalDiscount = $state(0);
   let totalDiscountedPrice = $state(0);
   let total = $state(0);
-  let orderType = $state(typeof orderTypeOptions === 'string' ? orderTypeOptions : orderTypeOptions[0]);
+  let linkedOrderId = $state<string>();
+
+  if (Array.isArray(orderTypeOptions)) {
+    selectedOrderType = orderTypeOptions[0];
+  } else if (orderTypeOptions) {
+    selectedOrderType = orderTypeOptions;
+  }
 
   const createOrder = async () => {
     if (!$store || !$store.loggedIn) return;
     stringToast('Creating order...');
     const processedCart = prehook ? await prehook(cartList) : cartList;
+    const addedData: Record<string, unknown> = {};
+    if (selectedOrderType === OrderTypeEnum.SELLER_PURCHASE_ORDER && linkedOrderId) {
+      addedData.linkedOrderId = linkedOrderId;
+    }
     const response = await client.post('/order', {
       companyId,
       paymentTypeId,
       deliveryType,
       cartCode,
-      orderType,
+      orderType: selectedOrderType,
+      ...addedData,
       product: processedCart.map((value) => ({
         cartId: value.id,
         inventoryId: value.inventoryId,
         productId: value.productId,
         qty: value.qty,
+        neededQty: value.neededQty,
         price: value.sellingPrice,
         companyId: value.companyId,
         memberLevel: value.memberLevel,
@@ -89,9 +104,10 @@
   async function getCart() {
     if (!$store || !$store.loggedIn) return;
     stringToast('Loading cart...');
-    const params = new URLSearchParams({
-      orderType,
-    });
+    const params = new URLSearchParams();
+    if (selectedOrderType) {
+      params.append('orderType', selectedOrderType);
+    }
     if ($store.userId) {
       params.append('createdBy', $store.userId);
     }
@@ -162,13 +178,23 @@
     if (!store || $store?.loggedIn === false) return;
     stringToast('Updating cart...');
     const data = cartData[cartId];
-    const payload:Partial<Cart> = {};
+    const payload:CartUpdatePayload = {};
+    if (selectedOrderType) {
+      payload.orderType = selectedOrderType;
+    }
     if (data.qty !== undefined) {
       payload.qty = data.qty;
     }
     if (
-      orderType === OrderTypeEnum.SELLER_SALES_ORDER ||
-      orderType === OrderTypeEnum.SELLER_PURCHASE_ORDER
+      selectedOrderType === OrderTypeEnum.SELLER_SALES_ORDER
+    ) {
+      if (data.neededQty !== undefined) {
+        payload.neededQty = data.neededQty;
+      }
+    }
+    if (
+      selectedOrderType === OrderTypeEnum.SELLER_SALES_ORDER ||
+      selectedOrderType === OrderTypeEnum.SELLER_PURCHASE_ORDER
     ) {
       if (data.tierPrice) {
         payload.startPrice = data.tierPrice;
@@ -260,32 +286,36 @@
     itemList={cartList}
   >
     {#snippet header()}
-      <th>Qty</th>
-      {#if OvereStockOrderTypeList.includes(orderType)}
-        <th>Initial Price</th>
-        <th>Price</th>
-        <th>Discount</th>
-        <th>Discount Amount</th>
-        <th>Tax Type</th>
-        <th>Tax</th>
-        <th>Selling Price</th>
+      <td>Qty</td>
+      {#if OvereStockOrderTypeList.includes(selectedOrderType)}
+        <td>Needed Qty</td>
+        <td>Initial Price</td>
+        <td>Price</td>
+        <td>Discount</td>
+        <td>Discount Amount</td>
+        <td>Tax Type</td>
+        <td>Tax</td>
+        <td>Selling Price</td>
       {/if}
-      <th></th>
-      <th></th>
-      {#if !OvereStockOrderTypeList.includes(orderType)}
-        <th>Initial Price</th>
-        <th>Tier Price</th>
-        <th>Selling Price</th>
+      <td></td>
+      <td></td>
+      {#if !OvereStockOrderTypeList.includes(selectedOrderType)}
+        <td>Initial Price</td>
+        <td>Tier Price</td>
+        <td>Selling Price</td>
       {/if}
-      <th>Warehouse</th>
-      <th>Name</th>
+      <td>Warehouse</td>
+      <td>Name</td>
     {/snippet}
 
     {#snippet content(cart: Cart)}
       <td>
         <input type="number" bind:value={cartData[cart.id].qty} class="input input-bordered w-24 max-w-xs">
       </td>
-      {#if orderType === OrderTypeEnum.SELLER_PURCHASE_ORDER}
+      {#if OvereStockOrderTypeList.includes(selectedOrderType)}
+        <td>
+          <input type="number" bind:value={cartData[cart.id].neededQty} class="input input-bordered w-24 max-w-xs">
+        </td>
         <td>
           <input type="number" readonly value={cart.initialPrice} class="input input-bordered w-24 max-w-xs">
         </td>
@@ -324,7 +354,7 @@
           <Icon src={FaTrashCan}/>
         </button>
       </td>
-      {#if orderType !== OrderTypeEnum.SELLER_PURCHASE_ORDER}
+      {#if !OvereStockOrderTypeList.includes(selectedOrderType)}
         <td>{cart.initialPrice}</td>
         <td>{cart.tierPrice}</td>
         <td>{cart.sellingPrice}</td>
@@ -375,7 +405,7 @@
   </div>
   {#if Array.isArray(orderTypeOptions)}
     <div>
-      <select bind:value={orderType} class="select select-bordered w-full max-w-xs">
+      <select bind:value={selectedOrderType} class="select select-bordered w-full max-w-xs">
         <option value="" disabled selected>Payment Type</option>
         {#each orderTypeOptions as options}
           <option value={options}>{options}</option>
@@ -399,6 +429,9 @@
       {/each}
     </select>
   </div>
+  {#if selectedOrderType === OrderTypeEnum.SELLER_PURCHASE_ORDER}
+    <FormInput label="Linked Order Id" bind:value={linkedOrderId}/>
+  {/if}
   <button class="btn btn-secondary" onclick={createOrder} disabled={paymentTypeId === ''}>Create Order</button>
   {#if !draft}
     <button class="btn not-hover:bg-slate-600" onclick={saveCart}>Save Cart</button>

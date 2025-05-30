@@ -3,7 +3,6 @@
   import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
   import { getObjectDiff, isNil } from '@/lib/helper/util';
-  import { SellerAdminStore } from '@/store/store';
   import type { Cart, CartDraftUser, CartDraftUserAddress, CartParent } from '@/types/cart';
   import type { User, UserOffline } from '@/types/user';
   import AreaSelectInput from '../atoms/AreaSelectInput.svelte';
@@ -350,8 +349,6 @@
 
     {#if item?.id}
       <InventoryList
-        {client}
-        store={SellerAdminStore}
         order
         cartCode={item.id}
         bind:companyId
@@ -362,7 +359,7 @@
         draft
         {store}
         {client}
-        orderType={OrderTypeEnum.SELLER_PURCHASE_ORDER}
+        ordertype={OrderTypeEnum.SELLER_PURCHASE_ORDER}
         prehook={saveDraft}
         bind:cartCode={item.id}
         bind:companyId
@@ -375,7 +372,7 @@
         draft
         {store}
         {client}
-        orderType={OrderTypeEnum.SELLER_PURCHASE_ORDER}
+        ordertype={OrderTypeEnum.SELLER_PURCHASE_ORDER}
         {onordercreated}
         bind:companyId
         bind:paymentTypeId={newData.paymentTypeId!}

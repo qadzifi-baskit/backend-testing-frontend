@@ -7,6 +7,7 @@
   import type { Writable } from 'svelte/store';
   import Table from '../Table.svelte';
   import Table5 from '../Table5.svelte';
+  import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -102,6 +103,9 @@
   };
 </script>
 
+<div>
+  <PaginationNavigationPanel search={undefined} page={undefined} onreload={() => getDetail(id)}/>
+</div>
 <Table5 itemList={detailList}>
   {#snippet header()}
     <th>Name</th>

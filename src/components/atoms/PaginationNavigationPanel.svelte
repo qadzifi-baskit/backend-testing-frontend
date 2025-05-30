@@ -10,7 +10,7 @@
   let {
     search = $bindable(),
     max = $bindable(1),
-    page = $bindable(1),
+    page = $bindable(),
     sort = $bindable(null),
     order = $bindable('ASC'),
     onreload,
@@ -19,7 +19,9 @@
   }:PaginationPanelProps = $props();
 
   const debounceResetPage = debounce(() => {
-    page = 1;
+    if (page !== undefined) {
+      page = 1;
+    }
   });
 
   $effect(() => {
@@ -38,10 +40,12 @@
     bind:value={search}
   />
 {/if}
-<PaginationFancyButton
-  bind:max
-  bind:value={page}
-/>
+{#if page !== undefined}
+  <PaginationFancyButton
+    bind:max
+    bind:value={page}
+  />
+{/if}
 {#if sortOptions.length > 0}
   <DropdownSelect
     class="w-fit"

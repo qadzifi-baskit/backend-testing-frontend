@@ -1,12 +1,11 @@
 <script lang="ts">
+  import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
   import type { Brand } from '@/types';
-  import type { AxiosInstance } from 'axios';
   import type { Snippet } from 'svelte';
   import DropdownSelect from '../atoms/DropdownSelect.svelte';
 
   type Props = {
-    client: AxiosInstance,
     value?: string,
     search?: string,
     page?: number,
@@ -17,7 +16,6 @@
   };
 
   let {
-    client,
     value = $bindable(),
     search = $bindable(''),
     page = 1,
@@ -26,6 +24,8 @@
     label = placeholder,
     onselect: onParentSelect,
   }: Props = $props();
+
+  const client = Context.strict.client;
 
   let show = $state(false);
   let brandList:Brand[] = $state([]);

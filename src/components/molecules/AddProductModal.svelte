@@ -142,7 +142,7 @@
         options={categoryList.map((item) => [item.id, item.name])}
         bind:value={productData.categoryId}
       />
-      <BrandDropdownSelect {client} bind:value={productData.brand} onselect={onSelectBrand}/>
+      <BrandDropdownSelect bind:value={productData.brand} onselect={onSelectBrand}/>
       <span class="fieldset-label">Principal</span>
       <input readonly type="text" placeholder="principal" bind:value={productData.principal} class="input input-bordered w-full max-w-xs" />
       <UomDropdownSelect {client} bind:value={productData.uomId}/>

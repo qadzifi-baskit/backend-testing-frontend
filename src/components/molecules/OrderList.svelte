@@ -13,6 +13,7 @@
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import OrderDetail from './OrderDetail.svelte';
   import UpdateStatus from './UpdateStatus.svelte';
+  import FormInput from '../atoms/FormInput.svelte';
 
   type Props = {
     endpoint?: string,
@@ -38,6 +39,7 @@
   let page = $state(1);
   let max = $state(1);
   let endDate:Date|null = $state(null);
+  let linkedOrderId = $state('');
 
   async function getOrderList() {
     if ($store && !$store.loggedIn) return;
@@ -60,6 +62,9 @@
     }
     if (endDate) {
       params.append('end', endDate.toISOString());
+    }
+    if (linkedOrderId) {
+      params.append('linkedOrderId', linkedOrderId);
     }
     const response = await client.get(
       `/order/${endpoint}`,
@@ -143,6 +148,7 @@
     onreload={getOrderList}
   />
   <DatePicker bind:value={endDate} label="End Date"/>
+  <FormInput label="Linked Order Id" bind:value={linkedOrderId}/>
   {#if orderList.length > 0}
     <Table5 itemList={orderList} pincols pinrows>
       {#snippet header()}
@@ -152,6 +158,7 @@
         <td>Order Code</td>
         <td></td>
         <td></td>
+        <td>Linked</td>
         <td>Salesname</td>
         <td>Delivery Type</td>
         <td>Status</td>
@@ -182,6 +189,7 @@
             <Icon src={FaSolidList}/>
           </button>
         </td>
+        <td>{order.linkedOrder.length}</td>
         <td><NoWrap>{order.salesName}</NoWrap></td>
         <td>{order.deliveryType}</td>
         <td>{order.status}</td>

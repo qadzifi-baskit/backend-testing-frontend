@@ -20,6 +20,7 @@
     input?: Snippet,
     disabled?: boolean,
     required?: boolean,
+    checked?: boolean,
   };
   let {
     type: inputType,
@@ -35,6 +36,7 @@
     input,
     disabled = $bindable(false),
     required = $bindable(false),
+    checked = $bindable(),
   }: Props = $props();
 </script>
 
@@ -47,23 +49,39 @@
   {#if input}
     {@render input()}
   {:else}
-    <input
-      {disabled}
-      {required}
-      {readonly}
-      type={inputType}
-      minlength={min}
-      maxlength={max}
-      {placeholder}
-      bind:value
-      {pattern}
-      class={cn(
-        'input input-bordered flex mb-2 w-full max-w-xs',
-        {
-          'validator': Boolean(error),
-        },
-      )}
-    />
+    {#if inputType === 'checkbox'}
+      <input
+        {disabled}
+        {required}
+        {readonly}
+        type="checkbox"
+        bind:checked
+        class={cn(
+          'input input-bordered flex mb-2 w-full max-w-xs',
+          {
+            'validator': Boolean(error),
+          },
+        )}
+      />
+    {:else}
+      <input
+        {disabled}
+        {required}
+        {readonly}
+        type={inputType}
+        minlength={min}
+        maxlength={max}
+        {placeholder}
+        bind:value
+        {pattern}
+        class={cn(
+          'input input-bordered flex mb-2 w-full max-w-xs',
+          {
+            'validator': Boolean(error),
+          },
+        )}
+      />
+    {/if}
   {/if}
   {#if typeof error === 'string'}
     <p class="validator-hint">{error}</p>

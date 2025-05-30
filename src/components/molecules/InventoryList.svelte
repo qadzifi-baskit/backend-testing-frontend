@@ -1,23 +1,22 @@
 <script lang="ts">
   import Collapse from '@/components/Collapse.svelte';
   import AddInventoryModal from '@/components/molecules/AddInventoryModal.svelte';
+  import { Context } from '@/lib/helper/context';
+  import { stringToast } from '@/lib/helper/toast';
   import { debounce } from '@/lib/helper/util';
-  import type { AuthStore } from '@/types';
+  import type { HTMLInputEvent } from '@/types/event';
   import type { Inventory } from '@/types/inventory';
-  import type { AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPencil } from 'svelte-icons-pack/fa';
-  import type { Writable } from 'svelte/store';
   import DropdownSelect from '../atoms/DropdownSelect.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import Table5 from '../Table5.svelte';
   import ModifyInventoryModal from './ModifyInventoryModal.svelte';
-  import type { HTMLInputEvent } from '@/types/event';
-  import { stringToast } from '@/lib/helper/toast';
+  import type { OrderTypeEnum } from '@/lib/enum';
+  import FormInput from '../atoms/FormInput.svelte';
+  import { uuidRegexp } from '@/consts/regexp';
 
   type Props = {
-    client: AxiosInstance,
-    store: Writable<AuthStore>,
     grosir?: boolean,
     order?: boolean,
     userId?: string,
@@ -25,20 +24,28 @@
     companyId?: string,
     memberLevel?: string|null,
     show?: boolean,
+    ordertype?: OrderTypeEnum|OrderTypeEnum[],
+    selectedOrderType?: OrderTypeEnum,
   };
   let {
-    client,
-    store,
     grosir = false,
     order = false,
     cartCode,
     companyId = $bindable(),
     memberLevel = $bindable(null),
     show = $bindable(false),
+    ordertype,
+    selectedOrderType = $bindable(),
   }:Props = $props();
 
   const prefix = grosir ? '' : '';
   const selectedMap:Record<string, Inventory> = $state({});
+  const client = Context.strict.client;
+  const store = Context.strict.auth;
+  const orderTypeOptions:[string, string][] = ordertype ? (
+    typeof ordertype === 'string' ? [[ordertype, ordertype]]
+      : ordertype.map((item) => [item, item])
+  ) : [];
 
   let inventoryList:Inventory[] = $state([]);
   let page = $state(1);
@@ -46,6 +53,13 @@
   let search = $state('');
   let selectedInventoryId = $state('');
   let bulkSelect = $state(false);
+  let orderId = $state('');
+
+  if (Array.isArray(ordertype)) {
+    selectedOrderType = ordertype[0];
+  } else if (ordertype) {
+    selectedOrderType = ordertype;
+  }
 
   const getInventoryList = async () => {
     if (!$store.loggedIn) return;
@@ -58,6 +72,9 @@
     });
     if (companyId && companyId !== '') {
       params.append('companyId', companyId);
+    }
+    if (orderId && uuidRegexp.test(orderId)) {
+      params.append('orderId', orderId);
     }
     const response = await client.get(
       `${prefix}/inventory`,
@@ -75,6 +92,7 @@
 
   $effect(() => {
     search;
+    orderId;
     page = 1;
   });
 
@@ -82,6 +100,7 @@
     if (show && $store.loggedIn) {
       page;
       search;
+      orderId;
       debounceGetInventory();
     }
   });
@@ -94,6 +113,7 @@
   const qtyMap:Record<string, number> = $state({});
   function addItem(item: Inventory) {
     return async () => client.post(`${prefix}/cart`, {
+      orderType: selectedOrderType,
       inventoryId: item.id,
       qty: qtyMap[item.id],
       userId: null,
@@ -181,10 +201,17 @@
   />
   {#if order}
     <fieldset class="fieldset p-4 bg-base-100 border border-base-300 rounded-box w-64">
-      <legend class="fieldset-legend">Bulk</legend>
-      <label class="fieldset-label">
-        <input type="checkbox" bind:checked={bulkSelect} class="toggle" />
-      </label>
+      <FormInput label="Bulk" type="checkbox" bind:checked={bulkSelect}/>
+      <FormInput label="Order Id" bind:value={orderId}/>
+      <div class="fieldset-label">Order Type</div>
+      {#if ordertype}
+        <DropdownSelect
+          resetable
+          default={undefined}
+          options={orderTypeOptions}
+          bind:value={selectedOrderType}
+        />
+      {/if}
     </fieldset>
     <button onclick={addItemBulk} disabled={!bulkSelect || Object.keys(selectedMap).length <= 0} class="btn not-hover:bg-slate-600">Add Bulk</button>
   {/if}
