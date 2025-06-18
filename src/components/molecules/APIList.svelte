@@ -1,9 +1,8 @@
 <script lang="ts">
+  import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
   import { debounce } from '@/lib/helper/util';
-  import { SuperAdminStore } from '@/store/store';
   import type { APIItem } from '@/types';
-  import type { AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPencil } from 'svelte-icons-pack/fa';
   import NoWrap from '../atoms/NoWrap.svelte';
@@ -13,12 +12,7 @@
   import AddApiModal from './AddAPIModal.svelte';
   import ModifyApiModal from './ModifyAPIModal.svelte';
 
-  type Props = {
-    client: AxiosInstance,
-  };
-  let {
-    client,
-  }:Props = $props();
+  const { client, auth: store } = Context.strict;
 
   let apiList:APIItem[] = $state([]);
   let page = $state(1);
@@ -26,7 +20,7 @@
   let search = $state('');
 
   const reloadData = async () => {
-    if (!$SuperAdminStore.loggedIn) {
+    if (!$store.loggedIn) {
       return;
     }
 

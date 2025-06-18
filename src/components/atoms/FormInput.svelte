@@ -21,6 +21,8 @@
     disabled?: boolean,
     required?: boolean,
     checked?: boolean,
+    toggle?: boolean,
+    show?: boolean,
   };
   let {
     type: inputType,
@@ -37,15 +39,21 @@
     disabled = $bindable(false),
     required = $bindable(false),
     checked = $bindable(),
+    toggle = false,
+    show = $bindable(false),
   }: Props = $props();
 </script>
 
-<label class={cn('w-full max-w-xs mb-2', clazz)}>
-  {#if typeof label === 'string'}
-    <span class="fieldset-label mb-2">{label}</span>
-  {:else}
-    {@render label()}
-  {/if}
+{#if typeof label === 'string'}
+  <span class="fieldset-label mb-2">{label}</span>
+{:else}
+  {@render label()}
+{/if}
+<label class={cn(
+  !error && 'input flex',
+  inputType !== 'checkbox' && 'p-0 gap-0 w-full max-w-xs mb-2',
+  clazz,
+)}>
   {#if input}
     {@render input()}
   {:else}
@@ -57,7 +65,7 @@
         type="checkbox"
         bind:checked
         class={cn(
-          'input input-bordered flex mb-2 w-full max-w-xs',
+          'checkbox',
           {
             'validator': Boolean(error),
           },
@@ -68,24 +76,29 @@
         {disabled}
         {required}
         {readonly}
-        type={inputType}
+        type={show && inputType === 'password' ? 'text' : inputType}
         minlength={min}
         maxlength={max}
         {placeholder}
         bind:value
         {pattern}
         class={cn(
-          'input input-bordered flex mb-2 w-full max-w-xs',
+          'px-4 w-full',
           {
-            'validator': Boolean(error),
+            'input validator': Boolean(error),
           },
         )}
       />
     {/if}
   {/if}
   {#if typeof error === 'string'}
-    <p class="validator-hint">{error}</p>
+    {#if error}
+      <p class="validator-hint">{error}</p>
+    {/if}
   {:else}
     {@render error()}
+  {/if}
+  {#if toggle}
+    <input type="checkbox" class="checkbox bg-transparent! mr-4" bind:checked={show}/>
   {/if}
 </label>

@@ -3,6 +3,7 @@ import type { OrderContext, UserContext } from '@/types/context';
 import type { AxiosInstance } from 'axios';
 import { getContext, setContext } from 'svelte';
 import type { Writable } from 'svelte/store';
+import { stringToast } from './toast';
 
 type ContextMap = {
   order?: Writable<OrderContext>;
@@ -25,6 +26,7 @@ function createContextHelpers<T extends Record<string, unknown>>() {
     getStrict<K extends keyof T>(key: K): NonNullable<T[K]> {
       const result = getContext(key as string);
       if (!result) {
+        stringToast(`Context "${String(key)}" is not defined`);
         throw new Error(`Context "${String(key)}" is not defined`);
       }
       return result as NonNullable<T[K]>;

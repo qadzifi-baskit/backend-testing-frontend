@@ -1,33 +1,29 @@
 <script lang="ts">
+  import { Context } from '@/lib/helper/context';
   import { clamp } from '@/lib/helper/math';
   import { debounce } from '@/lib/helper/util';
-  import type { AuthStore } from '@/types';
   import type { PaginationOrder } from '@/types/pagination';
   import type { User } from '@/types/user';
-  import type { AxiosInstance } from 'axios';
-  import type { Writable } from 'svelte/store';
   import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
+  import NoWrap from '../atoms/NoWrap.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import AddFieldTeamModal from './AddFieldTeamModal.svelte';
-  import NoWrap from '../atoms/NoWrap.svelte';
 
   type Props = {
-    client: AxiosInstance,
     role: string|string[],
     title?: string,
-    store?: Writable<AuthStore>,
     companyId?: string,
     show?: boolean,
   };
   let {
-    client,
     role,
     title = 'Field Team Management',
-    store,
     companyId = $bindable(),
     show = $bindable(false),
   }:Props = $props();
+
+  const { auth: store, client } = Context.strict;
 
   let userList:User[] = $state([]);
   let max = $state(1);

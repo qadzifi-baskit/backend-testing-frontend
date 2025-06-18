@@ -6,6 +6,7 @@
   import FormWrapper from '../atoms/FormWrapper.svelte';
   import FormInput from '../atoms/FormInput.svelte';
   import SubmitButton from '../atoms/SubmitButton.svelte';
+  import { stringToast } from '@/lib/helper/toast';
 
   type Props = {
     client: AxiosInstance,
@@ -21,11 +22,14 @@
   const payload = $state({
     firstName: '',
     lastName: '',
-    phone: '',
+    phone: <string|undefined>undefined,
     email: <string|undefined>undefined,
+    password: '',
     companyName: '',
     subscriptionType: 'ENTERPRISE',
+    companyTypeId: <string|undefined>undefined,
   });
+  let showDetail = $state(false);
 
   function generateEmail() {
     payload.email = `${payload.firstName.replace(/\s+/g, '-').toLowerCase()}.` +
@@ -41,7 +45,7 @@
   });
 
   $effect(() => {
-    if (payload.phone.startsWith('0')) {
+    if (payload.phone?.startsWith('0')) {
       payload.phone = payload.phone.replace(/^0+/, '+62');
     }
   });
@@ -50,6 +54,23 @@
     ['ENTERPRISE', 'Enterprise'],
     ['FREE_TRIAL', 'Free Trial'],
   ];
+
+  function prehook(data: typeof payload) {
+    if (!data.phone && !data.email) {
+      stringToast('Please provide either phone or email.');
+      return;
+    }
+    if (!data.phone) {
+      data.phone = undefined;
+    }
+    if (!data.email) {
+      data.email = undefined;
+    }
+    if (!payload.companyTypeId) {
+      data.companyTypeId = undefined;
+    }
+    return data;
+  }
 </script>
 
 {#snippet content()}
@@ -57,6 +78,7 @@
     <FormWrapper
       {client}
       {payload}
+      {prehook}
       path="/auth/register"
     >
       <FormInput label="First Name" placeholder="first name" bind:value={payload.firstName}/>
@@ -67,8 +89,9 @@
         Show E-Mail
       </label>
       {#if showEmail}
-        <FormInput label="E-Mail" placeholder="email" bind:value={payload.email}/>
+        <FormInput label="E-Mail" placeholder="email" type="email" bind:value={payload.email}/>
       {/if}
+      <FormInput label="Password" type="password" placeholder="password" bind:value={payload.password} toggle/>
       <FormInput label="Company Name" placeholder="company name" bind:value={payload.companyName}/>
       <span class="fieldset-label">Subscription Type</span>
       <DropdownSelect
@@ -77,6 +100,10 @@
         bind:value={payload.subscriptionType}
       />
       <div class="fieldset-label my-2"></div>
+      <FormInput label="Details" type="checkbox" bind:checked={showDetail}/>
+      {#if showDetail}
+        <FormInput label="Company Type ID" placeholder="company type id" bind:value={payload.companyTypeId}/>
+      {/if}
       <SubmitButton/>
     </FormWrapper>
   </div>

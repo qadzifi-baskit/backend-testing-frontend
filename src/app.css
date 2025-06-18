@@ -28,6 +28,17 @@
   @apply table;
 }
 
+@utility wrap-line-column {
+  --webkit-line-clamp: 2;
+  display: -webkit-box;
+  line-clamp: var(--webkit-line-clamp);
+  -webkit-line-clamp: var(--webkit-line-clamp);
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 40ch;
+}
+
 html {
   height: 100%;
   scrollbar-gutter: auto;

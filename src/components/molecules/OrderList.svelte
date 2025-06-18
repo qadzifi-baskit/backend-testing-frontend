@@ -1,39 +1,37 @@
 <script lang="ts">
+  import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
-  import type { AuthStore, Order } from '@/types';
-  import type { AxiosInstance } from 'axios';
+  import type { Order } from '@/types';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidList, FaSolidPencil } from 'svelte-icons-pack/fa';
-  import type { Writable } from 'svelte/store';
   import Collapse from '../Collapse.svelte';
   import DatePicker from '../DatePicker.svelte';
   import Modal from '../Modal.svelte';
   import Table5 from '../Table5.svelte';
+  import FormInput from '../atoms/FormInput.svelte';
   import NoWrap from '../atoms/NoWrap.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import OrderDetail from './OrderDetail.svelte';
   import UpdateStatus from './UpdateStatus.svelte';
-  import FormInput from '../atoms/FormInput.svelte';
 
   type Props = {
     endpoint?: string,
-    client: AxiosInstance,
     userId?: string,
     orderType?: string|string[],
     companyId?: string,
-    store?: Writable<AuthStore>,
     show?: boolean,
   };
 
   let {
     endpoint = 'list-order',
-    client,
     userId = undefined,
     orderType = 'SHOP',
     companyId,
-    store,
     show = $bindable(false),
   }:Props = $props();
+
+  const store = Context.auth;
+  const { client } = Context.strict;
 
   let orderList:Order[] = $state([]);
   let page = $state(1);

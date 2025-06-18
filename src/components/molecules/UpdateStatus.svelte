@@ -43,11 +43,8 @@
           ),
         });
         break;
+      case OrderStatusEnum.ORDER_CREATED:
       case OrderStatusEnum.ORDER_PICKED_UP:
-        await client.patch(`/order/status/${id}`, {
-          orderStatus,
-        });
-        break;
       case OrderStatusEnum.ORDER_RECEIVED:
         await client.patch(`/order/status/${id}`, {
           orderStatus,

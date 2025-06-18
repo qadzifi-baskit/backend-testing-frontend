@@ -1,27 +1,23 @@
 <script lang="ts">
-  import type { AuthStore } from '@/types';
+  import { Context } from '@/lib/helper/context';
   import type { UserOffline } from '@/types/user';
-  import type { AxiosInstance } from 'axios';
-  import type { Writable } from 'svelte/store';
+  import NoWrap from '../atoms/NoWrap.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
   import AddUserOfflineModal from './AddUserOfflineModal.svelte';
-  import NoWrap from '../atoms/NoWrap.svelte';
 
   type Props = {
-    client: AxiosInstance,
-    store: Writable<AuthStore>,
     companyId: string,
     show?: boolean,
   };
   let {
-    client,
-    store,
     companyId = $bindable(''),
     show = $bindable(false),
   }:Props = $props();
   let userList:UserOffline[] = $state([]);
+
+  const { auth: store, client } = Context.strict;
 
   async function getCustomerOFflineList() {
     if (!$store.loggedIn) return;

@@ -17,7 +17,7 @@
   import { createAxiosInstance } from '@/lib/helper/axios.svelte';
   import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
-  import { SellerAdminStore } from '@/store/store';
+  import { createAuthStore } from '@/store/store';
   import type { Company } from '@/types';
   import type { AppConfig } from '@/types/app';
   import type { OrderContext, UserContext } from '@/types/context';
@@ -32,6 +32,7 @@
     config = 'host',
   }:Props = $props();
   let element:HTMLElement|undefined = $state();
+  const store = createAuthStore();
   const client = createAxiosInstance({ baseURL: host });
   const orderContext = writable<OrderContext>({
     paymentTypeList: [],
@@ -46,7 +47,7 @@
   Context.set('order', orderContext);
   Context.set('user', userContext);
   Context.set('client', client);
-  Context.set('auth', SellerAdminStore);
+  Context.set('auth', store);
 
   let clientType = $state('WEB_CMS');
   let username = $state('david@gmail.com');
@@ -55,9 +56,9 @@
   let selectedOrderType = $state(OrderTypeEnum.OFFLINE);
 
   async function getMyCompany() {
-    if (!$SellerAdminStore.loggedIn) return;
+    if (!$store.loggedIn) return;
     userContext.set({
-      id: $SellerAdminStore.userId,
+      id: $store.userId,
     });
     const response = await client.get('/users/me');
     if (response.status !== 200) return;
@@ -66,8 +67,8 @@
 
   let customerId:string|undefined = $state();
 
-  const getPaymentType = async () => {
-    if (!$SellerAdminStore.loggedIn) return;
+  async function getPaymentType() {
+    if (!$store.loggedIn) return;
     stringToast('Loading payment type...');
     const response = await client.get('/payment-type', {
       headers: {
@@ -98,47 +99,20 @@
 </script>
 
 <div bind:this={element} class="p-6">
-  <Config
-    bind:host
-    bind:clientType
-    show={config}
-    {client}
-  />
+  <Config bind:host bind:clientType show={config} {client}/>
   <div class="divider"></div>
-  <SellerRegister
-    {client}
-  />
+  <SellerRegister {client}/>
   <div class="divider"></div>
-  <Auth
-    store={SellerAdminStore}
-    {client}
-    bind:username
-    bind:password
-    bind:element
-  />
+  <Auth {store} {client} bind:username bind:password bind:element/>
   {#if companyId}
     <div class="divider"></div>
-    <FieldTeamManagement
-      {client}
-      role="SELLER_ADMIN"
-      {companyId}
-      title="Seller Admin Management"
-      store={SellerAdminStore}
-    />
+    <FieldTeamManagement role="SELLER_ADMIN" {companyId} title="Seller Admin Management"/>
     <div class="divider"></div>
-    <ProductManagement
-      store={SellerAdminStore}
-      {client}
-      {companyId}
-    />
+    <ProductManagement {companyId}/>
     <div class="divider"></div>
     <InventoryList {companyId}/>
     <div class="divider"></div>
-    <UserOfflineManagement
-      {client}
-      store={SellerAdminStore}
-      {companyId}
-    />
+    <UserOfflineManagement {companyId}/>
     <div class="divider"></div>
     <ExternalSalesManagament
       {client}
@@ -157,8 +131,6 @@
       <div class="divider divider-horizontal"></div>
       <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
         <BuyerCart
-          store={SellerAdminStore}
-          {client}
           bind:userId={customerId}
           {companyId}
           ordertype={orderTypeList}
@@ -172,13 +144,8 @@
       {companyId}
     />
     <div class="divider"></div>
-    <OrderList
-      {client}
-      store={SellerAdminStore}
-      {companyId}
-      orderType={orderTypeList}
-    />
+    <OrderList {companyId} orderType={orderTypeList}/>
     <div class="divider"></div>
-    <DocumentManagement {client}/>
+    <DocumentManagement/>
   {/if}
 </div>

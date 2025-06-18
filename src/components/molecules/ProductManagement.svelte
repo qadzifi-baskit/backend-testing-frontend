@@ -1,28 +1,23 @@
 <script lang="ts">
+  import { Context } from '@/lib/helper/context';
   import { debounce } from '@/lib/helper/util';
-  import type { AuthStore, ProductMaster } from '@/types';
-  import type { AxiosInstance } from 'axios';
+  import type { ProductMaster } from '@/types';
+  import type { AddInventoryOptions } from '@/types/inventory';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidCheck, FaSolidPlus } from 'svelte-icons-pack/fa';
-  import type { Writable } from 'svelte/store';
+  import NoWrap from '../atoms/NoWrap.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import Collapse from '../Collapse.svelte';
   import Table5 from '../Table5.svelte';
-  import AddProductModal from './AddProductModal.svelte';
   import AddInventoryModal from './AddInventoryModal.svelte';
-  import NoWrap from '../atoms/NoWrap.svelte';
-  import type { AddInventoryOptions } from '@/types/inventory';
+  import AddProductModal from './AddProductModal.svelte';
 
   type Props = {
-    client: AxiosInstance,
-    store: Writable<AuthStore>,
     companyId?: string,
     addOptions?: AddInventoryOptions,
     show?: boolean,
   };
   let {
-    client,
-    store,
     companyId = $bindable(),
     addOptions = {},
     show = $bindable(false),
@@ -31,6 +26,8 @@
     moq = 1,
     tierAmount = 4,
   } = addOptions;
+
+  const { auth: store, client } = Context.strict;
 
   let page = $state(1);
   let max = $state(1);

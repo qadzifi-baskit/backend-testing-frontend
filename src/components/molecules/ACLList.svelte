@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Context } from '@/lib/helper/context';
   import { debounce } from '@/lib/helper/util';
-  import { SuperAdminStore } from '@/store/store';
   import type { APIACLItem } from '@/types';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPencil } from 'svelte-icons-pack/fa';
@@ -23,7 +22,7 @@
     show = $bindable(),
   }:Props = $props();
 
-  const client = Context.getStrict('client');
+  const { client, auth: store } = Context.strict;
   const showMethod = $derived(typeof roleId === 'string' || roleId?.length === 1);
 
   let aclList:APIACLItem[] = $state([]);
@@ -33,7 +32,7 @@
   let selectedAclItem:APIACLItem|undefined = $state();
 
   const getACLList = async () => {
-    if (!$SuperAdminStore.loggedIn) {
+    if (!$store.loggedIn) {
       return;
     }
 

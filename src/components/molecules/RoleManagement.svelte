@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Context } from '@/lib/helper/context';
   import { debounce } from '@/lib/helper/util';
-  import { SuperAdminStore } from '@/store/store';
   import type { Role } from '@/types/user';
   import Collapse from '../Collapse.svelte';
   import Table5 from '../Table5.svelte';
@@ -12,7 +11,7 @@
   import Modal from '../Modal.svelte';
   import AclList from './ACLList.svelte';
 
-  const client = Context.getStrict('client');
+  const { client, auth: store } = Context.strict;
 
   let roleList:Role[] = $state([]);
   let page = $state(1);
@@ -20,7 +19,7 @@
   let search = $state('');
 
   async function getRoleList() {
-    if (!$SuperAdminStore.loggedIn) return;
+    if (!$store.loggedIn) return;
     const params = new URLSearchParams();
     params.append('search', search);
     params.append('$page', `${page}`);

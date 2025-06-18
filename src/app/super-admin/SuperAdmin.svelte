@@ -3,12 +3,13 @@
   import ApiList from '@/components/molecules/APIList.svelte';
   import Auth from '@/components/molecules/Auth.svelte';
   import Config from '@/components/molecules/Config.svelte';
+  import FeatureManagement from '@/components/molecules/FeatureManagement.svelte';
   import RoleManagement from '@/components/molecules/RoleManagement.svelte';
   import TranslationManagement from '@/components/molecules/TranslationManagement.svelte';
   import UserManagement from '@/components/molecules/UserManagement.svelte';
   import { createAxiosInstance } from '@/lib/helper/axios.svelte';
   import { Context } from '@/lib/helper/context';
-  import { SuperAdminStore } from '@/store/store';
+  import { createAuthStore } from '@/store/store';
   import type { AppConfig } from '@/types/app';
 
   type Props = {
@@ -21,8 +22,10 @@
   }: Props = $props();
 
   const client = createAxiosInstance({ baseURL: host });
+  const store = createAuthStore();
 
   Context.set('client', client);
+  Context.set('auth', store);
 
   let clientType = $state('WEB_CMS');
   let username = $state('super.admin@testing.com');
@@ -38,27 +41,23 @@
   />
   <div class="divider"></div>
   <Auth
-    store={SuperAdminStore}
+    {store}
     {client}
     bind:username
     bind:password
   />
-  {#if $SuperAdminStore.loggedIn}
+  {#if $store.loggedIn}
     <div class="divider"></div>
-    <ApiList
-      {client}
-    />
+    <ApiList/>
     <div class="divider"></div>
     <AclList/>
     <div class="divider"></div>
     <RoleManagement/>
     <div class="divider"></div>
-    <UserManagement
-      {client}
-    />
+    <UserManagement/>
     <div class="divider"></div>
-    <TranslationManagement
-      {client}
-    />
+    <TranslationManagement/>
+    <div class="divider"></div>
+    <FeatureManagement addfeature/>
   {/if}
 </div>

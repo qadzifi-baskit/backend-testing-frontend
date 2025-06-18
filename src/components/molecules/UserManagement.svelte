@@ -1,10 +1,9 @@
 <script lang="ts">
   import { listenAuthSuccess } from '@/event';
+  import { Context } from '@/lib/helper/context';
   import { debounce } from '@/lib/helper/util';
-  import { SuperAdminStore } from '@/store/store';
   import type { DropdownReturnType } from '@/types/component';
   import type { Role, User } from '@/types/user';
-  import type { AxiosInstance } from 'axios';
   import type { Snippet } from 'svelte';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPlus, FaSolidXmark } from 'svelte-icons-pack/fa';
@@ -14,10 +13,7 @@
   import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
 
-  type Props = {
-    client: AxiosInstance,
-  };
-  let { client }:Props = $props();
+  const { client, auth: store } = Context.strict;
 
   let userList:User[] = $state([]);
   let page = $state(1);
@@ -27,7 +23,7 @@
   let roleSearch = $state('');
 
   async function getUserList() {
-    if (!$SuperAdminStore.loggedIn) return;
+    if (!$store.loggedIn) return;
     const params = new URLSearchParams({
       search,
       $page: `${page}`,
@@ -61,7 +57,7 @@
   }
 
   async function getRoleList() {
-    if (!$SuperAdminStore.loggedIn) return;
+    if (!$store.loggedIn) return;
     const params = new URLSearchParams({
       search: roleSearch,
     });

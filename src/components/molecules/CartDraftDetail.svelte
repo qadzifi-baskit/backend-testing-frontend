@@ -77,10 +77,13 @@
     if (response.status !== 200) {
       return stringToast('Failed to load cart draft detail');
     }
-    Object.assign(newData, response.data.data);
-    newData.companyId = companyId;
-    Object.assign(oldData, response.data.data);
-    oldData.companyId = companyId;
+    const data:Partial<CartParent> = response.data.data;
+    data.companyId = companyId;
+    if (!data.customerData) {
+      data.customerData = defaultData.customerData;
+    }
+    Object.assign(newData, data);
+    Object.assign(oldData, data);
     return stringToast('Cart draft detail loaded');
   }
 
@@ -330,15 +333,17 @@
         <FormInput readonly type="text" label="Order Code" bind:value={newData.orderCode}/>
       {/if}
       <FormInput type="text" placeholder="ref code" label="Ref Code" bind:value={newData.refCode}/>
-      <FormInput type="text" placeholder="e-mail" label="E-Mail" bind:value={newData.customerData!.email}/>
-      <span class="fieldset-label font-bold mb-2">Billing Address</span>
-      {@render addressForm(newData.customerData!.billingAddress!)}
-      <span class="fieldset-label font-bold mb-2">Delivery Address</span>
-      <label class="label">
-        <input type="checkbox" bind:checked={sameAddress} class="checkbox">
-        Same Address
-      </label>
-      {@render addressForm(newData.customerData!.deliveryAddress!, sameAddress)}
+      {#if newData.customerData}
+        <FormInput type="text" placeholder="e-mail" label="E-Mail" bind:value={newData.customerData.email}/>
+        <span class="fieldset-label font-bold mb-2">Billing Address</span>
+        {@render addressForm(newData.customerData.billingAddress!)}
+        <span class="fieldset-label font-bold mb-2">Delivery Address</span>
+        <label class="label">
+          <input type="checkbox" bind:checked={sameAddress} class="checkbox">
+          Same Address
+        </label>
+        {@render addressForm(newData.customerData.deliveryAddress!, sameAddress)}
+      {/if}
       <FormInput type="number" placeholder="shipping cost" label="Shipping Cost" bind:value={newData.shippingCost}/>
       <FormInput type="number" placeholder="tax" label="Tax" bind:value={newData.tax}/>
       <SubmitButton/>

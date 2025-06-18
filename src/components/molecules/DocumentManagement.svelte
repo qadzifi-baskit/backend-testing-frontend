@@ -1,8 +1,8 @@
 <script lang="ts">
+  import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
   import { cancelableDebounce } from '@/lib/helper/util';
   import type { Document } from '@/types/document';
-  import type { AxiosInstance } from 'axios';
   import type { Snippet } from 'svelte';
   import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
@@ -14,15 +14,15 @@
   import ModifyDocumentModal from './ModifyDocumentModal.svelte';
 
   type Props = {
-    client: AxiosInstance,
     show?: boolean,
     entityid?: string,
   };
   let {
-    client,
     show = $bindable(false),
     entityid: targetEntityId = $bindable(),
   }: Props = $props();
+
+  const { client } = Context.strict;
 
   let entityId = $state('');
   let search = $state(''); 

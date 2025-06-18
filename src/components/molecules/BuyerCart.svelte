@@ -1,23 +1,20 @@
 <script lang="ts">
-  import { DeliveryTypeEnum, OrderTypeEnum } from '@/lib/enum';
+  import { OvereStockOrderTypeList } from '@/consts/order';
+  import { DeliveryTypeEnum, OrderStatusEnum, OrderTypeEnum } from '@/lib/enum';
   import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
-  import type { AuthStore, PaymentType, WarehouseDetail } from '@/types';
+  import type { PaymentType, WarehouseDetail } from '@/types';
   import type { Cart, CartParent, CartUpdatePayload } from '@/types/cart';
-  import type { AxiosInstance } from 'axios';
+  import type { CreateOrderPayload } from '@/types/order';
   import type { Snippet } from 'svelte';
   import { Icon } from 'svelte-icons-pack';
   import { FaFloppyDisk, FaTrashCan } from 'svelte-icons-pack/fa';
-  import type { Writable } from 'svelte/store';
+  import FormInput from '../atoms/FormInput.svelte';
   import Collapse from '../Collapse.svelte';
   import Table5 from '../Table5.svelte';
   import CartDraftDetail from './CartDraftDetail.svelte';
-  import { OvereStockOrderTypeList } from '@/consts/order';
-  import FormInput from '../atoms/FormInput.svelte';
 
   type Props = {
-    client: AxiosInstance,
-    store?: Writable<AuthStore>,
     userId?: string,
     cartCode?: string,
     companyId?: string,
@@ -34,8 +31,6 @@
     deliveryType?: DeliveryTypeEnum,
   };
   let {
-    client,
-    store,
     userId = $bindable(),
     cartCode = $bindable(),
     companyId = $bindable(),
@@ -52,6 +47,9 @@
 
   const orderContext = Context.get('order');
   const cartData:Record<string, Partial<Cart>> = {};
+  const store = Context.strict.auth;
+  const client = Context.strict.client;
+
   let paymentTypeList:PaymentType[] = $state([]);
   let cartList:Cart[] = $state([]);
   let subTotal = $state(0);
@@ -72,9 +70,22 @@
     if (!$store || !$store.loggedIn) return;
     stringToast('Creating order...');
     const processedCart = prehook ? await prehook(cartList) : cartList;
-    const addedData: Record<string, unknown> = {};
-    if (selectedOrderType === OrderTypeEnum.SELLER_PURCHASE_ORDER && linkedOrderId) {
-      addedData.linkedOrderId = linkedOrderId;
+    const addedData:CreateOrderPayload = {};
+    if (selectedOrderType === OrderTypeEnum.SELLER_PURCHASE_ORDER) {
+      addedData.status = OrderStatusEnum.WAITING_FOR_CONFIRMATION;
+
+      if (linkedOrderId) {
+        addedData.linkedOrderId = linkedOrderId;
+      }
+    }
+    if (selectedOrderType === OrderTypeEnum.SELLER_SALES_ORDER) {
+      const totalNeededQty = processedCart.reduce(
+        (acc, curr) => acc + (curr.neededQty ?? 0),
+        0,
+      );
+      if (totalNeededQty > 0) {
+        addedData.status = OrderStatusEnum.WAITING_FOR_CONFIRMATION;
+      }
     }
     const response = await client.post('/order', {
       companyId,
@@ -282,13 +293,13 @@
     </div>
   {/snippet}
   <button class="btn not-hover:bg-slate-600" onclick={getCart}>Get Cart</button>
-  <Table5
-    itemList={cartList}
-  >
+  <Table5 itemList={cartList} pincols>
     {#snippet header()}
       <td>Qty</td>
-      {#if OvereStockOrderTypeList.includes(selectedOrderType)}
+      {#if selectedOrderType === OrderTypeEnum.SELLER_SALES_ORDER}
         <td>Needed Qty</td>
+      {/if}
+      {#if OvereStockOrderTypeList.includes(selectedOrderType)}
         <td>Initial Price</td>
         <td>Price</td>
         <td>Discount</td>
@@ -297,8 +308,6 @@
         <td>Tax</td>
         <td>Selling Price</td>
       {/if}
-      <td></td>
-      <td></td>
       {#if !OvereStockOrderTypeList.includes(selectedOrderType)}
         <td>Initial Price</td>
         <td>Tier Price</td>
@@ -306,16 +315,19 @@
       {/if}
       <td>Warehouse</td>
       <td>Name</td>
+      <th></th>
     {/snippet}
 
     {#snippet content(cart: Cart)}
       <td>
         <input type="number" bind:value={cartData[cart.id].qty} class="input input-bordered w-24 max-w-xs">
       </td>
-      {#if OvereStockOrderTypeList.includes(selectedOrderType)}
+      {#if selectedOrderType === OrderTypeEnum.SELLER_SALES_ORDER}
         <td>
           <input type="number" bind:value={cartData[cart.id].neededQty} class="input input-bordered w-24 max-w-xs">
         </td>
+      {/if}
+      {#if OvereStockOrderTypeList.includes(selectedOrderType)}
         <td>
           <input type="number" readonly value={cart.initialPrice} class="input input-bordered w-24 max-w-xs">
         </td>
@@ -338,29 +350,21 @@
           <input type="number" readonly bind:value={cartData[cart.id].sellingPrice} class="input input-bordered w-24 max-w-xs">
         </td>
       {/if}
-      <td>
-        <button
-          onclick={() => updateCart(cart.id)}
-          class="btn btn-secondary"
-        >
-          <Icon src={FaFloppyDisk}/>
-        </button>
-      </td>
-      <td>
-        <button
-          onclick={() => deleteCart(cart.id)}
-          class="btn btn-secondary"
-        >
-          <Icon src={FaTrashCan}/>
-        </button>
-      </td>
       {#if !OvereStockOrderTypeList.includes(selectedOrderType)}
         <td>{cart.initialPrice}</td>
         <td>{cart.tierPrice}</td>
         <td>{cart.sellingPrice}</td>
       {/if}
       <td>{cart.warehouse}</td>
-      <td>{cart.fullName}</td>
+      <td><span class="wrap-line-column">{cart.fullName}</span></td>
+      <th class="flex gap-1">
+        <button onclick={() => updateCart(cart.id)} class="btn btn-secondary">
+          <Icon src={FaFloppyDisk}/>
+        </button>
+        <button onclick={() => deleteCart(cart.id)} class="btn btn-secondary">
+          <Icon src={FaTrashCan}/>
+        </button>
+      </th>
     {/snippet}
   </Table5>
   <div class="overflow-x-auto">

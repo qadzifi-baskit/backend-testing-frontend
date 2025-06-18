@@ -24,6 +24,7 @@
     prehook?: (data: DataType) => PrehookReturn|Promise<PrehookReturn>,
     onsuccess?: (data: ResponseType) => void,
     params?: URLSearchParams,
+    validateStatus?: boolean|null|((status: number) => boolean),
   };
   let {
     client,
@@ -36,6 +37,7 @@
     prehook,
     onsuccess,
     params = $bindable(),
+    validateStatus,
   }:Props = $props();
 
   export function trigger() {
@@ -64,6 +66,13 @@
     }
     if (params) {
       config.params = params;
+    }
+    if (validateStatus !== undefined) {
+      if (typeof validateStatus === 'boolean') {
+        config.validateStatus = () => validateStatus;
+      } else {
+        config.validateStatus = validateStatus;
+      }
     }
     stringToast('Submitting...');
     const response = await client(config);

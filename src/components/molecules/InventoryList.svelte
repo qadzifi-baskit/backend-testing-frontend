@@ -270,7 +270,7 @@
             </button>
           </td>
         {/if}
-        <td>{item.fullName}</td>
+        <td><span class="wrap-line-column">{item.fullName}</span></td>
       {/snippet}
     </Table5>
   {/if}

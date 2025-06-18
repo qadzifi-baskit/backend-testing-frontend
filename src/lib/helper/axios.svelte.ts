@@ -41,7 +41,7 @@ export function createAxiosInstance(
     },
   );
 
-  instance.defaults.validateStatus = () => true;
+  // instance.defaults.validateStatus = () => true;
 
   return instance;
 }

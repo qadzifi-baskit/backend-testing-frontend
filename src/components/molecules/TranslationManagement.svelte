@@ -1,13 +1,11 @@
 <script lang="ts">
+  import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
-  import { SuperAdminStore } from '@/store/store';
-  import type { AuthStore } from '@/types';
+  import { debounce } from '@/lib/helper/util';
   import type { Translation } from '@/types/translation';
-  import type { AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPencil } from 'svelte-icons-pack/fa';
   import { LuFileJson } from 'svelte-icons-pack/lu';
-  import type { Writable } from 'svelte/store';
   import NoWrap from '../atoms/NoWrap.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import Collapse5 from '../Collapse5.svelte';
@@ -15,16 +13,8 @@
   import AddTranslationModal from './AddTranslationModal.svelte';
   import ModifyTranslationModal from './ModifyTranslationModal.svelte';
   import ViewTranslationObjectModal from './ViewTranslationObjectModal.svelte';
-  import { debounce } from '@/lib/helper/util';
 
-  type Props = {
-    client: AxiosInstance,
-    store?: Writable<AuthStore>,
-  };
-  let {
-    client,
-    store = SuperAdminStore,
-  }: Props = $props();
+  const { client, auth: store } = Context.strict;
 
   let langList:string[] = $state([]);
   let platformList:string[] = $state([]);
