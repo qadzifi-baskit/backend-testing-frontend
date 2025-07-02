@@ -1,49 +1,94 @@
 <script lang="ts">
+  import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
-  import type { AuthStore } from '@/types';
   import type { Tutorial } from '@/types/tutorial';
-  import type { AxiosInstance } from 'axios';
   import type { Snippet } from 'svelte';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPencil, FaSolidTrash } from 'svelte-icons-pack/fa';
-  import type { Writable } from 'svelte/store';
   import NoWrap from '../atoms/NoWrap.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
   import AddTutorialModal from './AddTutorialModal.svelte';
   import ModifyTutorialModal from './ModifyTutorialModal.svelte';
+  import { cancelableDebounce } from '@/lib/helper/util';
 
   type Props = {
-    client: AxiosInstance,
-    store: Writable<AuthStore>,
+    ownerId?: string;
+    referenceId?: string;
+    show?: boolean;
   };
   let {
-    client,
-    store,
+    ownerId = $bindable(),
+    referenceId = $bindable(),
+    show = $bindable(),
   }: Props = $props();
 
+  const { client, auth } = Context.strict;
+
   let search = $state('');
-  let page = $state(1);
-  let max = $state(1);
   let completedBy = $state('');
+  let page = $state(1);
+  let limit = $state(10);
+  let max = $state(1);
+
+  $effect(() => {
+    search;
+    completedBy;
+    ownerId;
+    referenceId;
+    limit;
+    page = 1;
+  });
 
   let tutorialList = $state([]);
 
-  async function reloadData() {
-    if (!$store.loggedIn) {
+  export async function reloadData() {
+    if (!$auth.loggedIn) {
       return stringToast('Not logged in');
     }
-    const params = new URLSearchParams();
+    const params = new URLSearchParams({
+      search,
+      $page: `${page}`,
+      $limit: `${limit}`,
+    });
     if (completedBy !== '') {
       params.append('completedBy', completedBy);
+    }
+    if (ownerId) {
+      params.append('ownerId', ownerId);
+    }
+    if (referenceId) {
+      params.append('referenceId', referenceId);
     }
     const response = await client.get('/tutorial', { params });
     if (response.status !== 200) {
       return stringToast('Failed to load data');
     }
     tutorialList = response.data?.data ?? [];
+    max = response.data?.totalPage ?? 0;
   }
+
+  const deferReload = () => setTimeout(reloadData);
+  const [debounceReload] = cancelableDebounce(deferReload);
+
+  $effect(() => {
+    if (show) {
+      deferReload();
+    }
+  });
+  $effect(() => {
+    if (show) {
+      search;
+      completedBy;
+      ownerId;
+      referenceId;
+      limit;
+      page;
+      debounceReload();
+    }
+  });
+
 
   let addTutorialDialog:HTMLDialogElement|undefined = $state();
   function showAddModal() {
@@ -60,7 +105,7 @@
   }
 
   async function deleteTutorial(id: string) {
-    if (!$store.loggedIn) {
+    if (!$auth.loggedIn) {
       return stringToast('Not logged in');
     }
     const response = await client.delete(`/tutorial/${id}`);
@@ -69,12 +114,14 @@
     }
     await reloadData();
   }
+
+  $inspect({ limit });
 </script>
 
 <AddTutorialModal
   bind:dialog={addTutorialDialog}
   {client}
-  {store}
+  store={auth}
   onsuccess={reloadData}
 />
 <ModifyTutorialModal
@@ -85,11 +132,13 @@
 />
 <Collapse5
   title="Tutorial Management"
+  bind:show
 >
   <PaginationNavigationPanel
     bind:search
     bind:page
     bind:max
+    bind:limit
     onreload={reloadData}
     onadd={showAddModal}
   />
@@ -117,6 +166,8 @@
         <col>
         <col>
         <col>
+        <col>
+        <col>
         <col class="max-w-fit">
       </colgroup>
     {/snippet}
@@ -124,6 +175,8 @@
     {#snippet header()}
       <th>Completed</th>
       <td>Id</td>
+      <td>Owner Id</td>
+      <td>Reference Id</td>
       <td></td>
       <td>Name</td>
       <td>Title</td>
@@ -136,7 +189,9 @@
       <th>
         <input disabled type="checkbox" checked={tutorial.completed} class="checkbox"/>
       </th>
-      <td><NoWrap>{tutorial.id}</NoWrap></td>
+      <td><NoWrap><code>{tutorial.id}</code></NoWrap></td>
+      <td><NoWrap><code>{tutorial.ownerId}</code></NoWrap></td>
+      <td><NoWrap><code>{tutorial.referenceId}</code></NoWrap></td>
       <td>
         <button class="btn btn-secondary"
           onclick={modifyTutorial(tutorial)}

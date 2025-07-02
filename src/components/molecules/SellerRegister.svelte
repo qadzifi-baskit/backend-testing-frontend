@@ -84,10 +84,7 @@
       <FormInput label="First Name" placeholder="first name" bind:value={payload.firstName}/>
       <FormInput label="Last Name" placeholder="last name" bind:value={payload.lastName}/>
       <FormInput label="Phone" placeholder="phone" bind:value={payload.phone}/>
-      <label class="label fieldset-label mb-2">
-        <input type="checkbox" bind:checked={showEmail} class="checkbox"/>
-        Show E-Mail
-      </label>
+      <FormInput label="Show E-Mail" type="checkbox" bind:checked={showEmail}/>
       {#if showEmail}
         <FormInput label="E-Mail" placeholder="email" type="email" bind:value={payload.email}/>
       {/if}

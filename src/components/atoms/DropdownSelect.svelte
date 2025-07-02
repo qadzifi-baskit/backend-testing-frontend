@@ -1,4 +1,4 @@
-<script lang="ts" generics="VT, LT">
+<script lang="ts" generics="VT, LT, DT">
   import { cn } from '@/lib/helper/tailwind';
   import SearchField from './SearchField.svelte';
   import type { Snippet } from 'svelte';
@@ -10,6 +10,8 @@
   type ValueType = VT;
   // eslint-disable-next-line no-undef
   type LabelType = LT;
+  // eslint-disable-next-line no-undef
+  type DisplayType = DT;
 
   type Display = 'VALUE'|'LABEL';
 
@@ -17,7 +19,7 @@
 
   type Props = {
     class?: string,
-    options?: [ValueType, LabelType][],
+    options?: [ValueType, LabelType, DisplayType?][],
     placeholder?: string|Snippet,
     search?: string,
     value?: ValueType,
@@ -166,3 +168,8 @@
     </ul>
   {/if}
 </details>
+{#if options.reduce((acc, curr) => Math.max(acc, curr.length), 0) > 2}
+  <div>
+    {options.find(([value]) => value === selectValue)?.[2] || ''}
+  </div>
+{/if}

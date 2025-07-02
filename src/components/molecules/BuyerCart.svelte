@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { OvereStockOrderTypeList } from '@/consts/order';
+  import { OverStockOrderTypeList } from '@/consts/order';
   import { DeliveryTypeEnum, OrderStatusEnum, OrderTypeEnum } from '@/lib/enum';
   import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
@@ -47,8 +47,7 @@
 
   const orderContext = Context.get('order');
   const cartData:Record<string, Partial<Cart>> = {};
-  const store = Context.strict.auth;
-  const client = Context.strict.client;
+  const { client, auth } = Context.strict;
 
   let paymentTypeList:PaymentType[] = $state([]);
   let cartList:Cart[] = $state([]);
@@ -67,7 +66,7 @@
   }
 
   const createOrder = async () => {
-    if (!$store || !$store.loggedIn) return;
+    if (!$auth || !$auth.loggedIn) return;
     stringToast('Creating order...');
     const processedCart = prehook ? await prehook(cartList) : cartList;
     const addedData:CreateOrderPayload = {};
@@ -87,12 +86,22 @@
         addedData.status = OrderStatusEnum.WAITING_FOR_CONFIRMATION;
       }
     }
+    const totalQty = processedCart.reduce(
+      (acc, curr) => acc + (curr.neededQty ?? 0),
+      0,
+    );
+    let status:OrderStatusEnum = OrderStatusEnum.ORDER_CREATED;
+    if (totalQty > 0) {
+      status = OrderStatusEnum.WAITING_FOR_CONFIRMATION;
+    }
+
     const response = await client.post('/order', {
       companyId,
       paymentTypeId,
       deliveryType,
       cartCode,
       orderType: selectedOrderType,
+      status,
       ...addedData,
       product: processedCart.map((value) => ({
         cartId: value.id,
@@ -113,14 +122,14 @@
   };
 
   async function getCart() {
-    if (!$store || !$store.loggedIn) return;
+    if (!$auth || !$auth.loggedIn) return;
     stringToast('Loading cart...');
     const params = new URLSearchParams();
     if (selectedOrderType) {
       params.append('orderType', selectedOrderType);
     }
-    if ($store.userId) {
-      params.append('createdBy', $store.userId);
+    if ($auth.userId) {
+      params.append('createdBy', $auth.userId);
     }
     if (cartCode) {
       params.append('cartCode', cartCode);
@@ -186,7 +195,7 @@
   };
 
   const updateCart = async (cartId: string) => {
-    if (!store || $store?.loggedIn === false) return;
+    if (!auth || $auth?.loggedIn === false) return;
     stringToast('Updating cart...');
     const data = cartData[cartId];
     const payload:CartUpdatePayload = {};
@@ -231,7 +240,7 @@
     getCart();
   };
   async function deleteCart(cartId: string) {
-    if (!$store || !$store.loggedIn) return;
+    if (!$auth || !$auth.loggedIn) return;
     stringToast('Deleting cart...');
     const response = await client.delete(`/cart/${cartId}`);
     if (response.status !== 200) return stringToast('Failed to delete cart');
@@ -240,9 +249,9 @@
   }
 
   const updateCartMemberLevel = async () => {
-    if (!$store || !$store.loggedIn) return;
+    if (!$auth || !$auth.loggedIn) return;
     const params = new URLSearchParams();
-    params.append('createdBy', $store.userId);
+    params.append('createdBy', $auth.userId);
     const response = await client.patch('/cart', {
       memberLevel,
     }, { params });
@@ -299,7 +308,7 @@
       {#if selectedOrderType === OrderTypeEnum.SELLER_SALES_ORDER}
         <td>Needed Qty</td>
       {/if}
-      {#if OvereStockOrderTypeList.includes(selectedOrderType)}
+      {#if OverStockOrderTypeList.includes(selectedOrderType)}
         <td>Initial Price</td>
         <td>Price</td>
         <td>Discount</td>
@@ -308,7 +317,7 @@
         <td>Tax</td>
         <td>Selling Price</td>
       {/if}
-      {#if !OvereStockOrderTypeList.includes(selectedOrderType)}
+      {#if !OverStockOrderTypeList.includes(selectedOrderType)}
         <td>Initial Price</td>
         <td>Tier Price</td>
         <td>Selling Price</td>
@@ -327,7 +336,7 @@
           <input type="number" bind:value={cartData[cart.id].neededQty} class="input input-bordered w-24 max-w-xs">
         </td>
       {/if}
-      {#if OvereStockOrderTypeList.includes(selectedOrderType)}
+      {#if OverStockOrderTypeList.includes(selectedOrderType)}
         <td>
           <input type="number" readonly value={cart.initialPrice} class="input input-bordered w-24 max-w-xs">
         </td>
@@ -350,7 +359,7 @@
           <input type="number" readonly bind:value={cartData[cart.id].sellingPrice} class="input input-bordered w-24 max-w-xs">
         </td>
       {/if}
-      {#if !OvereStockOrderTypeList.includes(selectedOrderType)}
+      {#if !OverStockOrderTypeList.includes(selectedOrderType)}
         <td>{cart.initialPrice}</td>
         <td>{cart.tierPrice}</td>
         <td>{cart.sellingPrice}</td>

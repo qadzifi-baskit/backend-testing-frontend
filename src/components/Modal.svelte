@@ -4,6 +4,7 @@
   import type { HTMLDialogToggleEvent } from '@/types/event';
   import type { Snippet } from 'svelte';
   import type { EventHandler, ToggleEventHandler } from 'svelte/elements';
+  import FloatingBadge from './atoms/FloatingBadge.svelte';
 
   type Props = {
     title?: string,
@@ -45,9 +46,7 @@
 >
   <div class="modal-box p-4 h-full w-full max-w-[unset]">
     {#if title}
-      <div class="sticky z-10 h-0 float-right top-0">
-        <div class="badge badge-primary">{title}</div>
-      </div>
+      <FloatingBadge>{title}</FloatingBadge>
     {/if}
     {@render children?.()}
   </div>

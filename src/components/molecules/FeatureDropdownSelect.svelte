@@ -1,16 +1,14 @@
 <script lang="ts">
   import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
-  import type { User } from '@/types/user';
+  import { cancelableDebounce } from '@/lib/helper/util';
+  import type { EntityCategory } from '@/types/entityCategory';
   import type { Snippet } from 'svelte';
   import DropdownSelect from '../atoms/DropdownSelect.svelte';
-  import { cancelableDebounce } from '@/lib/helper/util';
 
   type Props = {
-    value?: string,
+    value?: string|null,
     search?: string,
-    sellerId?: string,
-    roleName?: string|string[],
     page?: number,
     limit?: number,
     placeholder?: string,
@@ -19,19 +17,17 @@
 
   let {
     value = $bindable(),
-    roleName,
-    sellerId = $bindable(),
     search = $bindable(''),
     page = 1,
     limit = 10,
-    placeholder = $bindable('User'),
-    label = placeholder,
+    placeholder = $bindable('Feature'),
+    label,
   }: Props = $props();
 
   const { client } = Context.strict;
 
   let show = $state(false);
-  let userList:User[] = $state([]);
+  let featureList:EntityCategory[] = $state([]);
 
   async function getUserList() {
     const params = new URLSearchParams({
@@ -39,19 +35,9 @@
       $limit: `${limit}`,
       search,
     });
-    if (typeof roleName === 'string') {
-      params.append('roleName', roleName);
-    } else if (Array.isArray(roleName)) {
-      roleName.forEach((name) => {
-        params.append('roleName', name);
-      });
-    }
-    if (sellerId) {
-      params.append('sellerId', sellerId);
-    }
-    const response = await client.get('/users', { params });
+    const response = await client.get('/feature', { params });
     if (response.status !== 200) return stringToast('Failed get user');
-    userList = response.data.data ?? [];
+    featureList = response.data.data ?? [];
   }
 
   const [debounce, cancel] = cancelableDebounce(getUserList);
@@ -69,7 +55,7 @@
   {#if typeof label === 'string'}
     <span class="fieldset-label mb-2 capitalize">{label}</span>
   {:else}
-    {@render label()}
+    {@render label?.()}
   {/if}
   <DropdownSelect
     bind:search
@@ -78,10 +64,9 @@
     display="LABEL"
     bind:value
     default={null}
-    options={userList.map((user) => [
-      user.id,
-      `${user.profile?.firstName ?? '-'} ${user.profile?.lastName ?? '-'} | ${user.email || '-'}`,
-      user.email,
+    options={featureList.map((feature) => [
+      feature.id,
+      feature.name,
     ])}
   />
 </fieldset>

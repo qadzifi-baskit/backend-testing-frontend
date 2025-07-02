@@ -10,7 +10,6 @@
     onsuccess?: (data: unknown) => void;
   };
   let {
-    client,
     dialog = $bindable(),
     onsuccess,
   }: Props = $props();
@@ -38,7 +37,6 @@
     <FormWrapper
       class="*:mb-2"
       path="/api"
-      {client}
       {payload}
       onsuccess={onAdded}
     >

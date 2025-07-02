@@ -2,6 +2,7 @@
   import Auth from '@/components/molecules/Auth.svelte';
   import CategoryManagement from '@/components/molecules/CategoryManagement.svelte';
   import CompanyTypeManagement from '@/components/molecules/CompanyTypeManagement.svelte';
+  import CompanyUserManagement from '@/components/molecules/CompanyUserManagement.svelte';
   import Config from '@/components/molecules/Config.svelte';
   import EntityCategoryManagement from '@/components/molecules/EntityCategoryManagement.svelte';
   import InventoryList from '@/components/molecules/InventoryList.svelte';
@@ -51,15 +52,13 @@
   />
   {#if $BaskitAdminStore.loggedIn}
     <div class="divider"></div>
+    <CompanyUserManagement/>
+    <div class="divider"></div>
     <CategoryManagement {client} store={BaskitAdminStore}/>
     <div class="divider"></div>
-    <OrderList
-      {client}
-      store={BaskitAdminStore}
-      orderType={[OrderTypeEnum.SHOP, OrderTypeEnum.ONLINE]}
-    />
+    <OrderList orderType={[OrderTypeEnum.SHOP, OrderTypeEnum.ONLINE]}/>
     <div class="divider"></div>
-    <ProductManagement {client} store={BaskitAdminStore} />
+    <ProductManagement/>
     <div class="divider"></div>
     <InventoryList/>
     <div class="divider"></div>
@@ -67,7 +66,7 @@
     <div class="divider"></div>
     <CompanyTypeManagement {client}/>
     <div class="divider"></div>
-    <TutorialManagement {client} store={BaskitAdminStore}/>
+    <TutorialManagement/>
     <div class="divider"></div>
     <EntityCategoryManagement addcategory modify/>
   {/if}

@@ -32,7 +32,7 @@
     config = 'host',
   }:Props = $props();
   let element:HTMLElement|undefined = $state();
-  const store = createAuthStore();
+  const auth = createAuthStore();
   const client = createAxiosInstance({ baseURL: host });
   const orderContext = writable<OrderContext>({
     paymentTypeList: [],
@@ -47,7 +47,7 @@
   Context.set('order', orderContext);
   Context.set('user', userContext);
   Context.set('client', client);
-  Context.set('auth', store);
+  Context.set('auth', auth);
 
   let clientType = $state('WEB_CMS');
   let username = $state('david@gmail.com');
@@ -56,19 +56,20 @@
   let selectedOrderType = $state(OrderTypeEnum.OFFLINE);
 
   async function getMyCompany() {
-    if (!$store.loggedIn) return;
+    if (!$auth.loggedIn) return;
     userContext.set({
-      id: $store.userId,
+      id: $auth.userId,
     });
     const response = await client.get('/users/me');
     if (response.status !== 200) return;
     companyId = (<Company[]|undefined>response.data?.data?.companies)?.[0]?.id ?? '';
+    console.log({ companyId });
   }
 
   let customerId:string|undefined = $state();
 
   async function getPaymentType() {
-    if (!$store.loggedIn) return;
+    if (!$auth.loggedIn) return;
     stringToast('Loading payment type...');
     const response = await client.get('/payment-type', {
       headers: {
@@ -103,7 +104,7 @@
   <div class="divider"></div>
   <SellerRegister {client}/>
   <div class="divider"></div>
-  <Auth {store} {client} bind:username bind:password bind:element/>
+  <Auth store={auth} {client} bind:username bind:password bind:element/>
   {#if companyId}
     <div class="divider"></div>
     <FieldTeamManagement role="SELLER_ADMIN" {companyId} title="Seller Admin Management"/>

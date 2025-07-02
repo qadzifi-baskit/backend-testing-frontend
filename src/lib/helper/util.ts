@@ -23,15 +23,21 @@ export function cancelableDebounce<
   callback: (...args: ArgType) => ReturnType,
   delay = 300,
 ) {
-  let timeoutId: NodeJS.Timeout;
-  const cancelCallback = () => clearTimeout(timeoutId);
+  const data = {
+    timeoutId: null as NodeJS.Timeout | null,
+    cancelCallback: null as (() => void) | null,
+    debouncedCallback: null as ((...args: ArgType) => void) | null,
+  };
+  const cancelCallback = () => data.timeoutId && clearTimeout(data.timeoutId);
   const debouncedCallback = (...args: ArgType) => {
     cancelCallback();
-    timeoutId = setTimeout(() => {
+    data.timeoutId = setTimeout(() => {
       callback(...args);
     }, delay);
   };
-  return [debouncedCallback, cancelCallback] as const;
+  data.cancelCallback = cancelCallback;
+  data.debouncedCallback = debouncedCallback;
+  return [debouncedCallback, cancelCallback, data] as const;
 }
 
 export function toURLStringEntries(data: Record<string, unknown>): Entry[] {
@@ -57,7 +63,7 @@ export function isObjectEmpty(item: unknown) {
   return true;
 }
 
-export function isNil(value: unknown) {
+export function isNil(value: unknown): value is null | undefined | void {
   return value === undefined || value === null;
 }
 

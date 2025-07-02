@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
-  import type { User } from '@/types/user';
+  import type { Company } from '@/types';
   import type { Snippet } from 'svelte';
   import DropdownSelect from '../atoms/DropdownSelect.svelte';
   import { cancelableDebounce } from '@/lib/helper/util';
@@ -19,42 +19,37 @@
 
   let {
     value = $bindable(),
-    roleName,
     sellerId = $bindable(),
     search = $bindable(''),
     page = 1,
     limit = 10,
-    placeholder = $bindable('User'),
+    placeholder = $bindable('Company'),
     label = placeholder,
   }: Props = $props();
 
   const { client } = Context.strict;
 
   let show = $state(false);
-  let userList:User[] = $state([]);
+  let companyList:Company[] = $state([]);
 
-  async function getUserList() {
+  async function getCompanyList() {
     const params = new URLSearchParams({
       $page: `${page}`,
       $limit: `${limit}`,
       search,
     });
-    if (typeof roleName === 'string') {
-      params.append('roleName', roleName);
-    } else if (Array.isArray(roleName)) {
-      roleName.forEach((name) => {
-        params.append('roleName', name);
-      });
-    }
+    ['SELLER', 'BASKIT', 'BRAND', 'CHANNEL'].forEach(
+      (companyType) => params.append('companyType', companyType),
+    );
     if (sellerId) {
       params.append('sellerId', sellerId);
     }
-    const response = await client.get('/users', { params });
-    if (response.status !== 200) return stringToast('Failed get user');
-    userList = response.data.data ?? [];
+    const response = await client.get('/company/seller', { params });
+    if (response.status !== 200) return stringToast('Failed get company');
+    companyList = response.data.data ?? [];
   }
 
-  const [debounce, cancel] = cancelableDebounce(getUserList);
+  const [debounce, cancel] = cancelableDebounce(getCompanyList);
 
   $effect(() => {
     if (show) {
@@ -77,11 +72,9 @@
     bind:placeholder
     display="LABEL"
     bind:value
-    default={null}
-    options={userList.map((user) => [
-      user.id,
-      `${user.profile?.firstName ?? '-'} ${user.profile?.lastName ?? '-'} | ${user.email || '-'}`,
-      user.email,
+    options={companyList.map((company) => [
+      company.id,
+      company.companyName,
     ])}
   />
 </fieldset>

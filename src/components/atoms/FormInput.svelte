@@ -1,6 +1,8 @@
 <script lang="ts" generics="T">
   import { cn } from '@/lib/helper/tailwind';
   import type { Snippet } from 'svelte';
+  import { Icon } from 'svelte-icons-pack';
+  import { AiOutlineEye, AiOutlineEyeInvisible } from 'svelte-icons-pack/ai';
   import type { HTMLInputTypeAttribute } from 'svelte/elements';
 
   // eslint-disable-next-line no-undef
@@ -42,16 +44,23 @@
     toggle = false,
     show = $bindable(false),
   }: Props = $props();
+
+  const isError = Boolean(error);
+  const isCheckbox = inputType === 'checkbox';
 </script>
 
-{#if typeof label === 'string'}
-  <span class="fieldset-label mb-2">{label}</span>
-{:else}
-  {@render label()}
+{#if inputType !== 'checkbox'}
+  {#if typeof label === 'string'}
+    <span class="fieldset-label mb-2">{label}</span>
+  {:else}
+    {@render label()}
+  {/if}
 {/if}
 <label class={cn(
-  !error && 'input flex',
-  inputType !== 'checkbox' && 'p-0 gap-0 w-full max-w-xs mb-2',
+  'mb-2',
+  !error && 'flex',
+  inputType !== 'checkbox' && 'p-0 gap-0 w-full max-w-xs',
+  !isCheckbox && !isError && 'input',
   clazz,
 )}>
   {#if input}
@@ -85,7 +94,8 @@
         class={cn(
           'px-4 w-full',
           {
-            'input validator': Boolean(error),
+            'validator': isError,
+            'input': inputType !== 'password' && isError,
           },
         )}
       />
@@ -99,6 +109,17 @@
     {@render error()}
   {/if}
   {#if toggle}
-    <input type="checkbox" class="checkbox bg-transparent! mr-4" bind:checked={show}/>
+    <label class="absolute right-2 grid place-items-center hover:cursor-pointer">
+      <input type="checkbox" class="checkbox peer invisible" bind:checked={show}/>
+      <Icon className="absolute hidden peer-checked:block" src={AiOutlineEye} size="1.5em"/>
+      <Icon className="absolute peer-checked:hidden" src={AiOutlineEyeInvisible} size="1.5em"/>
+    </label>
+  {/if}
+  {#if inputType === 'checkbox'}
+    {#if typeof label === 'string'}
+      <span class="ml-2 fieldset-label">{label}</span>
+    {:else}
+      {@render label()}
+    {/if}
   {/if}
 </label>

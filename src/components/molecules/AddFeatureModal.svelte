@@ -34,6 +34,7 @@
 
 <Modal
   bind:dialog
+  title="Add Feature"
 >
   <div
     class="flex flex-col items-start w-full h-full"

@@ -10,6 +10,7 @@
   let {
     search = $bindable(),
     max = $bindable(1),
+    limit = $bindable(10),
     page = $bindable(),
     sort = $bindable(null),
     order = $bindable('ASC'),
@@ -44,6 +45,7 @@
   <PaginationFancyButton
     bind:max
     bind:value={page}
+    bind:limit
   />
 {/if}
 {#if sortOptions.length > 0}

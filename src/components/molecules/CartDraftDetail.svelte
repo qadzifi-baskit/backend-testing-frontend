@@ -5,7 +5,6 @@
   import { getObjectDiff, isNil } from '@/lib/helper/util';
   import type { Cart, CartDraftUser, CartDraftUserAddress, CartParent } from '@/types/cart';
   import type { User, UserOffline } from '@/types/user';
-  import AreaSelectInput from '../atoms/AreaSelectInput.svelte';
   import FormInput from '../atoms/FormInput.svelte';
   import FormWrapper from '../atoms/FormWrapper.svelte';
   import SubmitButton from '../atoms/SubmitButton.svelte';
@@ -14,8 +13,9 @@
   import BuyerCart from './BuyerCart.svelte';
   import DocumentManagement from './DocumentManagement.svelte';
   import InventoryList from './InventoryList.svelte';
-  import UserDropdownSelect from './UserDropdownSelect.svelte';
   import UserOfflineDropdownSelect from './UserOfflineDropdownSelect.svelte';
+  import CompanyUserDropdownSelect from './CompanyUserDropdownSelect.svelte';
+  import AreaDropdownSelect from './AreaDropdownSelect.svelte';
 
   type Props = {
     dialog: HTMLDialogElement | undefined,
@@ -32,9 +32,8 @@
     ondelete,
   }: Props = $props();
 
-  const userContext = Context.get('user');
-  const client = Context.getStrict('client');
-  const store = Context.getStrict('auth');
+  const { user } = Context;
+  const { client, auth } = Context.strict;
 
   const defaultData = {
     customerId: '',
@@ -272,17 +271,17 @@
 
 {#snippet addressForm(data: CartDraftUserAddress, disabled = false)}
   <FormInput {disabled} type="text" placeholder="address" label="Address" bind:value={data.address}/>
-  <AreaSelectInput
+  <AreaDropdownSelect
     {disabled}
     {client}
-    {store}
+    store={auth}
     bind:value={data.provinceId}
   />
-  <AreaSelectInput
+  <AreaDropdownSelect
     {disabled}
     type="REGENCY"
     {client}
-    {store}
+    store={auth}
     bind:parentId={data.provinceId}
     bind:value={data.regencyId}
   />
@@ -292,7 +291,6 @@
 <Modal bind:dialog onopen={() => show = true}>
   <div class="flex flex-col items-start w-full min-h-full h-fit overflow-y-scroll">
     <FormWrapper
-      {client}
       class="mb-2"
       path={'/cart/draft' + (item?.id ? `/${item.id}` : '')}
       method={item?.id ? 'PATCH' : 'POST'}
@@ -308,8 +306,7 @@
         bind:value={newData.creationDate!}
         onselect={console.log}
       />
-      <UserDropdownSelect
-        {client}
+      <CompanyUserDropdownSelect
         bind:value={newData.salesId!}
         roleName={[
           'EXTERNAL_SALESMAN',
@@ -362,8 +359,6 @@
       <BuyerCart
         bind:show
         draft
-        {store}
-        {client}
         ordertype={OrderTypeEnum.SELLER_PURCHASE_ORDER}
         prehook={saveDraft}
         bind:cartCode={item.id}
@@ -375,8 +370,6 @@
       <BuyerCart
         bind:show
         draft
-        {store}
-        {client}
         ordertype={OrderTypeEnum.SELLER_PURCHASE_ORDER}
         {onordercreated}
         bind:companyId
@@ -384,9 +377,9 @@
         bind:deliveryType={newData.deliveryType!}
       />
     {/if}
-    {#if $userContext?.id}
+    {#if $user?.id}
       <div class="mb-2"></div>
-      <DocumentManagement show bind:entityid={$userContext.id} {client}/>
+      <DocumentManagement show bind:entityid={$user.id}/>
     {/if}
   </div>
 </Modal>

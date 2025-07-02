@@ -80,6 +80,13 @@
     selectedAclItem = item;
     modifyDialog?.showModal();
   };
+  function onModifyACL() {
+    getACLList();
+    selectedAclItem = aclList.find((acl) => selectedAclItem?.id === acl.id);
+    if (!selectedAclItem) {
+      modifyDialog?.close();
+    }
+  }
 
   $effect(() => {
     if (modifyDialog) {
@@ -117,7 +124,6 @@
 <Modal bind:dialog={addDialog} title="Add ACL">
   <div>
     <FormWrapper
-      {client}
       payload={newACL}
       path="/acls"
     >
@@ -128,10 +134,10 @@
 <ModifyAclModal
   bind:item={selectedAclItem}
   bind:dialog={modifyDialog}
-  {client}
+  onmodify={onModifyACL}
 />
 <Collapse
-  title="ACL List"
+  title="ACL Management"
   class="w-full"
   onclick={getACLList}
   bind:show

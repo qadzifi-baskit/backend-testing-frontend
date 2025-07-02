@@ -10,6 +10,8 @@
   import Table5 from '../Table5.svelte';
   import AddFeatureModal from './AddFeatureModal.svelte';
   import ModifyEntityCategoryModal from './ModifyEntityCategoryModal.svelte';
+  import { Icon } from 'svelte-icons-pack';
+  import { FaFloppyDisk, FaTrashCan } from 'svelte-icons-pack/fa';
 
   type Props = {
     class?: string,
@@ -89,6 +91,17 @@
       modifyFeatureDialog?.showModal();
     };
   }
+
+  function deleteFeature(id: string) {
+    return async () => {
+      const response = await client.delete(`/feature/${id}`);
+      if (response.status !== 200) {
+        return stringToast('Failed to delete feature');
+      }
+      stringToast('Feature deleted successfully');
+      cancelAndReload();
+    };
+  }
 </script>
 
 {#if addFeature}
@@ -114,7 +127,18 @@
     onreload={cancelAndReload}
     onadd={showAddModal}
   />
-  <Table5 itemList={featureList}>
+  <Table5 itemList={featureList} pincols>
+    {#snippet colgroup()}
+      <col>
+      <col>
+      {#if modify}
+        <col>
+      {/if}
+      <col>
+      <col class="w-full">
+      <col>
+    {/snippet}
+
     {#snippet header()}
       <td>Id</td>
       <td>Name</td>
@@ -123,6 +147,7 @@
       {/if}
       <td>Label</td>
       <td>Description</td>
+      <th></th>
     {/snippet}
 
     {#snippet content(category)}
@@ -133,6 +158,14 @@
       {/if}
       <td><NoWrap>{category.label}</NoWrap></td>
       <td>{category.description}</td>
+      <th class="flex gap-1">
+        <button class="btn btn-secondary">
+          <Icon src={FaFloppyDisk}/>
+        </button>
+        <button class="btn btn-secondary" onclick={deleteFeature(category.id)}>
+          <Icon src={FaTrashCan}/>
+        </button>
+      </th>
     {/snippet}
   </Table5>
 </Collapse5>

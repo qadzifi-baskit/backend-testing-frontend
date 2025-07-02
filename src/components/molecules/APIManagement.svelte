@@ -79,7 +79,7 @@
   onsuccess={successModify}
 />
 <Collapse
-  title="API List"
+  title="API Management"
   class="w-full"
   onclick={reloadData}
 >

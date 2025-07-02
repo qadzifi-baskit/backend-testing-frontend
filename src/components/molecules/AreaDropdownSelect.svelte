@@ -7,7 +7,7 @@
   import type { AxiosInstance } from 'axios';
   import type { Snippet } from 'svelte';
   import type { Writable } from 'svelte/store';
-  import DropdownSelect from './DropdownSelect.svelte';
+  import DropdownSelect from '../atoms/DropdownSelect.svelte';
 
   type Props = {
     type?: AreaType,

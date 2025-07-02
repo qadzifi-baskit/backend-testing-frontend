@@ -8,14 +8,23 @@
   import Table from '../Table.svelte';
   import Table5 from '../Table5.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
+  import TutorialManagement from './TutorialManagement.svelte';
+  import Modal from '../Modal.svelte';
+  import type { EventHandler } from 'svelte/elements';
+  import type { OrderTypeEnum } from '@/lib/enum';
+  import { SellerSalesOrderTypeMap } from '@/consts/order';
 
   type Props = {
+    dialog?: HTMLDialogElement,
+    onclose?: EventHandler<Event, HTMLDialogElement>,
     client: AxiosInstance,
     id: string,
     store?: Writable<AuthStore>,
     onUpdateOrder?:((data: UpdateOrderData[]) => unknown),
   };
   let {
+    dialog = $bindable(),
+    onclose,
     client,
     id = $bindable(''),
     store,
@@ -30,6 +39,7 @@
   let detailList:OrderDetail[] = $state([]);
   let reasonList:OrderReason[] = $state([]);
   let historyList:HistoryEntity[] = $state([]);
+  let orderType = $state<OrderTypeEnum>();
 
   const getHistory = async (orderId: string) => {
     if ($store && !$store.loggedIn) return;
@@ -51,8 +61,10 @@
 
   const getDetail = async (detailId: string) => {
     if ($store && !$store.loggedIn) return;
+    orderType = undefined;
     const detailResponse = await client.get(`/order/${detailId}`);
     if (detailResponse.status === 200) {
+      orderType = detailResponse.data?.data?.orderType ?? undefined;
       const newDetailList:OrderDetail[] = detailResponse?.data?.data?.orderDetail ?? [];
       for (const { id, qty, sellingPrice: price } of newDetailList) {
         updateDataMap[id] = {
@@ -101,48 +113,70 @@
     ));
     onUpdateOrder(updateData);
   };
+
+  let notifSection:ReturnType<typeof TutorialManagement>;
+
+  $effect(() => {
+    if (id) {
+      notifSection?.reloadData();
+    }
+  });
 </script>
 
-<div>
-  <PaginationNavigationPanel search={undefined} page={undefined} onreload={() => getDetail(id)}/>
-</div>
-<Table5 itemList={detailList}>
-  {#snippet header()}
-    <th>Name</th>
-    <th>Qty</th>
-    <th>Base Price</th>
-    <th>Start Price</th>
-    <th>Selling Price</th>
-    <th>Status</th>
-    <th></th>
-  {/snippet}
-  {#snippet content(item)}
-    <td>{item.fullName}</td>
-    <td>
-      <input type="number" placeholder="qty" bind:value={updateDataMap[item.id].qty} class="input input-bordered w-24 max-w-xs"
-        onchange={(e) => { updateDataMap[item.id].qty = Number(e.currentTarget.value) }}
-      />
-    </td>
-    <td>{item.basePrice}</td>
-    <td>{item.startPrice}</td>
-    <td>{item.sellingPrice}</td>
-    <td>{item.status}</td>
-    <th>
-      <button
-        onclick={onCancel(item.id)}
-        class="btn"
-      >
-        <Icon
-          src={FaSolidTrash}
-        />
-      </button>
-    </th>
-  {/snippet}
-</Table5>
-<Table itemList={historyList}>
-</Table>
-<button class="btn btn-secondary"
-  onclick={processUpdate}
+<Modal
+  bind:title={id}
+  bind:dialog
+  {onclose}
 >
-  Update
-</button>
+  <div>
+    <PaginationNavigationPanel search={undefined} page={undefined} onreload={() => getDetail(id)}/>
+  </div>
+  <Table5 itemList={detailList}>
+    {#snippet header()}
+      <th>Name</th>
+      <th>Qty</th>
+      {#if SellerSalesOrderTypeMap[orderType]}
+        <th>Needed Qty</th>
+        <th>Ordered Qty</th>
+      {/if}
+      <th>Base Price</th>
+      <th>Start Price</th>
+      <th>Selling Price</th>
+      <th>Status</th>
+      <th></th>
+    {/snippet}
+    {#snippet content(item)}
+      <td>{item.fullName}</td>
+      <td>
+        <input type="number" placeholder="qty" bind:value={updateDataMap[item.id].qty} class="input input-bordered w-24 max-w-xs"
+          onchange={(e) => { updateDataMap[item.id].qty = Number(e.currentTarget.value) }}
+        />
+      </td>
+      {#if SellerSalesOrderTypeMap[orderType]}
+        <td>{item.neededQty}</td>
+        <td>{item.orderedQty}</td>
+      {/if}
+      <td>{item.basePrice}</td>
+      <td>{item.startPrice}</td>
+      <td>{item.sellingPrice}</td>
+      <td>{item.status}</td>
+      <th>
+        <button
+          onclick={onCancel(item.id)}
+          class="btn"
+        >
+          <Icon
+            src={FaSolidTrash}
+          />
+        </button>
+      </th>
+    {/snippet}
+  </Table5>
+  <button class="btn btn-secondary"
+    onclick={processUpdate}
+  >
+    Update
+  </button>
+  <TutorialManagement bind:this={notifSection} show bind:ownerId={id}/>
+  <Table itemList={historyList}/>
+</Modal>

@@ -1,6 +1,7 @@
 import type { OrderDetailStatusEnum } from '@/lib/enum';
 import type { Cart } from './cart';
 import type { Role } from './user';
+import type { EntityCategory } from './entityCategory';
 
 export type AuthStore = {
   userId: string,
@@ -86,6 +87,8 @@ export type Order = {
 export type OrderDetail = {
   id: string,
   qty: number,
+  neededQty: number,
+  orderedQty: number,
   basePrice: number,
   startPrice: number,
   sellingPrice: number,
@@ -135,7 +138,8 @@ export type ACLItem = {
   apiId: string,
   roleId: string|null,
   userId: string|null,
-  role: Role,
+  role?: Role,
+  features: EntityCategory[],
 };
 
 export type APIACLItem = APIItem & {

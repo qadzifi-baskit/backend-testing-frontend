@@ -1,6 +1,6 @@
 <script lang="ts">
-  import AclList from '@/components/molecules/ACLList.svelte';
-  import ApiList from '@/components/molecules/APIList.svelte';
+  import AclManagement from '@/components/molecules/ACLManagement.svelte';
+  import ApiManagement from '@/components/molecules/APIManagement.svelte';
   import Auth from '@/components/molecules/Auth.svelte';
   import Config from '@/components/molecules/Config.svelte';
   import FeatureManagement from '@/components/molecules/FeatureManagement.svelte';
@@ -48,9 +48,9 @@
   />
   {#if $store.loggedIn}
     <div class="divider"></div>
-    <ApiList/>
+    <ApiManagement/>
     <div class="divider"></div>
-    <AclList/>
+    <AclManagement/>
     <div class="divider"></div>
     <RoleManagement/>
     <div class="divider"></div>

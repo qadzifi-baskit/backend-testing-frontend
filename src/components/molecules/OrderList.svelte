@@ -130,15 +130,12 @@
     {onUpdateStatus}
   />
 </Modal>
-<Modal
+<OrderDetail
   bind:dialog={detailDialog}
   onclose={onCloseModal}
->
-  <OrderDetail
-    bind:id={selectedId}
-    {client}
-  />
-</Modal>
+  bind:id={selectedId}
+  {client}
+/>
 <Collapse title='Order' onclick={getOrderList} bind:show>
   <PaginationNavigationPanel
     bind:page

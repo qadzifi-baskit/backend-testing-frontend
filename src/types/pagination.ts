@@ -10,6 +10,7 @@ export type PaginationPanelProps<
 > = {
   search?: string,
   max?: number,
+  limit?: number,
   page?: number,
   sort?: string|null,
   order?: PaginationOrder,

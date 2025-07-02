@@ -2,14 +2,13 @@
   import { Context } from '@/lib/helper/context';
   import { debounce } from '@/lib/helper/util';
   import type { Role } from '@/types/user';
-  import Collapse from '../Collapse.svelte';
-  import Table5 from '../Table5.svelte';
-  import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
-  import AddRoleModal from './AddRoleModal.svelte';
   import EditButton from '../atoms/EditButton.svelte';
   import NoWrap from '../atoms/NoWrap.svelte';
-  import Modal from '../Modal.svelte';
-  import AclList from './ACLList.svelte';
+  import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
+  import Collapse from '../Collapse.svelte';
+  import Table5 from '../Table5.svelte';
+  import AddRoleModal from './AddRoleModal.svelte';
+  import ModifyRoleModal from './ModifyRoleModal.svelte';
 
   const { client, auth: store } = Context.strict;
 
@@ -54,11 +53,11 @@
   });
 
   let roleDetailDialog = $state<HTMLDialogElement>();
-  let selectedAclId = $state('');
+  let selectedAclRoleId = $state('');
   let selectedName = $state('');
   function showRoleDetail(role:Role) {
     return () => {
-      selectedAclId = role.id;
+      selectedAclRoleId = role.id;
       selectedName = role.roleName;
       roleDetailDialog?.showModal();
     };
@@ -66,7 +65,7 @@
   $inspect(() => {
     if (roleDetailDialog) {
       roleDetailDialog.onclose = () => {
-        selectedName = selectedAclId = '';
+        selectedName = selectedAclRoleId = '';
       };
     }
   });
@@ -76,9 +75,12 @@
   bind:dialog={addRoleDialog}
   {client}
 />
-<Modal bind:dialog={roleDetailDialog} bind:title={selectedName}>
-  <AclList show bind:roleid={selectedAclId}/>
-</Modal>
+<ModifyRoleModal
+  show
+  bind:dialog={roleDetailDialog}
+  bind:title={selectedName}
+  bind:roleid={selectedAclRoleId}
+/>
 <Collapse
   title="Role Management"
   class="w-full"

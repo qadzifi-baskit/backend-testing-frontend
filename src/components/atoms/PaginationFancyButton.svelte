@@ -1,6 +1,7 @@
 <script lang="ts">
   type Props = {
     value?: number,
+    limit?: number,
     min?: number,
     max?: number,
     dynamic?: boolean,
@@ -8,6 +9,7 @@
 
   let {
     value = $bindable(1),
+    limit = $bindable(10),
     min = $bindable(1),
     max = $bindable(100),
     dynamic = $bindable(false),
@@ -38,6 +40,11 @@
   const onJump = () => {
     selectJump = false;
   };
+
+  $effect(() => {
+    limit;
+    value = min;
+  });
 </script>
 
 <div id="pagination-button" class="join input-bordered border">
@@ -88,6 +95,12 @@
     </button>
   {/if}
   <button class="join-item btn" onclick={onCLickForward}>›</button>
+</div>
+<div class="my-2">
+  <label>
+    <input type="range" min="1" max="100" bind:value={limit} class="range">
+    <span>{limit}</span>
+  </label>
 </div>
 
 <style>

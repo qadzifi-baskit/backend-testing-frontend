@@ -4,7 +4,6 @@
   import type { User } from '@/types/user';
   import type { Snippet } from 'svelte';
   import DropdownSelect from '../atoms/DropdownSelect.svelte';
-  import { cancelableDebounce } from '@/lib/helper/util';
 
   type Props = {
     value?: string,
@@ -49,18 +48,14 @@
     if (sellerId) {
       params.append('sellerId', sellerId);
     }
-    const response = await client.get('/users', { params });
+    const response = await client.get('/company/user', { params });
     if (response.status !== 200) return stringToast('Failed get user');
     userList = response.data.data ?? [];
   }
 
-  const [debounce, cancel] = cancelableDebounce(getUserList);
-
   $effect(() => {
     if (show) {
-      search;
-      cancel();
-      debounce();
+      getUserList();
     }
   });
 </script>
@@ -77,11 +72,9 @@
     bind:placeholder
     display="LABEL"
     bind:value
-    default={null}
     options={userList.map((user) => [
       user.id,
-      `${user.profile?.firstName ?? '-'} ${user.profile?.lastName ?? '-'} | ${user.email || '-'}`,
-      user.email,
+      `${user.profile?.firstName ?? '-'} ${user.profile?.lastName ?? '-'}`,
     ])}
   />
 </fieldset>

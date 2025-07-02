@@ -39,6 +39,24 @@
   min-width: 40ch;
 }
 
+@utility drawer-right {
+  div.drawer-side {
+    button {
+      translate: 100%;
+    }
+  }
+
+  .drawer-toggle {
+    &:checked {
+      & ~ .drawer-side {
+        & > *:not(.drawer-overlay) {
+          translate: 0%;
+        }
+      }
+    }
+  }
+}
+
 html {
   height: 100%;
   scrollbar-gutter: auto;

@@ -1,52 +1,33 @@
 <script lang="ts">
-  import { debounce, isObjectEmpty } from '@/lib/helper/util';
-  import { SuperAdminStore } from '@/store/store';
+  import { Context } from '@/lib/helper/context';
+  import { stringToast } from '@/lib/helper/toast';
+  import { isObjectEmpty } from '@/lib/helper/util';
   import type { ACLItem, APIACLItem } from '@/types';
-  import type { Role } from '@/types/user';
-  import type { AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
-  import { FaSolidFloppyDisk, FaSolidPencil } from 'svelte-icons-pack/fa';
+  import { FaSolidFloppyDisk } from 'svelte-icons-pack/fa';
   import Modal from '../Modal.svelte';
   import Table5 from '../Table5.svelte';
-  import DropdownSelect from '../atoms/DropdownSelect.svelte';
+  import DeleteButton from '../atoms/DeleteButton.svelte';
   import NoWrap from '../atoms/NoWrap.svelte';
+  import SaveButton from '../atoms/SaveButton.svelte';
+  import FeatureDropdownSelect from './FeatureDropdownSelect.svelte';
+  import RoleDropdownSelect from './RoleDropdownSelect.svelte';
 
   type Props = {
-    client: AxiosInstance,
     item?: APIACLItem,
     dialog?: HTMLDialogElement,
+    onmodify?: () => void,
   };
   let {
-    client,
     item = $bindable(),
     dialog = $bindable(),
+    onmodify,
   }: Props = $props();
 
-  async function getRoleList() {
-    if (!$SuperAdminStore.loggedIn) return;
-    const params = new URLSearchParams({
-      search: roleSearch,
-    });
-    const response = await client.get(
-      '/role',
-      { params },
-    );
-    if (response.status !== 200) return;
-    roleList = response.data?.data ?? [];
-  }
-
-  const debounceGetRoleList = debounce(getRoleList);
-
-  $effect(() => {
-    $SuperAdminStore.loggedIn;
-    roleSearch;
-    debounceGetRoleList();
-  });
+  const { client, auth: store } = Context.strict;
 
   let acls:Record<string, ACLItem> = $state({});
   let addingNewAcl = $state(false);
-  let roleList:Role[] = $state([]);
-  let roleSearch = $state('');
 
   $effect(() => {
     if (item?.acls) {
@@ -56,27 +37,33 @@
 
   const updateACL = (target: ACLItem) => async () => {
     const payload: Partial<ACLItem> = {
-      apiId: target.apiId,
-      roleId: target.roleId,
       methodGet: target.methodGet,
       methodFind: target.methodFind,
       methodPost: target.methodPost,
       methodPatch: target.methodPatch,
       methodDelete: target.methodDelete,
     };
+    if (target.apiId) {
+      payload.apiId = target.apiId;
+    }
+    if (target.roleId) {
+      payload.roleId = target.roleId;
+    }
+    stringToast('Updating ACL...');
     const response = await client.patch(
       `/acls/${target.id}`,
       payload,
     );
     if (response.status !== 200) {
-      return;
+      return stringToast('Failed to update ACL');
     }
-
-    dialog?.close();
+    stringToast('ACL updated successfully');
+    onmodify?.();
   };
 
   const newACL = $state({
-    roleId: '',
+    roleId: <string|null>null,
+    featureId: <string|null>null,
     apiId: item?.id,
     methodPost: false,
     methodGet: false,
@@ -90,14 +77,15 @@
   });
 
   async function createACL() {
-    if (!$SuperAdminStore.loggedIn) return;
+    if (!$store.loggedIn) return;
     const response = await client.post(
       '/acls',
       newACL,
     );
     if (response.status !== 200) return;
     addingNewAcl = false;
-    newACL.roleId = '';
+    newACL.roleId = null;
+    newACL.featureId = null;
     newACL.methodPost = false;
     newACL.methodGet = false;
     newACL.methodPatch = false;
@@ -110,54 +98,9 @@
   }
 </script>
 
-{#snippet colgroup()}
-  <colgroup>
-    <col class="max-w-fit">
-    <col class="max-w-fit">
-    <col>
-    <col>
-    <col>
-    <col>
-    <col>
-    <col>
-    <col class="w-full">
-  </colgroup>
-{/snippet}
-
-{#snippet header()}
-  <td>Id</td>
-  <td>Role Name</td>
-  <td></td>
-  <td>Get</td>
-  <td>Find</td>
-  <td>Post</td>
-  <td>Patch</td>
-  <td>Delete</td>
-{/snippet}
-
-{#snippet content(acl: ACLItem)}
-  {#if acl.id in acls}
-    <td><NoWrap>{acl.id}</NoWrap></td>
-    <td><NoWrap>{acl.role.roleName}</NoWrap></td>
-    <td>
-      <button
-        onclick={updateACL(acls[acl.id])}
-        class="btn btn-secondary"
-      >
-        <Icon src={FaSolidPencil}/>
-      </button>
-    </td>
-    <td><input type="checkbox" bind:checked={acls[acl.id].methodGet} class="checkbox"></td>
-    <td><input type="checkbox" bind:checked={acls[acl.id].methodFind} class="checkbox"></td>
-    <td><input type="checkbox" bind:checked={acls[acl.id].methodPost} class="checkbox"></td>
-    <td><input type="checkbox" bind:checked={acls[acl.id].methodPatch} class="checkbox"></td>
-    <td><input type="checkbox" bind:checked={acls[acl.id].methodDelete} class="checkbox"></td>
-  {/if}
-{/snippet}
-
-
 <Modal
   bind:dialog
+  title={item?.id}
 >
   {#if item}
     <div>
@@ -172,20 +115,15 @@
       {#if addingNewAcl}
         <div id="new-acl-panel" class="w-fit p-4 border bordered border-white grid gap-4">
           <span class="w-80">Role</span>
+          <span class="w-80">Feature</span>
           <span>Save</span>
           <span>Get</span>
           <span>Find</span>
           <span>Post</span>
           <span>Patch</span>
           <span>Delete</span>
-          <DropdownSelect
-            bind:search={roleSearch}
-            bind:value={newACL.roleId}
-            showvalue
-            options={roleList.map((role) => [role.id, role.roleName])}
-            display="LABEL"
-            placeholder="ROLE"
-          />
+          <RoleDropdownSelect bind:value={newACL.roleId}/>
+          <FeatureDropdownSelect bind:value={newACL.featureId}/>
           <button
             class="btn btn-secondary w-fit"
             onclick={createACL}
@@ -204,10 +142,50 @@
         <Table5
           class="grow"
           itemList={item.acls.toSorted((first, second) => first.createdAt < second.createdAt ? -1 : 1)}
-          {colgroup}
-          {header}
-          {content}
-        />
+        >
+          {#snippet colgroup()}
+            <colgroup>
+              <col class="max-w-fit">
+              <col class="max-w-fit">
+              <col class="max-w-fit">
+              <col>
+              <col>
+              <col>
+              <col>
+              <col>
+              <col>
+              <col class="w-full">
+            </colgroup>
+          {/snippet}
+
+          {#snippet header()}
+            <td>Id</td>
+            <td>Role Name</td>
+            <td>Feature Name</td>
+            <td></td>
+            <td></td>
+            <td>Get</td>
+            <td>Find</td>
+            <td>Post</td>
+            <td>Patch</td>
+            <td>Delete</td>
+          {/snippet}
+
+          {#snippet content(acl: ACLItem)}
+            {#if acl.id in acls}
+              <td><NoWrap>{acl.id}</NoWrap></td>
+              <td><NoWrap>{acl.role?.roleName}</NoWrap></td>
+              <td><NoWrap>{acl.features?.[0]?.name}</NoWrap></td>
+              <td><SaveButton onclick={updateACL(acls[acl.id])}/></td>
+              <td><DeleteButton/></td>
+              <td><input type="checkbox" bind:checked={acls[acl.id].methodGet} class="checkbox"></td>
+              <td><input type="checkbox" bind:checked={acls[acl.id].methodFind} class="checkbox"></td>
+              <td><input type="checkbox" bind:checked={acls[acl.id].methodPost} class="checkbox"></td>
+              <td><input type="checkbox" bind:checked={acls[acl.id].methodPatch} class="checkbox"></td>
+              <td><input type="checkbox" bind:checked={acls[acl.id].methodDelete} class="checkbox"></td>
+            {/if}
+          {/snippet}
+        </Table5>
       {/if}
     </div>
   {/if}
@@ -215,6 +193,6 @@
 
 <style>
   #new-acl-panel {
-    grid-template-columns: repeat(7, max-content);
+    grid-template-columns: repeat(8, max-content);
   }
 </style>

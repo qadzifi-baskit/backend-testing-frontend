@@ -112,17 +112,25 @@
 
   const qtyMap:Record<string, number> = $state({});
   function addItem(item: Inventory) {
-    return async () => client.post(`${prefix}/cart`, {
-      orderType: selectedOrderType,
-      inventoryId: item.id,
-      qty: qtyMap[item.id],
-      userId: null,
-      productId: item.productId,
-      companyId: item.companyId,
-      wareHouse: 0,
-      memberLevel,
-      cartCode,
-    });
+    return async () => {
+      stringToast('Adding item...');
+      const response = await client.post(`${prefix}/cart`, {
+        orderType: selectedOrderType,
+        inventoryId: item.id,
+        qty: qtyMap[item.id],
+        userId: null,
+        productId: item.productId,
+        companyId: item.companyId,
+        wareHouse: 0,
+        memberLevel,
+        cartCode,
+      });
+      if (response.status !== 200) {
+        return stringToast('Failed to add item');
+      }
+      stringToast('Item added');
+      return response;
+    };
   }
   async function addItemBulk() {
     const payload = Object.values(selectedMap).map((item) => ({
@@ -135,6 +143,7 @@
       memberLevel,
       cartCode,
     }));
+    stringToast('Adding item...');
     const response = await client.post(`${prefix}/cart/bulk`, { data: payload });
     if (response.status !== 200) {
       return stringToast('Failed to add item');

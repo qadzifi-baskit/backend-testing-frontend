@@ -2,7 +2,7 @@
   import type { Component } from 'svelte';
   import { Icon } from 'svelte-icons-pack';
   import { BiError } from 'svelte-icons-pack/bi';
-  import { FaSolidAngleRight } from 'svelte-icons-pack/fa';
+  import { FaSolidAngleLeft, FaSolidAngleRight } from 'svelte-icons-pack/fa';
   import { VscOpenPreview } from 'svelte-icons-pack/vsc';
   import BaskitAdmin from './app/baskit-admin/BaskitAdmin.svelte';
   import BaskitSuperCompany from './app/baskit-super-company/BaskitSuperCompany.svelte';
@@ -17,20 +17,23 @@
   import { apiEnv } from './lib/config/env.svelte';
   import { cn } from './lib/helper/tailwind';
   import type { AppConfig } from './types/app';
-  // let selected = $state(apiEnv.DEFAULT_APP);
-  let selected = $state(1);
+  import FloatingBadge from './components/atoms/FloatingBadge.svelte';
   let host = $state(apiEnv.DEFAULT_API_HOST);
 
+  const DEFAULT = true;
   type PageComponent = Component<{ host: string, config: AppConfig }>;
-  const tabs:{ label: string, component: PageComponent }[] = [
+  const tabs:{ label: string, component: PageComponent, DEFAULT?: boolean }[] = [
     { label: 'Buyer', component: Buyer },
-    { label: 'Seller', component: Seller },
+    { label: 'Seller', component: Seller, DEFAULT },
     { label: 'Grosir Seller', component: GrosirSeller },
     { label: 'Baskit Admin', component: BaskitAdmin },
     { label: 'Brand User', component: BrandUser },
     { label: 'Super Admin', component: SuperAdmin },
     { label: 'Baskit Super Company', component: BaskitSuperCompany },
   ];
+  let selected = $state(
+    DEFAULT ? Math.max(0, tabs.findIndex((tab) => tab.DEFAULT)) : apiEnv.DEFAULT_APP,
+  );
 
   let errorModal = $state<HTMLDialogElement>();
   let resourceModal = $state<HTMLDialogElement>();
@@ -51,15 +54,15 @@
   {/each}
 </div>
 <div class="drawer">
-  <input id="my-drawer" type="checkbox" class="drawer-toggle" />
+  <input id="menu-drawer" type="checkbox" class="drawer-toggle" />
   <div class="drawer-content fixed bottom-8 left-0 z-10">
     <!-- Page content here -->
-    <label for="my-drawer" class="btn btn-primary drawer-button p-0 rounded-l-none">
+    <label for="menu-drawer" class="btn btn-primary drawer-button p-0 rounded-l-none">
       <Icon src={FaSolidAngleRight} className="text-xl"/>
     </label>
   </div> 
   <div class="drawer-side z-10">
-    <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+    <label for="menu-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
     <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
       <!-- Sidebar content here -->
       {#each tabs as { label }, index }
@@ -80,14 +83,26 @@
     </ul>
   </div>
 </div>
-<button class="btn btn-error fixed bottom-8 right-8 z-10" onclick={() => errorModal?.showModal()}>
-  <Icon src={BiError}/>
-</button>
-<button class="btn btn-info fixed bottom-20 right-8 z-10" onclick={() => resourceModal?.showModal()}>
-  <Icon src={VscOpenPreview}/>
-</button>
+<div class="drawer drawer-right">
+  <input id="resource-drawer" type="checkbox" class="drawer-toggle" />
+  <div class="drawer-content fixed bottom-8 right-0 z-10">
+    <!-- Page content here -->
+    <label for="resource-drawer" class="btn btn-primary drawer-button p-0 rounded-r-none">
+      <Icon src={FaSolidAngleLeft} className="text-xl"/>
+    </label>
+  </div> 
+  <div class="drawer-side z-10 w-fit">
+    <button class="btn btn-error fixed bottom-8 right-8 z-10" onclick={() => errorModal?.showModal()}>
+      <Icon src={BiError}/>
+    </button>
+    <button class="btn btn-info fixed bottom-20 right-8 z-10" onclick={() => resourceModal?.showModal()}>
+      <Icon src={VscOpenPreview}/>
+    </button>
+  </div>
+</div>
+<FloatingBadge class="fixed right-4 top-4">{tabs[selected].label}</FloatingBadge>
 
-<style lang="">
+<style>
   div.tabs {
     grid-template-columns: repeat(var(--amount), 1fr);
   }

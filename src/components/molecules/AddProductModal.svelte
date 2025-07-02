@@ -114,7 +114,6 @@
   >
     <FormWrapper
       path={!addToInventory ? '/product/master' : '/product/inventory'}
-      {client}
       payload={!addToInventory ? productData : addToInventoryData}
       params={new URLSearchParams({ type: 'PUBLIC' })}
       {onsuccess}

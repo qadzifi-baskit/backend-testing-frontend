@@ -16,7 +16,6 @@
     dialog?: HTMLDialogElement,
   };
   let {
-    client,
     store,
     parentId = $bindable(),
     onsuccess,
@@ -52,7 +51,6 @@
 <Modal bind:dialog>
   <div class="flex flex-col items-start w-full h-full">
     <FormWrapper
-      {client}
       {prehook}
       payload={data}
       path="/category/sub"

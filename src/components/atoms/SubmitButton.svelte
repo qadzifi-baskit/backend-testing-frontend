@@ -37,7 +37,7 @@
     children,
   }: Props = $props();
 
-  const onclick = async (e: MouseEvent) => {
+  async function onclick(e: MouseEvent) {
     if (!client || !data) return;
     e.preventDefault();
     if ($store && !$store.loggedIn) {
