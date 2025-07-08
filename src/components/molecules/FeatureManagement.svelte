@@ -2,16 +2,17 @@
   import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
   import { cancelableDebounce } from '@/lib/helper/util';
-  import type { EntityCategory } from '@/types/entityCategory';
-  import EditButton from '../atoms/EditButton.svelte';
+  import type { Feature } from '@/types/feature';
+  import { FaUser } from 'svelte-icons-pack/fa';
+  import DeleteButton from '../atoms/DeleteButton.svelte';
+  import IconButton from '../atoms/IconButton.svelte';
   import NoWrap from '../atoms/NoWrap.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
+  import SaveButton from '../atoms/SaveButton.svelte';
   import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
   import AddFeatureModal from './AddFeatureModal.svelte';
-  import ModifyEntityCategoryModal from './ModifyEntityCategoryModal.svelte';
-  import { Icon } from 'svelte-icons-pack';
-  import { FaFloppyDisk, FaTrashCan } from 'svelte-icons-pack/fa';
+  import ModifyFeatureModal from './ModifyFeatureModal.svelte';
 
   type Props = {
     class?: string,
@@ -36,7 +37,7 @@
   let search = $state('');
   let page = $state(1);
   let max = $state(1);
-  let featureList = $state<EntityCategory[]>([]);
+  let featureList = $state<Feature[]>([]);
 
   async function reloadData() {
     if (!show && !alwaysshow) return;
@@ -108,9 +109,9 @@
   <AddFeatureModal bind:dialog={addFeatureDialog} onsuccess={cancelAndReload}/>
 {/if}
 {#if modify}
-  <ModifyEntityCategoryModal
+  <ModifyFeatureModal
     bind:dialog={modifyFeatureDialog}
-    bind:categoryid={selectedFeatureId}
+    bind:featureId={selectedFeatureId}
     bind:title={selectedFeatureName}
   />
 {/if}
@@ -150,21 +151,19 @@
       <th></th>
     {/snippet}
 
-    {#snippet content(category)}
-      <td><NoWrap>{category.id}</NoWrap></td>
-      <td><NoWrap>{category.name}</NoWrap></td>
+    {#snippet content(feature)}
+      <td><NoWrap>{feature.id}</NoWrap></td>
+      <td><NoWrap>{feature.name}</NoWrap></td>
       {#if modify}
-        <td><EditButton onclick={showModifyModal(category.id, category.name)}/></td>
+        <td><IconButton icon={FaUser} onclick={showModifyModal(feature.id, feature.name)}/></td>
       {/if}
-      <td><NoWrap>{category.label}</NoWrap></td>
-      <td>{category.description}</td>
-      <th class="flex gap-1">
-        <button class="btn btn-secondary">
-          <Icon src={FaFloppyDisk}/>
-        </button>
-        <button class="btn btn-secondary" onclick={deleteFeature(category.id)}>
-          <Icon src={FaTrashCan}/>
-        </button>
+      <td><NoWrap>{feature.label}</NoWrap></td>
+      <td>{feature.description}</td>
+      <th>
+        <div class="flex gap-1">
+          <SaveButton/>
+          <DeleteButton onclick={deleteFeature(feature.id)}/>
+        </div>
       </th>
     {/snippet}
   </Table5>

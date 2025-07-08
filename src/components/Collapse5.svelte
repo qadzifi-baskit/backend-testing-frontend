@@ -11,16 +11,24 @@
     onClick?: MouseEventHandler<HTMLInputElement>,
     content?: Snippet,
     children?: Snippet,
+    onshow?: () => void,
   };
   let {
     class: clazz = '',
     title = '',
-    show = $bindable(false),
+    show = $bindable(),
     alwaysshow = false,
     onClick = () => undefined,
     content,
     children,
+    onshow,
   }:Props = $props();
+
+  $effect(() => {
+    if (show) {
+      onshow?.();
+    }
+  });
 
   export function open() {
     show = true;

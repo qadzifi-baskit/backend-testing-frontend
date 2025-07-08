@@ -24,11 +24,11 @@
   type PageComponent = Component<{ host: string, config: AppConfig }>;
   const tabs:{ label: string, component: PageComponent, DEFAULT?: boolean }[] = [
     { label: 'Buyer', component: Buyer },
-    { label: 'Seller', component: Seller, DEFAULT },
+    { label: 'Seller', component: Seller },
     { label: 'Grosir Seller', component: GrosirSeller },
     { label: 'Baskit Admin', component: BaskitAdmin },
     { label: 'Brand User', component: BrandUser },
-    { label: 'Super Admin', component: SuperAdmin },
+    { label: 'Super Admin', component: SuperAdmin, DEFAULT },
     { label: 'Baskit Super Company', component: BaskitSuperCompany },
   ];
   let selected = $state(

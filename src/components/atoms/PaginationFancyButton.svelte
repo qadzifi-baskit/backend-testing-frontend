@@ -9,7 +9,7 @@
 
   let {
     value = $bindable(1),
-    limit = $bindable(10),
+    limit = $bindable(),
     min = $bindable(1),
     max = $bindable(100),
     dynamic = $bindable(false),
@@ -96,12 +96,14 @@
   {/if}
   <button class="join-item btn" onclick={onCLickForward}>›</button>
 </div>
-<div class="my-2">
-  <label>
-    <input type="range" min="1" max="100" bind:value={limit} class="range">
-    <span>{limit}</span>
-  </label>
-</div>
+{#if limit !== undefined}
+  <div class="my-2">
+    <label>
+      <input type="range" min="1" max="100" bind:value={limit} class="range">
+      <span>{limit}</span>
+    </label>
+  </div>
+{/if}
 
 <style>
   #pagination-button>* {

@@ -22,10 +22,10 @@
   }: Props = $props();
 
   const client = createAxiosInstance({ baseURL: host });
-  const store = createAuthStore();
+  const auth = createAuthStore();
 
   Context.set('client', client);
-  Context.set('auth', store);
+  Context.set('auth', auth);
 
   let clientType = $state('WEB_CMS');
   let username = $state('super.admin@testing.com');
@@ -41,12 +41,12 @@
   />
   <div class="divider"></div>
   <Auth
-    {store}
+    store={auth}
     {client}
     bind:username
     bind:password
   />
-  {#if $store.loggedIn}
+  {#if $auth.loggedIn}
     <div class="divider"></div>
     <ApiManagement/>
     <div class="divider"></div>
@@ -58,6 +58,6 @@
     <div class="divider"></div>
     <TranslationManagement/>
     <div class="divider"></div>
-    <FeatureManagement addfeature/>
+    <FeatureManagement addfeature modify/>
   {/if}
 </div>

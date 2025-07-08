@@ -10,7 +10,7 @@
   let {
     search = $bindable(),
     max = $bindable(1),
-    limit = $bindable(10),
+    limit = $bindable(),
     page = $bindable(),
     sort = $bindable(null),
     order = $bindable('ASC'),

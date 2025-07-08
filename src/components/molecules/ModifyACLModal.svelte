@@ -16,7 +16,7 @@
   type Props = {
     item?: APIACLItem,
     dialog?: HTMLDialogElement,
-    onmodify?: () => void,
+    onmodify?: () => Promise<void>|void,
   };
   let {
     item = $bindable(),
@@ -26,13 +26,17 @@
 
   const { client, auth: store } = Context.strict;
 
-  let acls:Record<string, ACLItem> = $state({});
+  let aclList:ACLItem[] = $state([]);
+  let aclMap:Record<string, ACLItem> = $derived(Object.fromEntries(aclList.map((acl) => [acl.id, acl])));
   let addingNewAcl = $state(false);
 
+  function reloadACLList() {
+    aclList = [...(item?.acls ?? [])];
+  }
+
   $effect(() => {
-    if (item?.acls) {
-      acls = Object.fromEntries(item.acls.map((acl) => [acl.id, acl]));
-    }
+    item;
+    reloadACLList();
   });
 
   const updateACL = (target: ACLItem) => async () => {
@@ -57,13 +61,27 @@
     if (response.status !== 200) {
       return stringToast('Failed to update ACL');
     }
+    await onmodify?.();
+    reloadACLList();
     stringToast('ACL updated successfully');
-    onmodify?.();
+  };
+
+  const deleteACL = (id: string) => async () => {
+    stringToast('Deleting ACL...');
+    const response = await client.delete(
+      `/acls/${id}`,
+    );
+    if (response.status !== 200) {
+      return stringToast('Failed to delete ACL');
+    }
+    await onmodify?.();
+    reloadACLList();
+    stringToast('ACL deleted successfully');
   };
 
   const newACL = $state({
-    roleId: <string|null>null,
-    featureId: <string|null>null,
+    roleId: <string|undefined>undefined,
+    featureId: <string|undefined>undefined,
     apiId: item?.id,
     methodPost: false,
     methodGet: false,
@@ -78,19 +96,23 @@
 
   async function createACL() {
     if (!$store.loggedIn) return;
+    stringToast('Adding new ACL...');
     const response = await client.post(
       '/acls',
       newACL,
     );
     if (response.status !== 200) return;
     addingNewAcl = false;
-    newACL.roleId = null;
-    newACL.featureId = null;
+    newACL.roleId = undefined;
+    newACL.featureId = undefined;
     newACL.methodPost = false;
     newACL.methodGet = false;
     newACL.methodPatch = false;
     newACL.methodDelete = false;
     newACL.methodFind = false;
+    await onmodify?.();
+    reloadACLList();
+    stringToast('ACL added successfully');
   }
 
   async function toggleAddingACL() {
@@ -101,6 +123,7 @@
 <Modal
   bind:dialog
   title={item?.id}
+  onopen={reloadACLList}
 >
   {#if item}
     <div>
@@ -138,10 +161,10 @@
         </div>
       {/if}
       <div class="label"></div>
-      {#if !isObjectEmpty(acls)}
+      {#if !isObjectEmpty(aclMap)}
         <Table5
           class="grow"
-          itemList={item.acls.toSorted((first, second) => first.createdAt < second.createdAt ? -1 : 1)}
+          itemList={aclList.toSorted((first, second) => first.createdAt < second.createdAt ? -1 : 1)}
         >
           {#snippet colgroup()}
             <colgroup>
@@ -172,17 +195,17 @@
           {/snippet}
 
           {#snippet content(acl: ACLItem)}
-            {#if acl.id in acls}
+            {#if acl.id in aclMap}
               <td><NoWrap>{acl.id}</NoWrap></td>
               <td><NoWrap>{acl.role?.roleName}</NoWrap></td>
               <td><NoWrap>{acl.features?.[0]?.name}</NoWrap></td>
-              <td><SaveButton onclick={updateACL(acls[acl.id])}/></td>
-              <td><DeleteButton/></td>
-              <td><input type="checkbox" bind:checked={acls[acl.id].methodGet} class="checkbox"></td>
-              <td><input type="checkbox" bind:checked={acls[acl.id].methodFind} class="checkbox"></td>
-              <td><input type="checkbox" bind:checked={acls[acl.id].methodPost} class="checkbox"></td>
-              <td><input type="checkbox" bind:checked={acls[acl.id].methodPatch} class="checkbox"></td>
-              <td><input type="checkbox" bind:checked={acls[acl.id].methodDelete} class="checkbox"></td>
+              <td><SaveButton onclick={updateACL(aclMap[acl.id])}/></td>
+              <td><DeleteButton onclick={deleteACL(acl.id)}/></td>
+              <td><input type="checkbox" bind:checked={aclMap[acl.id].methodGet} class="checkbox"></td>
+              <td><input type="checkbox" bind:checked={aclMap[acl.id].methodFind} class="checkbox"></td>
+              <td><input type="checkbox" bind:checked={aclMap[acl.id].methodPost} class="checkbox"></td>
+              <td><input type="checkbox" bind:checked={aclMap[acl.id].methodPatch} class="checkbox"></td>
+              <td><input type="checkbox" bind:checked={aclMap[acl.id].methodDelete} class="checkbox"></td>
             {/if}
           {/snippet}
         </Table5>

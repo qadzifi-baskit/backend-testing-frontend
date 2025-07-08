@@ -4,14 +4,15 @@
   import type { APIACLItem } from '@/types';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPencil } from 'svelte-icons-pack/fa';
+  import FormInput from '../atoms/FormInput.svelte';
+  import FormWrapper from '../atoms/FormWrapper.svelte';
   import NoWrap from '../atoms/NoWrap.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
-  import Collapse from '../Collapse.svelte';
+  import Collapse5 from '../Collapse5.svelte';
+  import Modal from '../Modal.svelte';
   import Table5 from '../Table5.svelte';
   import ModifyAclModal from './ModifyACLModal.svelte';
-  import Modal from '../Modal.svelte';
-  import FormWrapper from '../atoms/FormWrapper.svelte';
-  import FormInput from '../atoms/FormInput.svelte';
+  import { stringToast } from '@/lib/helper/toast';
 
   type Props = {
     roleid?:string|string[],
@@ -22,7 +23,7 @@
     show = $bindable(),
   }:Props = $props();
 
-  const { client, auth: store } = Context.strict;
+  const { client, auth } = Context.strict;
   const showMethod = $derived(typeof roleId === 'string' || roleId?.length === 1);
 
   let aclList:APIACLItem[] = $state([]);
@@ -31,8 +32,8 @@
   let search = $state('');
   let selectedAclItem:APIACLItem|undefined = $state();
 
-  const getACLList = async () => {
-    if (!$store.loggedIn) {
+  async function getACLList() {
+    if (!$auth.loggedIn) {
       return;
     }
 
@@ -54,10 +55,11 @@
       '/acls',
       { params },
     );
-    if (response.status === 200) {
-      max = response.data?.totalPage ?? 1;
-      aclList = response.data?.data ?? [];
+    if (response.status !== 200) {
+      return stringToast('Failed to get ACL list');
     }
+    aclList = response.data?.data ?? [];
+    max = response.data?.totalPage ?? 1;
   };
 
   const debounceGetACLList = debounce(getACLList);
@@ -80,8 +82,8 @@
     selectedAclItem = item;
     modifyDialog?.showModal();
   };
-  function onModifyACL() {
-    getACLList();
+  async function onModifyACL() {
+    await getACLList();
     selectedAclItem = aclList.find((acl) => selectedAclItem?.id === acl.id);
     if (!selectedAclItem) {
       modifyDialog?.close();
@@ -136,10 +138,10 @@
   bind:dialog={modifyDialog}
   onmodify={onModifyACL}
 />
-<Collapse
+<Collapse5
   title="ACL Management"
   class="w-full"
-  onclick={getACLList}
+  onClick={getACLList}
   bind:show
 >
   <PaginationNavigationPanel
@@ -202,4 +204,4 @@
       {/snippet}
     </Table5>
   {/if}
-</Collapse>
+</Collapse5>

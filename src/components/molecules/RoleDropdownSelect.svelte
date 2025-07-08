@@ -8,12 +8,14 @@
 
   type Props = {
     label?: string|Snippet,
+    placeholder?: string|Snippet,
     show?: boolean,
     value?: string|null,
     name?: string|null,
   };
   let {
-    label = 'Role',
+    label,
+    placeholder = $bindable('Select a role'),
     show = $bindable(false),
     value = $bindable(),
     name = $bindable(),
@@ -50,12 +52,13 @@
   {#if typeof label === 'string'}
     <span class="fieldset-label mb-2 capitalize">{label}</span>
   {:else}
-    {@render label()}
+    {@render label?.()}
   {/if}
   <DropdownSelect
     bind:value
     bind:show
     bind:search
+    bind:placeholder
     options={roleList.map((role) => [role.id, role.roleName])}
   />
 </label>
