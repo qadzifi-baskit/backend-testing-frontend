@@ -114,8 +114,6 @@
     }
     await reloadData();
   }
-
-  $inspect({ limit });
 </script>
 
 <AddTutorialModal

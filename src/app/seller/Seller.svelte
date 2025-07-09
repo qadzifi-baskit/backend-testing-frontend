@@ -100,7 +100,7 @@
 </script>
 
 <div bind:this={element} class="p-6">
-  <Config bind:host bind:clientType show={config} {client}/>
+  <Config bind:clientType show={config} {client}/>
   <div class="divider"></div>
   <SellerRegister {client}/>
   <div class="divider"></div>

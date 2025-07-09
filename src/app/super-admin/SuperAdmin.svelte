@@ -33,12 +33,7 @@
 </script>
 
 <div id="root" class="p-6">
-  <Config
-    bind:host
-    bind:clientType
-    show={config}
-    {client}
-  />
+  <Config bind:clientType show={config} {client}/>
   <div class="divider"></div>
   <Auth
     store={auth}

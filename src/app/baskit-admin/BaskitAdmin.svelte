@@ -38,7 +38,6 @@
 
 <div id="root" class="p-6">
   <Config
-    bind:host
     bind:clientType
     show={config}
     {client}

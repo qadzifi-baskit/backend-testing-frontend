@@ -44,11 +44,7 @@
 </script>
 
 <div id="root" class="p-6">
-  <Config
-    bind:host
-    show={config}
-    {client}
-  />
+  <Config show={config} {client}/>
   <div class="divider"></div>
   <RegisterBrand
     {client}

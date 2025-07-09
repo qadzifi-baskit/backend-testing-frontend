@@ -19,15 +19,15 @@
   import { writable } from 'svelte/store';
 
   type Props = {
-    host?: string,
-    config: AppConfig,
+    config?: AppConfig,
   };
   let {
-    host = $bindable('https://api-beta.baskit.app/v2'),
-    config = 'host',
+    config: configList = 'host',
   }: Props = $props();
 
-  const client = createAxiosInstance({ baseURL: host });
+  const { config } = Context.strict;
+
+  const client = createAxiosInstance({ baseURL: config.host });
   const store = createAuthStore();
   const userContext = writable<UserContext>({});
   const orderContext = writable<OrderContext>({
@@ -92,9 +92,8 @@
 
 <div id="root" class="p-6">
   <Config
-    bind:host
     bind:clientType
-    show={config}
+    show={configList}
     {client}
   />
   <div class="divider"></div>
@@ -107,7 +106,6 @@
   {#if $store.loggedIn}
     <div class="divider"></div>
     <FieldTeamManagement
-      {client}
       role={[
         'BSC_SUPER_ADMIN',
         'BSC_ADMIN',
@@ -117,7 +115,6 @@
         'BSC_OFFICER',
       ]}
       {companyId}
-      {store}
     />
     <div class="divider"></div>
     <ProductManagement {companyId}/>

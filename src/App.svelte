@@ -11,18 +11,25 @@
   import GrosirSeller from './app/grosir-seller';
   import Seller from './app/seller';
   import SuperAdmin from './app/super-admin/SuperAdmin.svelte';
+  import FloatingBadge from './components/atoms/FloatingBadge.svelte';
   import Config from './components/molecules/Config.svelte';
   import ErrorManagerModal from './components/molecules/ErrorManagerModal.svelte';
   import ResourceViewerModal from './components/molecules/ResourceViewerModal.svelte';
   import { apiEnv } from './lib/config/env.svelte';
+  import { Context } from './lib/helper/context';
+  import { clamp } from './lib/helper/math';
   import { cn } from './lib/helper/tailwind';
+  import type { GlobalConfig } from './types/config';
   import type { AppConfig } from './types/app';
-  import FloatingBadge from './components/atoms/FloatingBadge.svelte';
-  let host = $state(apiEnv.DEFAULT_API_HOST);
 
-  const DEFAULT = true;
-  type PageComponent = Component<{ host: string, config: AppConfig }>;
-  const tabs:{ label: string, component: PageComponent, DEFAULT?: boolean }[] = [
+  const config:GlobalConfig = $state({
+    host: apiEnv.DEFAULT_API_HOST,
+  });
+  Context.set('config', config);
+
+  const DEFAULT = !import.meta.env.PROD;
+
+  const tabs:{ label: string, component: Component<{ config: AppConfig }>, DEFAULT?: boolean }[] = [
     { label: 'Buyer', component: Buyer },
     { label: 'Seller', component: Seller },
     { label: 'Grosir Seller', component: GrosirSeller },
@@ -31,9 +38,9 @@
     { label: 'Super Admin', component: SuperAdmin, DEFAULT },
     { label: 'Baskit Super Company', component: BaskitSuperCompany },
   ];
-  let selected = $state(
-    DEFAULT ? Math.max(0, tabs.findIndex((tab) => tab.DEFAULT)) : apiEnv.DEFAULT_APP,
-  );
+
+  const DEFAULT_APP = clamp(apiEnv.DEFAULT_APP ?? 0, 0, tabs.length - 1);
+  let selected = $state(DEFAULT ? Math.max(0, tabs.findIndex((tab) => tab.DEFAULT)) : DEFAULT_APP);
 
   let errorModal = $state<HTMLDialogElement>();
   let resourceModal = $state<HTMLDialogElement>();
@@ -41,15 +48,12 @@
 
 <ErrorManagerModal bind:dialog={errorModal}/>
 <ResourceViewerModal bind:dialog={resourceModal}/>
-<Config
-  bind:host
-  show='host'
-/>
+<Config show='host'/>
 <div style="--amount:{tabs.length}" role="tablist" class="tabs tabs-bordered w-full">
   {#each tabs as { component: Component }, index }
     <input checked={selected === index} type="radio" name="app-tab" role="tab" class="tab hidden" aria-label={`Tab ${index + 1}`}/>
     <div role="tabpanel" class="tab-content">
-      <Component bind:host config='client'/>
+      <Component config='client'/>
     </div>
   {/each}
 </div>

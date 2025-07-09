@@ -6,15 +6,14 @@
   import { apiEnv } from '@/lib/config/env.svelte';
   import type { AppConfig, AppConfigKey } from '@/types/app';
   import { AppConfigKeyList } from '@/consts/app';
+  import { Context } from '@/lib/helper/context';
 
   type Props = {
-    host?: string,
     clientType?: string,
     client?: AxiosInstance,
     show?: AppConfig,
   };
   let {
-    host = $bindable(apiEnv.DEFAULT_API_HOST),
     clientType = $bindable('BASKIT_SHOP'),
     show = AppConfigKeyList.map((key) => key),
     client,
@@ -32,13 +31,15 @@
     return false;
   }
 
+  const { config } = Context.strict;
+
   $effect(() => {
     if (client) {
-      client.defaults.baseURL = host;
+      client.defaults.baseURL = config.host;
     }
 
     dispatchChangeConfig({
-      host,
+      host: config.host,
       clientType,
     });
   });
@@ -50,7 +51,7 @@
       title="Host"
       showvalue
       options={apiEnv.API_HOST_LIST}
-      bind:value={host}
+      bind:value={config.host}
     />
   {/if}
   {#if getConfig('client')}

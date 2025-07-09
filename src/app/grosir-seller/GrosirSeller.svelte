@@ -54,7 +54,6 @@
 
 <div class="p-6">
   <Config
-    bind:host
     bind:clientType
     show={config}
     {client}
@@ -74,40 +73,26 @@
   />
   <div class="divider"></div>
   <FieldTeamManagement
-    {client}
     role="GROSIR_ADMIN"
     bind:companyId
     title="Grosir Admin Management"
-    store={GrosirSellerStore}
   />
   <div class="divider"></div>
   <FieldTeamManagement
-    {client}
     role="GROSIR_CASHIER"
     bind:companyId
     title="Grosir Cashier Management"
-    store={GrosirSellerStore}
   />
   <div class="divider"></div>
   <FieldTeamManagement
-    {client}
     role={['GROSIR_ADMIN', 'GROSIR_CASHIER']}
     bind:companyId
     title="Grosir Admin/Cashier Management"
-    store={GrosirSellerStore}
   />
   <div class="divider"></div>
-  <UserOfflineManagement
-    {client}
-    store={GrosirSellerStore}
-    bind:companyId
-  />
+  <UserOfflineManagement bind:companyId/>
   <div class="divider"></div>
-  <ProductManagement
-    store={GrosirSellerStore}
-    {client}
-    bind:companyId
-  />
+  <ProductManagement bind:companyId/>
   <div class="divider"></div>
   <InventoryList {companyId} grosir/>
   <div class="divider"></div>
@@ -117,8 +102,7 @@
     </div>
     <div class="divider divider-horizontal"></div>
     <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
-      <BuyerCart store={GrosirSellerStore}
-        {client}
+      <BuyerCart
         bind:memberLevel
         bind:userId={customerId}
         ordertype={OrderTypeEnum.GROSIR_OFFLINE}
@@ -126,10 +110,5 @@
     </div>
   </div>
   <div class="divider"></div>
-  <OrderList
-    {client}
-    store={GrosirSellerStore}
-    {companyId}
-    orderType={OrderTypeEnum.GROSIR_OFFLINE}
-  />
+  <OrderList {companyId} orderType={OrderTypeEnum.GROSIR_OFFLINE}/>
 </div>

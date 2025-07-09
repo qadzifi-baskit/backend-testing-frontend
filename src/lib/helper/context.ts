@@ -1,4 +1,5 @@
 import type { AuthStore } from '@/types';
+import type { GlobalConfig } from '@/types/config';
 import type { OrderContext, UserContext } from '@/types/context';
 import type { AxiosInstance } from 'axios';
 import { getContext, setContext } from 'svelte';
@@ -10,13 +11,15 @@ type ContextMap = {
   user?: Writable<UserContext>;
   auth?: Writable<AuthStore>;
   client?: AxiosInstance;
+  config?: GlobalConfig;
 };
-const ContextKey = Object.keys({
-  order: 0,
-  user: 0,
-  auth: 0,
-  client: 0,
-} satisfies Record<keyof ContextMap, 0>) as (keyof ContextMap)[];
+const ContextKey:(keyof ContextMap)[] = [
+  'order',
+  'user',
+  'auth',
+  'client',
+  'config',
+];
 
 function createContextHelpers<T extends Record<string, unknown>>() {
   const context = {

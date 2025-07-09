@@ -110,7 +110,6 @@
 </Modal>
 <div id="root" class="p-6">
   <Config
-    bind:host
     bind:clientType
     show={config}
     {client}
@@ -139,11 +138,7 @@
       </div>
       <div class="divider divider-horizontal"></div>
       <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
-        <BuyerCart
-          {client}
-          {userId}
-          onordercreated={resetQty}
-        />
+        <BuyerCart {userId} onordercreated={resetQty}/>
       </div>
     </div>
     <div class="divider"></div>
