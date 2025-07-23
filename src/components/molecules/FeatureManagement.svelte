@@ -55,7 +55,6 @@
       return stringToast('Failed to load data');
     }
     featureList = response.data?.data ?? [];
-    page = 1;
     max = response.data?.totalPage ?? 1;
   }
   const [debounceReloadData, cancelDebounceCall] = cancelableDebounce(reloadData);
@@ -66,15 +65,23 @@
 
   $effect(() => {
     if (show) {
-      featureList = [];
-      cancelAndReload();
+      setTimeout(cancelAndReload);
     }
   });
 
   $effect(() => {
-    page;
-    search;
-    debounceReloadData();
+    if (show) {
+      search;
+      page = 1; // Reset page when search changes
+    }
+  });
+
+  $effect(() => {
+    if (show) {
+      page;
+      search;
+      debounceReloadData();
+    }
   });
 
   let addFeatureDialog: HTMLDialogElement | undefined = $state();

@@ -11,49 +11,50 @@
   import SellerList from '@/components/molecules/SellerList.svelte';
   import TutorialManagement from '@/components/molecules/TutorialManagement.svelte';
   import { OrderTypeEnum } from '@/lib/enum';
+  import { createAxiosInstance } from '@/lib/helper/axios.svelte';
   import { Context } from '@/lib/helper/context';
-  import { BaskitAdminStore } from '@/store/store';
+  import { createAuthStore } from '@/store/store';
   import type { AppConfig } from '@/types/app';
-  import axios from 'axios';
 
   type Props = {
-    host?: string,
     config?: AppConfig,
   };
 
   let {
-    host = $bindable('https://api-beta.baskit.app/v2'),
-    config = 'host',
+    config: configList = 'host',
   }: Props = $props();
+
+  const { config } = Context.strict;
 
   let clientType = $state('WEB_CMS');
   let username = $state('boa@baskit.app');
   let password = $state('12345678');
 
-  const client = axios.create({ baseURL: host });
+  const client = createAxiosInstance({ baseURL: config.host });
+  const auth = createAuthStore();
 
-  Context.set('auth', BaskitAdminStore);
+  Context.set('auth', auth);
   Context.set('client', client);
 </script>
 
 <div id="root" class="p-6">
   <Config
     bind:clientType
-    show={config}
+    show={configList}
     {client}
   />
   <div class="divider"></div>
   <Auth
     {client}
-    store={BaskitAdminStore}
+    store={auth}
     bind:username
     bind:password
   />
-  {#if $BaskitAdminStore.loggedIn}
+  {#if $auth.loggedIn}
     <div class="divider"></div>
     <CompanyUserManagement/>
     <div class="divider"></div>
-    <CategoryManagement {client} store={BaskitAdminStore}/>
+    <CategoryManagement {client} store={auth}/>
     <div class="divider"></div>
     <OrderList orderType={[OrderTypeEnum.SHOP, OrderTypeEnum.ONLINE]}/>
     <div class="divider"></div>

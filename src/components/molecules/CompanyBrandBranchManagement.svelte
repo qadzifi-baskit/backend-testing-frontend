@@ -1,26 +1,23 @@
 <script lang="ts">
-  import { BrandUserStore } from '@/store/store';
+  import { Context } from '@/lib/helper/context';
+  import { createPaginationPanelState } from '@/lib/helper/template.svelte';
   import type {
     Company,
     CompanyStatus,
   } from '@/types';
-  import type { AxiosInstance } from 'axios';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPencil } from 'svelte-icons-pack/fa';
   import Collapse from '../Collapse.svelte';
   import Table5 from '../Table5.svelte';
   import NoWrap from '../atoms/NoWrap.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
-  import ModifyCompanyBrandBranchModal from './ModifyCompanyBrandBranchModal.svelte';
-  import { createPaginationPanelState } from '@/lib/helper/template.svelte';
   import AddCompanyBrandBranchModal from './AddCompanyBrandBranchModal.svelte';
+  import ModifyCompanyBrandBranchModal from './ModifyCompanyBrandBranchModal.svelte';
 
   type Props = {
-    client: AxiosInstance,
     userCompanyId: string,
   };
   let {
-    client,
     userCompanyId = $bindable(),
   }:Props = $props();
 
@@ -32,8 +29,10 @@
 
   let branchList:Company[] = $state([]);
 
+  const { client, auth } = Context.strict;
+
   async function getBranchList() {
-    if (!$BrandUserStore.loggedIn) return;
+    if (!$auth.loggedIn) return;
     const params = new URLSearchParams({
       parentId: userCompanyId,
       search,
@@ -123,7 +122,6 @@
 <AddCompanyBrandBranchModal
   bind:dialog={addDialog}
   brandId={userCompanyId}
-  {client}
 />
 <ModifyCompanyBrandBranchModal
   bind:dialog={modifyDialog}

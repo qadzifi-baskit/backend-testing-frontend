@@ -1,25 +1,25 @@
 <script lang="ts">
   import { DigitText, DigitTextID } from '@/consts/number';
+  import { listenConfigChange } from '@/event';
+  import { Context } from '@/lib/helper/context';
   import type { CompanyType } from '@/types';
-  import type { AxiosInstance } from 'axios';
   import SubmitButton from '../atoms/SubmitButton.svelte';
   import Modal from '../Modal.svelte';
   import Select from '../Select.svelte';
-  import { listenConfigChange } from '@/event';
 
   type Props = {
-    client: AxiosInstance,
     brandId: string,
     dialog?: HTMLDialogElement,
   };
   let {
-    client,
     brandId = $bindable(''),
     dialog = $bindable(),
   }:Props = $props();
 
   const phonePrefix = '+62999999994';
   const prefixOffset = phonePrefix.length;
+
+  const { client, auth } = Context.strict;
 
   let brandBranchCompanyTypeList:CompanyType[] = $state([]);
   let autoAdjust = $state(import.meta.env.MODE === 'development');
@@ -64,6 +64,7 @@
   });
 
   async function getBrandBranchCompanyTypeList() {
+    if (!$auth.loggedIn) return;
     const response = await client.get('/company/type?name=Brand%20Branch&type=BRAND');
     if (response.status !== 200) {
       return;

@@ -107,23 +107,27 @@
   }
 
   $effect(() => {
-    if (show) {
+    if (show || alwaysshow) {
       entityCategoryList = [];
-      cancelAndReload();
+      setTimeout(cancelAndReload);
     }
   });
 
   $effect(() => {
-    parentId;
-    parentOfId;
-    entityCategoryList = [];
-    cancelAndReload();
+    if (show || alwaysshow) {
+      parentId;
+      parentOfId;
+      entityCategoryList = [];
+      setTimeout(cancelAndReload);
+    }
   });
 
   $effect(() => {
-    page;
-    search;
-    debounceReloadData();
+    if (show || alwaysshow) {
+      page;
+      search;
+      setTimeout(debounceReloadData);
+    }
   });
 
   let addEntityCategoryDialog: HTMLDialogElement | undefined = $state();
@@ -232,7 +236,7 @@
     bind:page
     bind:max
     onreload={cancelAndReload}
-    onadd={showAddModal}
+    onadd={addCategory ? showAddModal : undefined}
   />
   <Table5 itemList={entityCategoryList}>
     {#snippet header()}

@@ -48,6 +48,7 @@
   const addToInventoryData = $derived({ productData, inventoryData });
 
   let categoryList:Category[] = $state([]);
+  let categorySearch = $state('');
   let selectedBrand = $state<Brand>();
   let principalList:Principal[] = $state([]);
   let addToInventory = $state(false);
@@ -56,6 +57,8 @@
     const response = await client.get('/category', {
       params: {
         type: 'CATEGORY',
+        includeEmpty: 'true',
+        name: categorySearch,
       },
     });
     if (response.status !== 200) {
@@ -63,6 +66,12 @@
     }
     categoryList = response.data?.data ?? [];
   }
+
+  $effect(() => {
+    if (!dialog?.open) return;
+    categorySearch;
+    getCategoryList();
+  });
 
   async function onopen() {
     await getCategoryList();
@@ -80,7 +89,7 @@
     if (!selectedBrand) {
       return stringToast('Brand not selected');
     }
-    const response = await client.get('/principal', {
+    const response = await client.get('/principal/', {
       params: {
         brandId,
       },
@@ -138,6 +147,7 @@
       <DropdownSelect
         placeholder="category"
         display="LABEL"
+        bind:search={categorySearch}
         options={categoryList.map((item) => [item.id, item.name])}
         bind:value={productData.categoryId}
       />

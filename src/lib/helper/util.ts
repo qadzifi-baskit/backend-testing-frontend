@@ -1,11 +1,13 @@
 import type { Entry } from '@/types/util';
 
+const DEFAULT_DELAY = 400;
+
 export function debounce<
   ArgType extends unknown[],
   ReturnType,
 >(
   callback: (...args: ArgType) => ReturnType,
-  delay = 300,
+  delay = DEFAULT_DELAY,
 ) {
   let timeoutId: NodeJS.Timeout;
   return (...args: ArgType) => {
@@ -21,7 +23,7 @@ export function cancelableDebounce<
   ReturnType,
 >(
   callback: (...args: ArgType) => ReturnType,
-  delay = 300,
+  delay = DEFAULT_DELAY,
 ) {
   const data = {
     timeoutId: null as NodeJS.Timeout | null,

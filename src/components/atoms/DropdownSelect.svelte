@@ -9,6 +9,8 @@
   // eslint-disable-next-line no-undef
   type ValueType = VT;
   // eslint-disable-next-line no-undef
+  type OptionType = VT extends Array<unknown> ? VT[number] : VT;
+  // eslint-disable-next-line no-undef
   type LabelType = LT;
   // eslint-disable-next-line no-undef
   type DisplayType = DT;
@@ -19,7 +21,7 @@
 
   type Props = {
     class?: string,
-    options?: [ValueType, LabelType, DisplayType?][],
+    options?: [OptionType, LabelType, DisplayType?][],
     placeholder?: string|Snippet,
     search?: string,
     value?: ValueType,

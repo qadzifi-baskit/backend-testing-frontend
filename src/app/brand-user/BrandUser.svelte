@@ -6,10 +6,11 @@
   import RegisterBrand from '@/components/molecules/RegisterBrand.svelte';
   import { listenAuthSuccess, listenDoAuth } from '@/event';
   import { apiEnv } from '@/lib/config/env.svelte';
-  import { BrandUserStore } from '@/store/store';
+  import { createAxiosInstance } from '@/lib/helper/axios.svelte';
+  import { Context } from '@/lib/helper/context';
+  import { createAuthStore } from '@/store/store';
   import type { Company } from '@/types';
   import type { AppConfig } from '@/types/app';
-  import axios from 'axios';
 
   type Props = {
     host?: string,
@@ -21,13 +22,18 @@
     config = 'host',
   }:Props = $props();
 
-  const client = axios.create({ baseURL: host });
+  const client = createAxiosInstance({ baseURL: host });
+  const auth = createAuthStore();
+
+  Context.set('client', client);
+  Context.set('auth', auth);
+
   let username = $state('');
   let password = $state('');
   let userCompanyId = $state('');
 
   async function getMyCompany() {
-    if (!$BrandUserStore.loggedIn) return;
+    if (!$auth.loggedIn) return;
     const response = await client.get('/users/me');
     if (response.status !== 200) return;
     userCompanyId = (<Company[]|undefined>response.data?.data?.companies)?.[0]?.id ?? '';
@@ -51,7 +57,7 @@
   />
   <div class="divider"></div>
   <Auth
-    store={BrandUserStore}
+    store={auth}
     {client}
     bind:username
     bind:password
@@ -64,6 +70,5 @@
   <div class="divider"></div>
   <CompanyBrandBranchManagement
     bind:userCompanyId
-    {client}
   />
 </div>

@@ -13,20 +13,32 @@
   import Table5 from '../Table5.svelte';
   import AddCategoryModal from './AddCategoryModal.svelte';
   import SubCategoryModal from './SubCategoryModal.svelte';
+  import { cancelableDebounce } from '@/lib/helper/util';
+  import FormInput from '../atoms/FormInput.svelte';
 
   type Props = {
     client: AxiosInstance,
     store: Writable<AuthStore>,
+    show?: boolean,
   };
   let {
     client,
     store,
+    show = $bindable(),
   }: Props = $props();
 
   let search = $state('');
   let page = $state(1);
   let max = $state(1);
   let nameExact = $state('');
+  let parentName = $state('');
+
+  $effect(() => {
+    search;
+    nameExact;
+    parentName;
+    page = 1;
+  });
 
   let categoryList:Category[] = $state([]);
 
@@ -36,16 +48,44 @@
     }
     const params = new URLSearchParams({
       includeEmpty: 'true',
+      name: search,
     });
     if (nameExact !== '') {
       params.append('nameExact', nameExact);
+    }
+    if (parentName !== '') {
+      params.append('parentName', parentName);
     }
     const response = await client.get('/category', { params });
     if (response.status !== 200) {
       return stringToast('Failed to load data');
     }
     categoryList = response.data?.data ?? [];
+    max = response.data?.totalPage ?? 1;
   }
+
+  const [debounceReload, cancelDebounce] = cancelableDebounce(reloadData);
+
+  function cancelAndReload() {
+    cancelDebounce();
+    reloadData();
+  }
+
+  $effect(() => {
+    if (show) {
+      setTimeout(cancelAndReload);
+    }
+  });
+
+  $effect(() => {
+    if (show) {
+      search;
+      nameExact;
+      parentName;
+      page;
+      debounceReload();
+    }
+  });
 
   let addCategoryDialog:HTMLDialogElement|undefined = $state();
   function showAddModal() {
@@ -70,6 +110,7 @@
     if (!$store.loggedIn) {
       return stringToast('Not logged in');
     }
+    stringToast('Deleting category...');
     const response = await client.delete(`/category/${id}`);
     if (response.status !== 200) {
       return stringToast('Failed to load data');
@@ -93,6 +134,7 @@
   {store}
 />
 <Collapse5
+  bind:show
   title="Category Management"
 >
   <PaginationNavigationPanel
@@ -102,12 +144,8 @@
     onreload={reloadData}
     onadd={showAddModal}
   />
-  <label class="form-control w-full max-w-xs mb-2">
-    <div class="label">
-      <span class="label-text">Name Exact</span>
-    </div>
-    <input type="text" placeholder="key" bind:value={nameExact} class="input input-bordered w-full max-w-xs" />
-  </label>
+  <FormInput label="Name Exact" placeholder="name exact" bind:value={nameExact}/>
+  <FormInput label="Parent Name" placeholder="parent name" bind:value={parentName}/>
   <Table5 itemList={categoryList}>
     {#snippet table(tableContent: Snippet)}
       <table class="table table-zebra table-pin-cols">

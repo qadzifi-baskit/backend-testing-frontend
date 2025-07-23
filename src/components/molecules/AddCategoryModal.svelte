@@ -7,6 +7,7 @@
   import Modal from '../Modal.svelte';
   import FormWrapper from '../atoms/FormWrapper.svelte';
   import SubmitButton from '../atoms/SubmitButton.svelte';
+  import FormInput from '../atoms/FormInput.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -53,21 +54,11 @@
     <FormWrapper
       {prehook}
       payload={data}
-      path="/category/sub"
+      path="/category"
       onsuccess={onCategoryAdded}
     >
-      <label class="form-control w-full max-w-xs mb-2">
-        <div class="label">
-          <span class="label-text">Name</span>
-        </div>
-        <input type="text" placeholder="name" bind:value={data.name} class="input input-bordered w-full max-w-xs" />
-      </label>
-      <label class="form-control w-full max-w-xs mb-2">
-        <div class="label">
-          <span class="label-text">Code</span>
-        </div>
-        <input type="text" placeholder="code" bind:value={data.code} class="input input-bordered w-full max-w-xs" />
-      </label>
+      <FormInput type="text" label="Name" placeholder="name" bind:value={data.name}/>
+      <FormInput type="text" label="Code" placeholder="code" bind:value={data.code}/>
       {#if parentId}
         <label class="form-control w-full max-w-xs mb-2">
           <div class="label">

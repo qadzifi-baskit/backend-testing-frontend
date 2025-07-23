@@ -12,6 +12,7 @@
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
+  import RoleDropdownSelect from './RoleDropdownSelect.svelte';
 
   const { client, auth: store } = Context.strict;
 
@@ -182,6 +183,7 @@
         {placeholder}
         {dropdownContainer}
       />
+      <RoleDropdownSelect/>
     </div>
   </td>
 {/snippet}

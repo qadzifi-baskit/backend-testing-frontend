@@ -36,7 +36,7 @@
       $limit: `${limit}`,
       search,
     });
-    const response = await client.get('/brand', { params });
+    const response = await client.get('/brand/', { params });
     if (response.status !== 200) return stringToast('Failed get user');
     brandList = response.data.data ?? [];
   }

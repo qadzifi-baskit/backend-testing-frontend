@@ -42,7 +42,7 @@
   <div class="flex flex-col items-start w-full h-full">
     <UserDropdownSelect bind:value={payload.userId}/>
     <CompanyDropdownSelect bind:value={payload.companyId}/>
-    <RoleDropdownSelect bind:value={payload.roleId}/>
+    <RoleDropdownSelect display-name bind:value={payload.roleId}/>
     <button class="btn btn-secondary mt-4" onclick={assign}>Assign</button>
   </div>
 </Modal>

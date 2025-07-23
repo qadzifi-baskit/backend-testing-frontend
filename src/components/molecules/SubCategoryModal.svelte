@@ -82,6 +82,7 @@
   bind:parentId
   {client}
   {store}
+  onsuccess={reloadData}
 />
 <Modal bind:dialog>
   <div class="w-full h-full">

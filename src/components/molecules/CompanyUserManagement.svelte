@@ -7,6 +7,7 @@
   import { cancelableDebounce } from '@/lib/helper/util';
   import AssignCompanyUserModal from './AssignCompanyUserModal.svelte';
   import RoleDropdownSelect from './RoleDropdownSelect.svelte';
+  import { getPaginationParams } from '@/lib/helper/pagination';
 
   type Props = {
     title?: string,
@@ -16,6 +17,7 @@
   }: Props = $props();
 
   const { client, auth } = Context.strict;
+  let { search, limit, max, page } = $state(getPaginationParams());
 
   let data:object[] = $state([]);
   let roleName = $state('');
@@ -26,6 +28,9 @@
     const params = new URLSearchParams({
       roleName,
       role: roleName,
+      search,
+      $limit: `${limit}`,
+      $page: `${page}`,
     });
     const response = await client.get('/company/user', { params });
     // Handle response and update state accordingly
@@ -33,6 +38,7 @@
       return stringToast('Failed to load company user data');
     }
     data = response.data.data ?? [];
+    max = response.data.max ?? 1;
   }
 
   const [debounce, cancel] = cancelableDebounce(reloadData);
@@ -51,9 +57,13 @@
 <AssignCompanyUserModal bind:dialog={addModal}/>
 <Collapse5 {title}>
   <PaginationNavigationPanel
+    bind:search
+    bind:limit
+    bind:max
+    bind:page
     onreload={cancelAndReload}
     {onadd}
   />
-  <RoleDropdownSelect bind:name={roleName}/>
+  <RoleDropdownSelect bind:name={roleName} display-name/>
   <Table5 itemList={data}></Table5>
 </Collapse5>

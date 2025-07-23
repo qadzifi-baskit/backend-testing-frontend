@@ -34,6 +34,8 @@
   let _this:ReturnType<typeof Collapse5>;
   export function open() {
     _this?.open();
+    relatedCategoryComponent?.cancelAndReload();
+    otherCategoryComponent?.cancelAndReload();
   }
 
   let relatedCategoryComponent: ReturnType<typeof EntityCategoryManagement>;
@@ -72,6 +74,7 @@
         excludeparentofid={parentofid}
         onaddchild={() => relatedCategoryComponent?.cancelAndReload()}
         onaddparent={() => relatedCategoryComponent?.cancelAndReload()}
+        addcategory
       />
     </div>
   </div>

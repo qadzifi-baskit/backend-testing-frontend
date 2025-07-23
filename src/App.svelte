@@ -33,9 +33,9 @@
     { label: 'Buyer', component: Buyer },
     { label: 'Seller', component: Seller },
     { label: 'Grosir Seller', component: GrosirSeller },
-    { label: 'Baskit Admin', component: BaskitAdmin },
+    { label: 'Baskit Admin', component: BaskitAdmin, DEFAULT },
     { label: 'Brand User', component: BrandUser },
-    { label: 'Super Admin', component: SuperAdmin, DEFAULT },
+    { label: 'Super Admin', component: SuperAdmin },
     { label: 'Baskit Super Company', component: BaskitSuperCompany },
   ];
 

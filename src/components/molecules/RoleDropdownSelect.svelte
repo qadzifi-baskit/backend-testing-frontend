@@ -10,8 +10,9 @@
     label?: string|Snippet,
     placeholder?: string|Snippet,
     show?: boolean,
-    value?: string|null,
+    value?: string|string[]|null,
     name?: string|null,
+    'display-name'?: boolean,
   };
   let {
     label,
@@ -19,6 +20,7 @@
     show = $bindable(false),
     value = $bindable(),
     name = $bindable(),
+    'display-name': displayName,
   }:Props = $props();
 
   const { client, auth } = Context.strict;
@@ -59,6 +61,7 @@
     bind:show
     bind:search
     bind:placeholder
+    display={displayName ? 'LABEL' : 'VALUE'}
     options={roleList.map((role) => [role.id, role.roleName])}
   />
 </label>

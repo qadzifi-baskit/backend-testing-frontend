@@ -1,19 +1,18 @@
 <script lang="ts">
   import { DigitText, DigitTextID } from '@/consts/number';
+  import { listenConfigChange } from '@/event';
+  import { Context } from '@/lib/helper/context';
   import type { CompanyType } from '@/types';
-  import type { AxiosInstance } from 'axios';
-  import Collapse from '../Collapse.svelte';
   import Select from '../Select.svelte';
   import SubmitButton from '../atoms/SubmitButton.svelte';
-  import { listenConfigChange } from '@/event';
+  import Collapse5 from '../Collapse5.svelte';
 
   type Props = {
-    client: AxiosInstance,
+    show?: boolean,
   };
+  let { show }:Props = $props();
 
-  let {
-    client,
-  }:Props = $props();
+  const { client } = Context.strict;
 
   const phonePrefix = '+62999999994';
   const prefixOffset = phonePrefix.length;
@@ -46,6 +45,7 @@
   });
 
   $effect(() => {
+    if (!show) return;
     if (!autoAdjust) return;
     const firstDigit = data.phone.slice(prefixOffset, prefixOffset + 1);
     const firstName = DigitText[firstDigit] ?? '-';
@@ -67,6 +67,7 @@
   });
 
   $effect(() => {
+    if (!show) return;
     if (!autoAdjust) return;
     const firstDigit = data.branch.phone.slice(prefixOffset, prefixOffset + 1);
     const firstName = DigitText[firstDigit] ?? '-';
@@ -125,6 +126,7 @@
   }
 
   listenConfigChange(() => {
+    if (!show) return;
     getBrandCompanyTypeList();
     getBrandBranchCompanyTypeList();
   });
@@ -137,9 +139,10 @@
   let aktaFiles:FileList|undefined = $state();
 </script>
 
-<Collapse
+<Collapse5
   title="Register Brand"
   class="w-full"
+  bind:show
 >
   <div class="form-control w-fit">
     <label class="label cursor-pointer">
@@ -288,4 +291,4 @@
   >
     Register
   </SubmitButton>
-</Collapse>
+</Collapse5>
