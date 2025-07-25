@@ -71,6 +71,7 @@
     if (!$authStore.loggedIn) {
       return stringToast('Not logged in');
     }
+    stringToast('Loading data...');
     const params = new URLSearchParams({
       search,
       $page: `${page}`,
@@ -99,6 +100,7 @@
     entityCategoryList = response.data?.data ?? [];
     page = 1;
     max = response.data?.totalPage ?? 1;
+    return stringToast('Data loaded successfully');
   }
   const [debounceReloadData, cancelDebounceCall] = cancelableDebounce(reloadData);
   export function cancelAndReload() {
@@ -223,6 +225,7 @@
     bind:dialog={modifyEntityCategoryDialog}
     bind:categoryid={selectedCategoryId}
     bind:title={selectedCategoryName}
+    onupdate={cancelAndReload}
   />
 {/if}
 <Collapse5
@@ -262,7 +265,7 @@
     {/snippet}
 
     {#snippet content(category)}
-      <td><NoWrap>{category.id}</NoWrap></td>
+      <td><NoWrap class="font-mono">{category.id}</NoWrap></td>
       <td><NoWrap>{category.name}</NoWrap></td>
       {#if modify}
         <td><EditButton onclick={showModifyModal(category.id, category.name)}/></td>
