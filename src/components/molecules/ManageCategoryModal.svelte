@@ -1,31 +1,28 @@
 <script lang="ts">
-  import type { AxiosInstance } from 'axios';
-  import Modal from '../Modal.svelte';
-  import type { Writable } from 'svelte/store';
-  import type { AuthStore } from '@/types';
+  import { Context } from '@/lib/helper/context';
   import type { Category } from '@/types/category';
+  import Modal from '../Modal.svelte';
   import Table5 from '../Table5.svelte';
   import NoWrap from '../atoms/NoWrap.svelte';
-  import AddCategoryModal from './AddCategoryModal.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
+  import AddCategoryModal from './AddCategoryModal.svelte';
+  import EntityCategoryHierarchyManagement from './EntityCategoryHierarchyManagement.svelte';
 
   type Props = {
     parentId: string,
-    client: AxiosInstance,
-    store: Writable<AuthStore>,
     dialog?: HTMLDialogElement,
   };
   let {
     parentId = $bindable(),
-    client,
-    store,
     dialog = $bindable(),
   }: Props = $props();
+
+  const { client, auth } = Context.strict;
 
   let subCategoryList:Category[] = $state([]);
 
   async function reloadData() {
-    if (!$store.loggedIn) {
+    if (!$auth.loggedIn) {
       throw new Error('Not logged in');
     }
     if (parentId === '') return;
@@ -81,7 +78,7 @@
   bind:dialog={addSubCategoryDialog}
   bind:parentId
   {client}
-  {store}
+  store={auth}
   onsuccess={reloadData}
 />
 <Modal bind:dialog>
@@ -95,6 +92,12 @@
       {colgroup}
       {header}
       {content}
+    />
+    <div class="divider"></div>
+    <EntityCategoryHierarchyManagement
+      path="tag"
+      method="PATCH"
+      parentofid={parentId}
     />
   </div>
 </Modal>

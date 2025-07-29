@@ -12,9 +12,9 @@
   import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
   import AddCategoryModal from './AddCategoryModal.svelte';
-  import SubCategoryModal from './SubCategoryModal.svelte';
   import { cancelableDebounce } from '@/lib/helper/util';
   import FormInput from '../atoms/FormInput.svelte';
+  import ManageCategoryModal from './ManageCategoryModal.svelte';
 
   type Props = {
     client: AxiosInstance,
@@ -127,7 +127,7 @@
   bind:dialog={addCategoryDialog}
   onsuccess={reloadData}
 />
-<SubCategoryModal
+<ManageCategoryModal
   bind:parentId
   bind:dialog={subCategoryDialog}
   {client}
@@ -177,7 +177,7 @@
 
     {#snippet content(category: Category, index: number)}
       <th>{index + 1}</th>
-      <td><NoWrap>{category.id}</NoWrap></td>
+      <td><NoWrap class="font-mono">{category.id}</NoWrap></td>
       <td><NoWrap>{category.code}</NoWrap></td>
       <td>
         <button class="btn btn-secondary"

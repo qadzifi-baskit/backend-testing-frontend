@@ -12,8 +12,11 @@
   import ModifyEntityCategoryModal from './ModifyEntityCategoryModal.svelte';
   import AddButton from '../atoms/AddButton.svelte';
   import DeleteButton from '../atoms/DeleteButton.svelte';
+  import type { RequestMethod } from '@/types/http';
 
   type Props = {
+    path?: string,
+    method?: RequestMethod,
     class?: string,
     categoryid?: string,
     modify?: boolean,
@@ -36,6 +39,8 @@
     title?: string,
   };
   let {
+    path = 'parent',
+    method = 'POST',
     class: clazz = $bindable(''),
     categoryid: categoryId,
     modify,
@@ -153,8 +158,11 @@
       if (!categoryId) {
         return stringToast('Missing category id');
       }
-      const response = await client.post(`/entity-category/parent/${addChildId}`, {
-        addParentId: categoryId,
+      const response = await client(`/entity-category/${path}/${addChildId}`, {
+        method,
+        data: {
+          addParentId: categoryId,
+        },
       });
       if (response.status !== 200) {
         return stringToast('Failed to add child');
@@ -170,8 +178,11 @@
       if (!categoryId) {
         return stringToast('Missing category id');
       }
-      const response = await client.post(`/entity-category/parent/${removeChildId}`, {
-        removeParentId: categoryId,
+      const response = await client(`/entity-category/${path}/${removeChildId}`, {
+        method,
+        data: {
+          removeParentId: categoryId,
+        },
       });
       if (response.status !== 200) {
         return stringToast('Failed to remove child');
@@ -187,8 +198,11 @@
       if (!categoryId) {
         return stringToast('Missing category id');
       }
-      const response = await client.post(`/entity-category/parent/${categoryId}`, {
-        addParentId,
+      const response = await client(`/entity-category/${path}/${categoryId}`, {
+        method,
+        data: {
+          addParentId,
+        },
       });
       if (response.status !== 200) {
         return stringToast('Failed to add parent');
@@ -204,8 +218,11 @@
       if (!categoryId) {
         return stringToast('Missing category id');
       }
-      const response = await client.post(`/entity-category/parent/${categoryId}`, {
-        removeParentId,
+      const response = await client(`/entity-category/${path}/${categoryId}`, {
+        method,
+        data: {
+          removeParentId,
+        },
       });
       if (response.status !== 200) {
         return stringToast('Failed to remove parent');

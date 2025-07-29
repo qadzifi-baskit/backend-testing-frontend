@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { RequestMethod } from '@/types/http';
   import Collapse5 from '../Collapse5.svelte';
   import EntityCategoryManagement from './EntityCategoryManagement.svelte';
 
@@ -8,12 +9,16 @@
     parentofid: string;
   };
   type Props = {
+    path?: string,
+    method?: RequestMethod,
     title?: string;
     subtitle?: string;
     parentid?: string;
     parentofid?: string;
   } & SubProps;
   let {
+    path = 'parent',
+    method = 'POST',
     title = 'Entity Category Hierarchy Management',
     subtitle = 'Related Entity Category Management',
     parentid,
@@ -46,6 +51,8 @@
   <div class="flex w-full h-full">
     <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
       <EntityCategoryManagement
+        {path}
+        {method}
         bind:this={relatedCategoryComponent}
         class="bg-base-300"
         alwaysshow
@@ -62,6 +69,8 @@
     <div class="divider divider-horizontal"></div>
     <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
       <EntityCategoryManagement
+        {path}
+        {method}
         bind:this={otherCategoryComponent}
         class="bg-base-300"
         title="Other Category"
