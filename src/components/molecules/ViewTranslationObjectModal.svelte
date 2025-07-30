@@ -26,12 +26,11 @@
       }),
     );
   }
-
-  getTranslationObjectList();
 </script>
 
 <Modal
   bind:dialog
+  onopen={getTranslationObjectList}
 >
   <div
     class="flex flex-col items-start w-full h-full"

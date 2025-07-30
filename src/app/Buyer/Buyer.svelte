@@ -11,8 +11,9 @@
   import './buyer.css';
   import { listenAuthSuccess } from '@/event';
   import { createAxiosInstance } from '@/lib/helper/axios.svelte';
-  import { BuyerStore } from '@/store/store';
   import type { AppConfig } from '@/types/app';
+  import { createAuthStore } from '@/store/store';
+  import { Context } from '@/lib/helper/context';
 
   type Props = {
     host?: string,
@@ -22,7 +23,12 @@
     host = $bindable('https://api-beta.baskit.app/v2'),
     config = 'host',
   }:Props = $props();
+
+  const auth = createAuthStore();
   const client = createAxiosInstance({ baseURL: host });
+
+  Context.set('client', client);
+  Context.set('auth', auth);
 
   const qtyMap:Record<string, number> = {};
   const warehouseList = writable(<Warehouse[]>[]);
@@ -61,6 +67,7 @@
   };
 
   listenAuthSuccess(() => {
+    if (!$auth.loggedIn) return;
     getBalance();
     getWarehouse();
   });
@@ -117,11 +124,11 @@
   <div class="divider"></div>
   <Auth
     {client}
-    store={BuyerStore}
+    store={auth}
     bind:username
     bind:password
   />
-  {#if $BuyerStore.loggedIn}
+  {#if $auth.loggedIn}
     <div class="divider"></div>
     <Collapse title="Profile">
       <button onclick={getBalance} class="btn btn-secondary">Get Balance</button>

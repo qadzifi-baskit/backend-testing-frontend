@@ -2,23 +2,37 @@
   import { listenAuthSuccess } from '@/event';
   import { DeliveryTypeEnum, OrderStatusEnum } from '@/lib/enum';
   import type { OrderReason } from '@/types';
-  import type { AxiosInstance } from 'axios';
   import DatePicker from '../DatePicker.svelte';
+  import Modal from '../Modal.svelte';
   import Select from '../Select.svelte';
+  import { Context } from '@/lib/helper/context';
+  import type { EventHandler } from 'svelte/elements';
 
-  export let onUpdateStatus:undefined|((status?: string) => void) = undefined;
-  export let id:string;
-  export let client:AxiosInstance;
+  type Props = {
+    onUpdateStatus?: (status: OrderStatusEnum) => void;
+    id: string;
+    dialog?: HTMLDialogElement;
+    onclose?: EventHandler<Event, HTMLDialogElement>;
+  };
+  let {
+    onUpdateStatus = $bindable(),
+    id = $bindable(''),
+    dialog = $bindable(),
+    onclose,
+  }: Props = $props();
+
+  const { client } = Context.strict;
+
   let selectedDate = new Date();
-  let selectedReasonId = '';
-  let cancelReasonList:OrderReason[] = [];
+  let selectedReasonId = $state('');
+  let cancelReasonList:OrderReason[] = $state([]);
 
   const excludedStatus:OrderStatusEnum[] = [
     OrderStatusEnum.ORDER_PARTIAL_RECEIVED,
   ];
-  let orderStatus: OrderStatusEnum = OrderStatusEnum.WAITING_FOR_PICK_UP;
+  let orderStatus: OrderStatusEnum = $state(OrderStatusEnum.WAITING_FOR_PICK_UP);
 
-  const getCancelReason = async () => {
+  async function getCancelReason() {
     const response = await client.get('/order/reason?type=CANCEL');
     if (response.status === 200) {
       cancelReasonList = response.data?.data ?? [];
@@ -27,7 +41,9 @@
   };
 
   listenAuthSuccess(() => {
-    getCancelReason();
+    if (dialog?.open) {
+      getCancelReason();
+    }
   });
 
   const updateStatus = async () => {
@@ -67,27 +83,33 @@
   };
 </script>
 
-<Select
-  title='Status'
-  showvalue
-  options={Object.entries(OrderStatusEnum)
-    .filter(([, status]) => !excludedStatus.includes(status))
-  }
-  bind:value={orderStatus}
-/>
-<DatePicker
-  on:select-date={onSelectDate}
-/>
-<div class="inline">
+<Modal
+  bind:dialog
+  onopen={getCancelReason}
+  {onclose}
+>
   <Select
-    title="Reason"
+    title='Status'
     showvalue
-    options={cancelReasonList.map((val) => [val.id, val.name])}
-    bind:value={selectedReasonId}
+    options={Object.entries(OrderStatusEnum)
+      .filter(([, status]) => !excludedStatus.includes(status))
+    }
+    bind:value={orderStatus}
   />
-</div>
-<button
-  class="btn btn-secondary"
-  on:click={updateStatus}>
-  Update
-</button>
+  <DatePicker
+    on:select-date={onSelectDate}
+  />
+  <div class="inline">
+    <Select
+      title="Reason"
+      showvalue
+      options={cancelReasonList.map((val) => [val.id, val.name])}
+      bind:value={selectedReasonId}
+    />
+  </div>
+  <button
+    class="btn btn-secondary"
+    onclick={updateStatus}>
+    Update
+  </button>
+</Modal>

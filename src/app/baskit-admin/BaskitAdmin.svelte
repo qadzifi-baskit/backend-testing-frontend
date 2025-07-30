@@ -54,7 +54,7 @@
     <div class="divider"></div>
     <CompanyUserManagement/>
     <div class="divider"></div>
-    <CategoryManagement {client} store={auth}/>
+    <CategoryManagement manage/>
     <div class="divider"></div>
     <OrderList orderType={[OrderTypeEnum.SHOP, OrderTypeEnum.ONLINE]}/>
     <div class="divider"></div>

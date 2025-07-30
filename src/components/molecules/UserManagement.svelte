@@ -14,6 +14,13 @@
   import Table5 from '../Table5.svelte';
   import RoleDropdownSelect from './RoleDropdownSelect.svelte';
 
+  type Props = {
+    show?: boolean,
+  };
+  let {
+    show = $bindable(),
+  }: Props = $props();
+
   const { client, auth: store } = Context.strict;
 
   let userList:User[] = $state([]);
@@ -38,6 +45,7 @@
   }
 
   $effect(() => {
+    if (!show) return;
     search;
     getUserList();
   });
@@ -45,6 +53,7 @@
   let excludeRoleId:string[] = $state([]);
 
   $effect(() => {
+    if (!show) return;
     excludeRoleId;
     getRoleList();
   });
@@ -76,6 +85,7 @@
   const debounceGetRoleList = debounce(getRoleList);
 
   $effect(() => {
+    if (!show) return;
     roleSearch;
     debounceGetRoleList();
   });
@@ -86,6 +96,7 @@
   }
 
   listenAuthSuccess(() => {
+    if (!show) return;
     reloadData();
   });
 

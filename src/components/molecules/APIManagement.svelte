@@ -7,12 +7,19 @@
   import { FaSolidPencil } from 'svelte-icons-pack/fa';
   import NoWrap from '../atoms/NoWrap.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
-  import Collapse from '../Collapse.svelte';
+  import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
   import AddApiModal from './AddAPIModal.svelte';
   import ModifyApiModal from './ModifyAPIModal.svelte';
 
-  const { client, auth: store } = Context.strict;
+  type Props = {
+    show?: boolean,
+  };
+  let {
+    show,
+  }: Props = $props();
+
+  const { client, auth } = Context.strict;
 
   let apiList:APIItem[] = $state([]);
   let page = $state(1);
@@ -20,7 +27,7 @@
   let search = $state('');
 
   const reloadData = async () => {
-    if (!$store.loggedIn) {
+    if (!$auth.loggedIn) {
       return;
     }
 
@@ -41,9 +48,11 @@
   const debounceReloadData = debounce(reloadData);
 
   $effect(() => {
-    page;
-    search;
-    debounceReloadData();
+    if (show) {
+      page;
+      search;
+      debounceReloadData();
+    }
   });
 
   let addApiDialog:HTMLDialogElement|undefined = $state();
@@ -78,10 +87,10 @@
   bind:item={selectedAPI}
   onsuccess={successModify}
 />
-<Collapse
+<Collapse5
   title="API Management"
   class="w-full"
-  onclick={reloadData}
+  bind:show
 >
   <PaginationNavigationPanel
     bind:search
@@ -129,4 +138,4 @@
       {/snippet}
     </Table5>
   {/if}
-</Collapse>
+</Collapse5>

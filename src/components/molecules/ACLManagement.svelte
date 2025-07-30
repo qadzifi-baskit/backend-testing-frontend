@@ -65,9 +65,11 @@
   const debounceGetACLList = debounce(getACLList);
 
   $effect(() => {
-    page;
-    search;
-    debounceGetACLList();
+    if (show) {
+      page;
+      search;
+      debounceGetACLList();
+    }
   });
 
   $effect(() => {

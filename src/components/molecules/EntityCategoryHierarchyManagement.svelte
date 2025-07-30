@@ -15,6 +15,7 @@
     subtitle?: string;
     parentid?: string;
     parentofid?: string;
+    show?: boolean;
   } & SubProps;
   let {
     path = 'parent',
@@ -23,6 +24,7 @@
     subtitle = 'Related Entity Category Management',
     parentid,
     parentofid,
+    show = $bindable(),
   }: Props = $props();
   const categoryid = $derived(parentid ?? parentofid);
 
@@ -47,7 +49,7 @@
   let otherCategoryComponent: ReturnType<typeof EntityCategoryManagement>;
 </script>
 
-<Collapse5 {title} bind:this={_this}>
+<Collapse5 {title} bind:this={_this} bind:show>
   <div class="flex w-full h-full">
     <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
       <EntityCategoryManagement
@@ -55,7 +57,7 @@
         {method}
         bind:this={relatedCategoryComponent}
         class="bg-base-300"
-        alwaysshow
+        bind:alwaysshow={show}
         title={subtitle}
         {categoryid}
         {parentid}
@@ -75,7 +77,7 @@
         class="bg-base-300"
         title="Other Category"
         {categoryid}
-        alwaysshow
+        bind:alwaysshow={show}
         addchild={Boolean(parentid)}
         addparent={Boolean(parentofid)}
         excludeid={categoryid}

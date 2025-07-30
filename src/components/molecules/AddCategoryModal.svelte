@@ -1,32 +1,31 @@
 <script lang="ts">
+  import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
-  import type { AuthStore } from '@/types';
   import type { Category } from '@/types/category';
-  import type { AxiosInstance } from 'axios';
-  import type { Writable } from 'svelte/store';
   import Modal from '../Modal.svelte';
+  import FormInput from '../atoms/FormInput.svelte';
   import FormWrapper from '../atoms/FormWrapper.svelte';
   import SubmitButton from '../atoms/SubmitButton.svelte';
-  import FormInput from '../atoms/FormInput.svelte';
+  import DropdownSelect from '../atoms/DropdownSelect.svelte';
 
   type Props = {
-    client: AxiosInstance,
-    store: Writable<AuthStore>,
     parentId?: string,
     onsuccess?: (data: Category) => void,
     dialog?: HTMLDialogElement,
   };
   let {
-    store,
     parentId = $bindable(),
     onsuccess,
     dialog = $bindable(),
   }:Props = $props();
 
+  const { auth } = Context.strict;
+
   const data = $state({
     name: '',
     code: '',
     parentId,
+    type: 'CATEGORY',
   });
 
   $effect(() => {
@@ -34,7 +33,7 @@
   });
 
   function prehook(payload: Partial<Category>) {
-    if (!$store.loggedIn) {
+    if (!$auth.loggedIn) {
       stringToast('Not logged in');
       throw new Error('Not logged in');
     }
@@ -67,7 +66,19 @@
           <input type="text" disabled placeholder="parent id" bind:value={parentId} class="input input-bordered w-full max-w-xs" />
         </label>
       {/if}
-      <SubmitButton>Add</SubmitButton>
+      <label>
+        <span class="fieldset-label mb-2 capitalize">Type</span>
+        <DropdownSelect
+          options={[
+            ['CATEGORY', 'Category'],
+            ['SUB', 'Subategory'],
+            ['SEGMENT', 'Segment'],
+            ['PRODUCT_TYPE', 'Product Type'],
+          ]}
+          bind:value={data.type}
+        />
+      </label>
+      <SubmitButton class="mt-2">Add</SubmitButton>
     </FormWrapper>
   </div>
 </Modal>

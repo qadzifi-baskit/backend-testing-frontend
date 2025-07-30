@@ -14,6 +14,13 @@
   import ModifyTranslationModal from './ModifyTranslationModal.svelte';
   import ViewTranslationObjectModal from './ViewTranslationObjectModal.svelte';
 
+  type Props = {
+    show?: boolean,
+  };
+  let {
+    show = $bindable(),
+  }: Props = $props();
+
   const { client, auth: store } = Context.strict;
 
   let langList:string[] = $state([]);
@@ -47,14 +54,18 @@
   const debounceReloadData = debounce(reloadData);
 
   $effect(() => {
-    search;
-    page = 1;
+    if (show) {
+      search;
+      page = 1;
+    }
   });
 
   $effect(() => {
-    search;
-    page;
-    debounceReloadData();
+    if (show) {
+      search;
+      page;
+      debounceReloadData();
+    }
   });
 
   async function getLangList() {
@@ -113,6 +124,7 @@
 <Collapse5
   title="Translation Management"
   class="w-full"
+  bind:show
 >
   <PaginationNavigationPanel
     bind:search

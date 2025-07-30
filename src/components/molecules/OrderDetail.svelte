@@ -11,7 +11,7 @@
   import TutorialManagement from './TutorialManagement.svelte';
   import Modal from '../Modal.svelte';
   import type { EventHandler } from 'svelte/elements';
-  import type { OrderTypeEnum } from '@/lib/enum';
+  import { OrderTypeEnum } from '@/lib/enum';
   import { SellerSalesOrderTypeMap } from '@/consts/order';
 
   type Props = {
@@ -39,7 +39,8 @@
   let detailList:OrderDetail[] = $state([]);
   let reasonList:OrderReason[] = $state([]);
   let historyList:HistoryEntity[] = $state([]);
-  let orderType = $state<OrderTypeEnum>();
+  let orderType = $state<OrderTypeEnum>(OrderTypeEnum.OFFLINE);
+  let showNotif = $state(false);
 
   const getHistory = async (orderId: string) => {
     if ($store && !$store.loggedIn) return;
@@ -61,10 +62,10 @@
 
   const getDetail = async (detailId: string) => {
     if ($store && !$store.loggedIn) return;
-    orderType = undefined;
+    orderType = OrderTypeEnum.OFFLINE; // Default to OFFLINE;
     const detailResponse = await client.get(`/order/${detailId}`);
     if (detailResponse.status === 200) {
-      orderType = detailResponse.data?.data?.orderType ?? undefined;
+      orderType = detailResponse.data?.data?.orderType ?? OrderTypeEnum.OFFLINE;
       const newDetailList:OrderDetail[] = detailResponse?.data?.data?.orderDetail ?? [];
       for (const { id, qty, sellingPrice: price } of newDetailList) {
         updateDataMap[id] = {
@@ -127,6 +128,9 @@
   bind:title={id}
   bind:dialog
   {onclose}
+  onopen={() => {
+    showNotif = true;
+  }}
 >
   <div>
     <PaginationNavigationPanel search={undefined} page={undefined} onreload={() => getDetail(id)}/>
@@ -177,6 +181,6 @@
   >
     Update
   </button>
-  <TutorialManagement bind:this={notifSection} show bind:ownerId={id}/>
+  <TutorialManagement bind:this={notifSection} bind:show={showNotif} bind:ownerId={id}/>
   <Table itemList={historyList}/>
 </Modal>

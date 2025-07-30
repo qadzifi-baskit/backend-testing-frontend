@@ -59,7 +59,7 @@
     excludeparentid: excludeParentId = $bindable(),
     excludeparentofid: excludeParentOfId = $bindable(),
     show = $bindable(false),
-    alwaysshow = false,
+    alwaysshow = $bindable(),
     title = 'Entity Category Management',
   }: Props = $props();
 

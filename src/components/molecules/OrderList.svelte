@@ -6,13 +6,12 @@
   import { FaSolidList, FaSolidPencil } from 'svelte-icons-pack/fa';
   import Collapse from '../Collapse.svelte';
   import DatePicker from '../DatePicker.svelte';
-  import Modal from '../Modal.svelte';
   import Table5 from '../Table5.svelte';
   import FormInput from '../atoms/FormInput.svelte';
   import NoWrap from '../atoms/NoWrap.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import OrderDetail from './OrderDetail.svelte';
-  import UpdateStatus from './UpdateStatus.svelte';
+  import UpdateStatusModal from './UpdateStatusModal.svelte';
 
   type Props = {
     endpoint?: string,
@@ -120,16 +119,12 @@
   };
 </script>
 
-<Modal
+<UpdateStatusModal
   bind:dialog={statusDialog}
   onclose={onCloseModal}
->
-  <UpdateStatus
-    bind:id={selectedId}
-    {client}
-    {onUpdateStatus}
-  />
-</Modal>
+  bind:id={selectedId}
+  {onUpdateStatus}
+/>
 <OrderDetail
   bind:dialog={detailDialog}
   onclose={onCloseModal}
