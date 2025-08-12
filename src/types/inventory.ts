@@ -30,6 +30,21 @@ export type Inventory = {
   memberDiscount: MemberDiscount[],
 };
 
+type UnitItem = {
+  unitId: string;
+  unit: string;
+  qty: number;
+  factor: number;
+};
+
+export type InventoryVariant = {
+  id: string,
+  name: string,
+  sku: string,
+  stockQty: number,
+  stockCount: UnitItem[];
+};
+
 export type AddInventoryOptions = {
   moq?: number,
   tierAmount?: number,

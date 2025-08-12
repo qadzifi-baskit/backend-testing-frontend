@@ -16,8 +16,9 @@ export type PaginationPanelProps<
   OnAdd extends (...args: unknown[]) => unknown = () => void,
 > = PaginationParams & {
   sort?: string|null,
-  order?: PaginationOrder,
+  order?: string,
   onreload?: OnReload,
   onadd?: OnAdd,
   sortOptions?: ([string]|[string, string])[],
+  orderOptions?: [string, string][],
 };

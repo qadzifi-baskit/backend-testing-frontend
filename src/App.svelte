@@ -31,11 +31,11 @@
 
   const tabs:{ label: string, component: Component<{ config: AppConfig }>, DEFAULT?: boolean }[] = [
     { label: 'Buyer', component: Buyer },
-    { label: 'Seller', component: Seller },
+    { label: 'Seller', component: Seller, DEFAULT },
     { label: 'Grosir Seller', component: GrosirSeller },
     { label: 'Baskit Admin', component: BaskitAdmin },
     { label: 'Brand User', component: BrandUser },
-    { label: 'Super Admin', component: SuperAdmin, DEFAULT },
+    { label: 'Super Admin', component: SuperAdmin },
     { label: 'Baskit Super Company', component: BaskitSuperCompany },
   ];
 

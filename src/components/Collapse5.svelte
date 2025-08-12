@@ -4,8 +4,8 @@
   import type { MouseEventHandler } from 'svelte/elements';
 
   type Props = {
-    title: string|Snippet,
     class?: string,
+    title?: string|Snippet,
     show?: boolean,
     alwaysshow?: boolean,
     onClick?: MouseEventHandler<HTMLInputElement>,

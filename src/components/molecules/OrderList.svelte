@@ -160,7 +160,17 @@
 
       {#snippet content(order)}
         <td><NoWrap>{order.id}</NoWrap></td>
-        <td><NoWrap>{order.createdAt}</NoWrap></td>
+        <td><NoWrap>
+          {(new Date(order.createdAt)).toLocaleString('ja-JP', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,// use 24-hour format
+          })}
+        </NoWrap></td>
         <td>{order.orderType}</td>
         <td><NoWrap>{order.orderCode}</NoWrap></td>
         <td>

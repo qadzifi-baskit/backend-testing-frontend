@@ -17,6 +17,7 @@
     onreload,
     onadd,
     sortOptions = [],
+    orderOptions,
   }:PaginationPanelProps = $props();
 
   const debounceResetPage = debounce(() => {
@@ -62,7 +63,7 @@
   <DropdownSelect
     class="w-fit"
     bind:value={order}
-    options={[
+    options={orderOptions ? orderOptions : [
       ['ASC', 'Ascending'],
       ['DESC', 'Descending'],
     ]}

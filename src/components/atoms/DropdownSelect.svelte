@@ -9,8 +9,6 @@
   // eslint-disable-next-line no-undef
   type ValueType = VT;
   // eslint-disable-next-line no-undef
-  type OptionType = VT extends Array<unknown> ? VT[number] : VT;
-  // eslint-disable-next-line no-undef
   type LabelType = LT;
   // eslint-disable-next-line no-undef
   type DisplayType = DT;
@@ -21,7 +19,7 @@
 
   type Props = {
     class?: string,
-    options?: [OptionType, LabelType, DisplayType?][],
+    options?: [ValueType, LabelType, DisplayType?][],
     placeholder?: string|Snippet,
     search?: string,
     value?: ValueType,
@@ -34,6 +32,7 @@
     dropdownContainer?: Snippet<[Snippet]>,
     show?: boolean,
     disabled?: boolean,
+    keepOpenOnSelect?: boolean,
   };
   let {
     class: clazz = '',
@@ -50,11 +49,12 @@
     dropdownContainer,
     show = $bindable(false),
     disabled = $bindable(false),
+    keepOpenOnSelect = true,
   }:Props = $props();
 
   let selectElement:HTMLDetailsElement|undefined;
   function onSelect() {
-    if (selectElement) {
+    if (keepOpenOnSelect === true && selectElement) {
       selectElement.open = false;
     }
   };
@@ -73,7 +73,7 @@
     }
   });
 
-  function reset() {
+  export function reset() {
     selectValue = defaultValue;
     onSelect();
   }

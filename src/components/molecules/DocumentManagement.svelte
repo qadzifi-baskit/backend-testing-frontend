@@ -18,7 +18,7 @@
     entityid?: string,
   };
   let {
-    show = $bindable(false),
+    show = $bindable(),
     entityid: targetEntityId = $bindable(),
   }: Props = $props();
 

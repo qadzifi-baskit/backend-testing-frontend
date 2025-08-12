@@ -135,7 +135,6 @@
   };
 
   const onUpdateInbound = async (data: UpdateOrderData[]) => {
-    console.log({ data });
     if (selectedInbound) {
       const response = await client.patch(
         `/order/inbound/status/${selectedInbound.id}`,

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import MultipleSelect from '@/components/atoms/MultipleSelect.svelte';
+  import Collapse5 from '@/components/Collapse5.svelte';
   import Auth from '@/components/molecules/Auth.svelte';
   import BuyerCart from '@/components/molecules/BuyerCart.svelte';
   import CartDraftManagement from '@/components/molecules/CartDraftManagement.svelte';
@@ -6,6 +8,7 @@
   import DocumentManagement from '@/components/molecules/DocumentManagement.svelte';
   import ExternalSalesManagament from '@/components/molecules/ExternalSalesManagament.svelte';
   import FieldTeamManagement from '@/components/molecules/FieldTeamManagement.svelte';
+  import Inventory2Management from '@/components/molecules/Inventory2Management.svelte';
   import InventoryList from '@/components/molecules/InventoryList.svelte';
   import OrderList from '@/components/molecules/OrderList.svelte';
   import ProductManagement from '@/components/molecules/ProductManagement.svelte';
@@ -16,11 +19,10 @@
   import { OrderTypeEnum } from '@/lib/enum';
   import { createAxiosInstance } from '@/lib/helper/axios.svelte';
   import { Context } from '@/lib/helper/context';
-  import { stringToast } from '@/lib/helper/toast';
   import { createAuthStore } from '@/store/store';
   import type { Company } from '@/types';
   import type { AppConfig } from '@/types/app';
-  import type { OrderContext, UserContext } from '@/types/context';
+  import type { UserContext } from '@/types/context';
   import { writable } from 'svelte/store';
 
   type Props = {
@@ -34,9 +36,6 @@
   let element:HTMLElement|undefined = $state();
   const auth = createAuthStore();
   const client = createAxiosInstance({ baseURL: host });
-  const orderContext = writable<OrderContext>({
-    paymentTypeList: [],
-  });
   const userContext = writable<UserContext>({});
   const orderTypeList:OrderTypeEnum[] = [
     OrderTypeEnum.OFFLINE,
@@ -44,7 +43,6 @@
     OrderTypeEnum.SELLER_PURCHASE_ORDER,
   ];
 
-  Context.set('order', orderContext);
   Context.set('user', userContext);
   Context.set('client', client);
   Context.set('auth', auth);
@@ -63,28 +61,9 @@
     const response = await client.get('/users/me');
     if (response.status !== 200) return;
     companyId = (<Company[]|undefined>response.data?.data?.companies)?.[0]?.id ?? '';
-    console.log({ companyId });
   }
 
   let customerId:string|undefined = $state();
-
-  async function getPaymentType() {
-    if (!$auth.loggedIn) return;
-    stringToast('Loading payment type...');
-    const response = await client.get('/payment-type', {
-      headers: {
-        'X-CLIENT': clientType,
-      },
-    });
-    if (response.status !== 200) return stringToast('Failed to load payment type');
-    orderContext.update((value) => (
-      {
-        ...value,
-        paymentTypeList: response.data?.data ?? [],
-      }
-    ));
-    stringToast('Payment type loaded');
-  };
 
   $effect(() => {
     if (element) {
@@ -93,13 +72,23 @@
       }, {}, element);
       listenAuthSuccess(() => {
         getMyCompany();
-        getPaymentType();
       }, {}, element);
     }
   });
 </script>
 
 <div bind:this={element} class="p-6">
+  <Collapse5>
+  </Collapse5>
+  <MultipleSelect
+    options={[
+      [1, 'One'],
+      [2, 'Two'],
+      [3, 'Three'],
+      [4, 'Four'],
+      [5, 'Five'],
+    ]}
+  />
   <Config bind:clientType show={config} {client}/>
   <div class="divider"></div>
   <SellerRegister {client}/>
@@ -122,12 +111,23 @@
     <div class="divider"></div>
     <div class="flex w-full rounded-box">
       <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
-        <InventoryList
-          order
-          ordertype={orderTypeList}
-          {companyId}
-          bind:selectedOrderType
-        />
+        <!-- name of each tab group should be unique -->
+        <div class="tabs tabs-box">
+          <input type="radio" name="order-tab" class="tab" aria-label="Old" checked/>
+          <div class="tab-content bg-base-100 border-base-300 h-fit">
+            <InventoryList
+              order
+              ordertype={orderTypeList}
+              {companyId}
+              bind:selectedOrderType
+            />
+          </div>
+
+          <input type="radio" name="order-tab" class="tab" aria-label="New"/>
+          <div class="tab-content bg-base-100 border-base-300 h-fit">
+            <Inventory2Management {companyId} isorder/>
+          </div>
+        </div>
       </div>
       <div class="divider divider-horizontal"></div>
       <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
@@ -136,6 +136,7 @@
           {companyId}
           ordertype={orderTypeList}
           bind:selectedOrderType
+          bind:clientType
         />
       </div>
     </div>
@@ -150,3 +151,9 @@
     <DocumentManagement/>
   {/if}
 </div>
+
+<style>
+  div.tab-content {
+    @apply h-fit;
+  }
+</style>

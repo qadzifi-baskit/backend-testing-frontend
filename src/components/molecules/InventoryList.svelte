@@ -42,7 +42,7 @@
   const selectedMap:Record<string, Inventory> = $state({});
   const client = Context.strict.client;
   const store = Context.strict.auth;
-  const orderTypeOptions:[string, string][] = ordertype ? (
+  const orderTypeOptions:[OrderTypeEnum, string][] = ordertype ? (
     typeof ordertype === 'string' ? [[ordertype, ordertype]]
       : ordertype.map((item) => [item, item])
   ) : [];

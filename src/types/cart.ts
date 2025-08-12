@@ -1,6 +1,11 @@
 import type { DeliveryTypeEnum, OrderTypeEnum } from '@/lib/enum';
 import type { MemberDiscountLevel } from '@/lib/enum/memberDiscount.enum';
 
+type StockCount = {
+  unitId: string,
+  unit: string,
+};
+
 export type Cart = {
   id: string, // Cart ID
   inventoryId: string,
@@ -17,10 +22,12 @@ export type Cart = {
   fullName: string,
   name: string,
   qty: number,
+  unitId: string|null,
   neededQty: number,
   warehouse: number,
   memberLevel: MemberDiscountLevel|null,
   memberDiscountAmount: number|null,
+  stockCount: StockCount[],
 };
 
 export type CartUpdatePayload = Partial<Cart> & {

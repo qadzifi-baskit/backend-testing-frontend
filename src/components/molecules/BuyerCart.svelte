@@ -13,6 +13,8 @@
   import Collapse from '../Collapse.svelte';
   import Table5 from '../Table5.svelte';
   import CartDraftDetail from './CartDraftDetail.svelte';
+  import { isNil } from '@/lib/helper/util';
+  import AddButton from '../atoms/AddButton.svelte';
 
   type Props = {
     userId?: string,
@@ -43,9 +45,9 @@
     onordercreated: onOrderCreated = () => null,
     paymentTypeId = $bindable(''),
     deliveryType = $bindable(DeliveryTypeEnum.SELLER_DELIVERY),
+    clientType = $bindable(),
   }:Props = $props();
 
-  const orderContext = Context.get('order');
   const cartData:Record<string, Partial<Cart>> = {};
   const { client, auth } = Context.strict;
 
@@ -219,10 +221,10 @@
       if (data.tierPrice) {
         payload.startPrice = data.tierPrice;
       }
-      if (data.discount) {
+      if (!isNil(data.discount)) {
         payload.discount = data.discount;
       }
-      if (data.discountAmount) {
+      if (!isNil(data.discountAmount)) {
         payload.discountAmount = data.discountAmount;
       }
       if (data.taxType) {
@@ -233,8 +235,13 @@
       if (data.tax) {
         payload.tax = data.tax;
       }
+      if (data.unitId) {
+        payload.unitId = data.unitId;
+      }
     }
-    const response = await client.patch(`/cart/${cartId}`, payload);
+    const response = await client.patch(`/cart/${cartId}`, {
+      ...payload,
+    });
     if (response.status !== 200) return stringToast('Failed to update cart');
     stringToast('Cart updated');
     getCart();
@@ -275,16 +282,48 @@
     getCart();
   }
 
+  async function getPaymentType() {
+    if (!$auth.loggedIn) return;
+    stringToast('Loading payment type...');
+    const response = await client.get('/payment-type', {
+      headers: {
+        'X-CLIENT': clientType,
+      },
+    });
+    if (response.status !== 200) return stringToast('Failed to load payment type');
+    paymentTypeList = response.data?.data ?? [];
+    stringToast('Payment type loaded');
+  };
+
   $effect(() => {
     if (show) {
       getCart();
+      getPaymentType();
     }
   });
 
-  if (orderContext) {
-    orderContext.subscribe((value) => {
-      paymentTypeList = value.paymentTypeList ?? [];
+  let addTempProduct = $state(false);
+  let addingTempProduct = $state(false);
+  const tempProduct = $state({
+    tempName: '',
+    unitName: '',
+  });
+  async function addTempProductToCart() {
+    if (!$auth || !$auth.loggedIn) return;
+    addingTempProduct = true;
+    stringToast('Adding temporary product to cart...');
+    const response = await client.post('/cart/temp', {
+      ...tempProduct,
+      companyId,
+      orderType: selectedOrderType,
     });
+    if (response.status !== 200) {
+      return stringToast('Failed to add temporary product to cart');
+    }
+    addTempProduct = false;
+    addingTempProduct = false;
+    getCart();
+    return stringToast('Temporary product added to cart');
   }
 </script>
 
@@ -309,6 +348,7 @@
         <td>Needed Qty</td>
       {/if}
       {#if OverStockOrderTypeList.includes(selectedOrderType)}
+        <td>Unit</td>
         <td>Initial Price</td>
         <td>Price</td>
         <td>Discount</td>
@@ -337,6 +377,21 @@
         </td>
       {/if}
       {#if OverStockOrderTypeList.includes(selectedOrderType)}
+        <td>
+          {#if cart.stockCount}
+            <!-- <DropdownSelect -->
+            <!--   options={cart.stockCount.map((stock) => [stock.unitId, stock.unit])} -->
+            <!--   bind:value={cartData[cart.id].unitId} -->
+            <!-- /> -->
+            <select class="select w-auto" bind:value={cartData[cart.id].unitId}>
+              {#each cart.stockCount as stock}
+                <option value={stock.unitId} selected={cartData[cart.id].unitId === stock.unitId}>
+                  {stock.unit}
+                </option>
+              {/each}
+            </select>
+          {/if}
+        </td>
         <td>
           <input type="number" readonly value={cart.initialPrice} class="input input-bordered w-24 max-w-xs">
         </td>
@@ -374,6 +429,27 @@
           <Icon src={FaTrashCan}/>
         </button>
       </th>
+    {/snippet}
+
+    {#snippet lastRow()}
+      {#if addTempProduct}
+        <tr>
+          <td>
+            <AddButton onclick={addTempProductToCart}/>
+          </td>
+          <td>
+            <input disabled={addingTempProduct} type="text" placeholder="product name" bind:value={tempProduct.tempName}>
+          </td>
+          <td>
+            <input disabled={addingTempProduct} type="text" placeholder="unit name" bind:value={tempProduct.unitName}>
+          </td>
+        </tr>
+      {/if}
+      <tr>
+        <td>
+          <AddButton onclick={() => addTempProduct = true}/>
+        </td>
+      </tr>
     {/snippet}
   </Table5>
   <div class="overflow-x-auto">

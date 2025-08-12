@@ -62,17 +62,21 @@
   const debounceGetFieldTeam = debounce(getFieldTeam);
 
   $effect(() => {
-    search;
-    page = 1;
-    max = 1;
+    if (show) {
+      search;
+      page = 1;
+      max = 1;
+    }
   });
 
   $effect(() => {
-    search;
-    page;
-    sort;
-    order;
-    debounceGetFieldTeam();
+    if (show) {
+      search;
+      page;
+      sort;
+      order;
+      debounceGetFieldTeam();
+    }
   });
 
   let addFieldTeamDialog:HTMLDialogElement|undefined = $state();

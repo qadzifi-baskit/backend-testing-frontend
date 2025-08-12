@@ -302,10 +302,7 @@
         <FormInput readonly type="text" placeholder="id" label="Id" bind:value={newData.id}/>
       {/if}
       <span class="fieldset label mb-2">Created At</span>
-      <DatePicker
-        bind:value={newData.creationDate!}
-        onselect={console.log}
-      />
+      <DatePicker bind:value={newData.creationDate!}/>
       <CompanyUserDropdownSelect
         bind:value={newData.salesId!}
         roleName={[
@@ -377,7 +374,7 @@
         bind:deliveryType={newData.deliveryType!}
       />
     {/if}
-    {#if $user?.id}
+    {#if $user?.id && dialog?.open}
       <div class="mb-2"></div>
       <DocumentManagement show bind:entityid={$user.id}/>
     {/if}
