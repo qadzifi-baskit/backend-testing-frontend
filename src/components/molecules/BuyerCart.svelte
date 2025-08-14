@@ -8,13 +8,15 @@
   import type { CreateOrderPayload } from '@/types/order';
   import type { Snippet } from 'svelte';
   import { Icon } from 'svelte-icons-pack';
-  import { FaFloppyDisk, FaTrashCan } from 'svelte-icons-pack/fa';
+  import { FaFloppyDisk, FaSolidPlus, FaTrashCan } from 'svelte-icons-pack/fa';
+  import { TiCancel } from 'svelte-icons-pack/ti';
   import FormInput from '../atoms/FormInput.svelte';
   import Collapse from '../Collapse.svelte';
   import Table5 from '../Table5.svelte';
   import CartDraftDetail from './CartDraftDetail.svelte';
   import { isNil } from '@/lib/helper/util';
   import AddButton from '../atoms/AddButton.svelte';
+  import IconButton from '../atoms/IconButton.svelte';
 
   type Props = {
     userId?: string,
@@ -135,6 +137,9 @@
     }
     if (cartCode) {
       params.append('cartCode', cartCode);
+    }
+    if (linkedOrderId) {
+      params.append('linkedOrderId', linkedOrderId);
     }
     const response = await client.get('/order', { params });
     if (response.status !== 200) return;
@@ -316,6 +321,7 @@
       ...tempProduct,
       companyId,
       orderType: selectedOrderType,
+      wareHouse: 0,
     });
     if (response.status !== 200) {
       return stringToast('Failed to add temporary product to cart');
@@ -447,7 +453,10 @@
       {/if}
       <tr>
         <td>
-          <AddButton onclick={() => addTempProduct = true}/>
+          <IconButton
+            icon={addTempProduct ? TiCancel : FaSolidPlus }
+            onclick={() => addTempProduct = !addTempProduct}
+          />
         </td>
       </tr>
     {/snippet}

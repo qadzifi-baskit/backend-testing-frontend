@@ -5,6 +5,7 @@ import type { AxiosInstance } from 'axios';
 import { getContext, setContext } from 'svelte';
 import type { Writable } from 'svelte/store';
 import { stringToast } from './toast';
+import type { AppSettings } from '@/types/app';
 
 type ContextMap = {
   order?: Writable<OrderContext>;
@@ -12,6 +13,7 @@ type ContextMap = {
   auth?: Writable<AuthStore>;
   client?: AxiosInstance;
   config?: GlobalConfig;
+  settings?: AppSettings;
 };
 const ContextKey:(keyof ContextMap)[] = [
   'order',
@@ -19,6 +21,7 @@ const ContextKey:(keyof ContextMap)[] = [
   'auth',
   'client',
   'config',
+  'settings',
 ];
 
 function createContextHelpers<T extends Record<string, unknown>>() {

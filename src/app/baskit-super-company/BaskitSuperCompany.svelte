@@ -3,6 +3,7 @@
   import BuyerCart from '@/components/molecules/BuyerCart.svelte';
   import Config from '@/components/molecules/Config.svelte';
   import FieldTeamManagement from '@/components/molecules/FieldTeamManagement.svelte';
+  import Inventory2Management from '@/components/molecules/Inventory2Management.svelte';
   import InventoryList from '@/components/molecules/InventoryList.svelte';
   import OrderList from '@/components/molecules/OrderList.svelte';
   import ProductManagement from '@/components/molecules/ProductManagement.svelte';
@@ -120,6 +121,8 @@
     <ProductManagement {companyId}/>
     <div class="divider"></div>
     <InventoryList {companyId}/>
+    <div class="divider"></div>
+    <Inventory2Management {companyId}/>
     <div class="divider"></div>
     <div class="flex w-full rounded-box">
       <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">

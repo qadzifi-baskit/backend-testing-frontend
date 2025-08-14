@@ -1,10 +1,10 @@
 <script lang="ts">
   import '@andypf/json-viewer';
   import { axiosErrorStore } from '@/store/store';
-  import Modal from '../Modal.svelte';
   import Fuse from 'fuse.js';
-  import SearchField from '../atoms/SearchField.svelte';
   import type { AxiosError } from 'axios';
+  import Modal from '@/components/Modal.svelte';
+  import SearchField from '@/components/atoms/SearchField.svelte';
 
   type Props = {
     dialog?: HTMLDialogElement,

@@ -1,52 +1,59 @@
 <script lang="ts">
-  import type { Component } from 'svelte';
   import { Icon } from 'svelte-icons-pack';
   import { BiError } from 'svelte-icons-pack/bi';
-  import { FaSolidAngleLeft, FaSolidAngleRight } from 'svelte-icons-pack/fa';
+  import { FaSolidAngleLeft, FaSolidAngleRight, FaSolidGear } from 'svelte-icons-pack/fa';
   import { VscOpenPreview } from 'svelte-icons-pack/vsc';
   import BaskitAdmin from './app/baskit-admin/BaskitAdmin.svelte';
   import BaskitSuperCompany from './app/baskit-super-company/BaskitSuperCompany.svelte';
   import BrandUser from './app/brand-user/BrandUser.svelte';
   import Buyer from './app/Buyer';
+  import ErrorManager from './app/ErrorManager.svelte';
   import GrosirSeller from './app/grosir-seller';
   import Seller from './app/seller';
+  import Settings from './app/Settings.svelte';
   import SuperAdmin from './app/super-admin/SuperAdmin.svelte';
   import FloatingBadge from './components/atoms/FloatingBadge.svelte';
   import Config from './components/molecules/Config.svelte';
-  import ErrorManagerModal from './components/molecules/ErrorManagerModal.svelte';
   import ResourceViewerModal from './components/molecules/ResourceViewerModal.svelte';
   import { apiEnv } from './lib/config/env.svelte';
   import { Context } from './lib/helper/context';
   import { clamp } from './lib/helper/math';
   import { cn } from './lib/helper/tailwind';
+  import type { AppSettings, AppTabs } from './types/app';
   import type { GlobalConfig } from './types/config';
-  import type { AppConfig } from './types/app';
 
   const config:GlobalConfig = $state({
     host: apiEnv.DEFAULT_API_HOST,
   });
+  const settings = $state<AppSettings>({ tabs: [] });
   Context.set('config', config);
+  Context.set('settings', settings);
 
-  const DEFAULT = !import.meta.env.PROD;
-
-  const tabs:{ label: string, component: Component<{ config: AppConfig }>, DEFAULT?: boolean }[] = [
+  const tabs:AppTabs[] = [
     { label: 'Buyer', component: Buyer },
-    { label: 'Seller', component: Seller, DEFAULT },
+    { label: 'Seller', component: Seller },
     { label: 'Grosir Seller', component: GrosirSeller },
     { label: 'Baskit Admin', component: BaskitAdmin },
     { label: 'Brand User', component: BrandUser },
     { label: 'Super Admin', component: SuperAdmin },
     { label: 'Baskit Super Company', component: BaskitSuperCompany },
   ];
+  settings.tabs = tabs;
 
   const DEFAULT_APP = clamp(apiEnv.DEFAULT_APP ?? 0, 0, tabs.length - 1);
-  let selected = $state(DEFAULT ? Math.max(0, tabs.findIndex((tab) => tab.DEFAULT)) : DEFAULT_APP);
+  settings.defaultTab = Number(localStorage.getItem('default-app') ?? DEFAULT_APP);
+
+  let selected = $state(
+    !import.meta.env.PROD ? settings.defaultTab : DEFAULT_APP,
+  );
 
   let errorModal = $state<HTMLDialogElement>();
   let resourceModal = $state<HTMLDialogElement>();
+  let settingsModal = $state<HTMLDialogElement>();
 </script>
 
-<ErrorManagerModal bind:dialog={errorModal}/>
+<ErrorManager bind:dialog={errorModal}/>
+<Settings bind:dialog={settingsModal}/>
 <ResourceViewerModal bind:dialog={resourceModal}/>
 <Config show='host'/>
 <div style="--amount:{tabs.length}" role="tablist" class="tabs tabs-bordered w-full">
@@ -101,6 +108,9 @@
     </button>
     <button class="btn btn-info fixed bottom-20 right-8 z-10" onclick={() => resourceModal?.showModal()}>
       <Icon src={VscOpenPreview}/>
+    </button>
+    <button class="btn btn-info fixed bottom-32 right-8 z-10" onclick={() => settingsModal?.showModal()}>
+      <Icon src={FaSolidGear}/>
     </button>
   </div>
 </div>

@@ -1,38 +1,31 @@
 <script lang="ts">
+  import { OrderTypeEnum } from '@/lib/enum';
   import { Context } from '@/lib/helper/context';
+  import { stringToast } from '@/lib/helper/toast';
   import { debounce } from '@/lib/helper/util';
-  import type { AddInventoryOptions, InventoryVariant } from '@/types/inventory';
+  import type { InventoryVariant } from '@/types/inventory';
   import type { PaginationOrder } from '@/types/pagination';
   import { untrack } from 'svelte';
+  import AddButton from '../atoms/AddButton.svelte';
+  import DropdownSelect from '../atoms/DropdownSelect.svelte';
   import NoWrap from '../atoms/NoWrap.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
-  import AddInventoryModal from './AddInventoryModal.svelte';
-  import AddProductModal from './AddProductModal.svelte';
-  import AddButton from '../atoms/AddButton.svelte';
-  import { stringToast } from '@/lib/helper/toast';
-  import { OrderTypeEnum } from '@/lib/enum';
-  import DropdownSelect from '../atoms/DropdownSelect.svelte';
+  import AddInventory2Modal from './AddInventory2Modal.svelte';
 
   type Props = {
     companyId?: string,
-    addOptions?: AddInventoryOptions,
     show?: boolean,
     isorder?: boolean,
     cartCode?: string,
   };
   let {
     companyId = $bindable(),
-    addOptions = {},
     show = $bindable(false),
     isorder = $bindable(false),
     cartCode,
   }:Props = $props();
-  const {
-    moq = 1,
-    tierAmount = 4,
-  } = addOptions;
 
   const { auth, client } = Context.strict;
   const payloadMap:Record<string, { qty: number, unitId: string }> = $state({});
@@ -42,11 +35,11 @@
   let limit = $state(10);
   let productList:InventoryVariant[] = $state([]);
   let search = $state('');
-  let productId = $state('');
   let sort:string|null = $state(null);
   let order:PaginationOrder = $state('ASC');
   let draft:string|null = $state(null);
   let active:string|null = $state(null);
+  let isLow:string|null = $state(null);
 
   async function reloadData() {
     if (!$auth.loggedIn) return;
@@ -67,6 +60,9 @@
     }
     if (draft) {
       params.append('draft', draft);
+    }
+    if (isLow) {
+      params.append('isLow', isLow);
     }
     const response = await client.get(
       '/inventory-2/variant',
@@ -119,6 +115,7 @@
       limit;
       active;
       draft;
+      isLow;
       page = 1;
     }
   });
@@ -132,14 +129,10 @@
       order;
       active;
       draft;
+      isLow;
       untrack(debounceGetProduct);
     }
   });
-
-  let addProductDialog:HTMLDialogElement|undefined = $state();
-  function showAddProduct() {
-    addProductDialog?.showModal();
-  };
 
   let addInventoryDialog:HTMLDialogElement|undefined = $state();
 
@@ -150,23 +143,16 @@
       };
     }
   });
+
+  let dropDialog = $state<HTMLDialogElement>();
 </script>
 
-<AddProductModal
-  bind:dialog={addProductDialog}
-  {client}
-  {companyId}
-/>
-<AddInventoryModal
-  bind:dialog={addInventoryDialog}
-  addOptions={{
-    moq,
-    tierAmount,
-  }}
-  {productId}
-  {companyId}
-  {client}
-/>
+{#if companyId}
+  <AddInventory2Modal
+    bind:dialog={addInventoryDialog}
+    {companyId}
+  />
+{/if}
 <Collapse5 title="Inventory 2"
   class="w-full"
   bind:show
@@ -191,11 +177,12 @@
       ['DESC,DESC', 'Descending, Descending'],
     ]}
     onreload={reloadData}
-    onadd={showAddProduct}
+    onadd={() => addInventoryDialog?.showModal()}
   />
   <div class="inline-block">
     <span class="fieldset-label mb-2 capitalize">Active</span>
     <DropdownSelect
+      placeholder="ALL"
       options={[
         [null, 'ALL'],
         ['true', 'True'],
@@ -207,6 +194,7 @@
   <div class="inline-block">
     <span class="fieldset-label mb-2 capitalize">Draft</span>
     <DropdownSelect
+      placeholder="ALL"
       options={[
         [null, 'ALL'],
         ['true', 'True'],
@@ -214,6 +202,39 @@
       ]}
       bind:value={draft}
     />
+  </div>
+  <div class="inline-block">
+    <span class="fieldset-label mb-2 capitalize">Is Low</span>
+    <DropdownSelect
+      placeholder="ALL"
+      options={[
+        [null, 'ALL'],
+        ['true', 'True'],
+        ['false', 'False'],
+      ]}
+      bind:value={isLow}
+    />
+  </div>
+  <div class="inline-block">
+    <button
+      class="btn btn-primary btn-sm"
+      onclick={() => {
+        if (dropDialog?.open) {
+          dropDialog.close();
+        } else {
+          dropDialog?.showModal();
+        }
+      }}
+    >
+      Drop
+    </button>
+    <dialog bind:this={dropDialog}>
+      <div>a</div>
+      <div>a</div>
+      <div>a</div>
+      <div>a</div>
+      <div>a</div>
+    </dialog>
   </div>
   {#if productList.length > 0}
     <Table5 itemList={productList}>

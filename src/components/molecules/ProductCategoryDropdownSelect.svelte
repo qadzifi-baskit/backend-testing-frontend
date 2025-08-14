@@ -2,7 +2,7 @@
   import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
   import { cancelableDebounce } from '@/lib/helper/util';
-  import type { EntityCategory } from '@/types/entityCategory';
+  import type { Category } from '@/types/category';
   import type { Snippet } from 'svelte';
   import DropdownSelect from '../atoms/DropdownSelect.svelte';
 
@@ -15,6 +15,7 @@
     disabled?: boolean,
     parentname?: string|string[],
     name?: string,
+    includeEmpty?: `${boolean}`,
   };
   let {
     placeholder = 'category',
@@ -25,18 +26,22 @@
     disabled = $bindable(false),
     parentname: parentName,
     name = $bindable(),
+    includeEmpty = 'true',
   }: Props = $props();
 
   const client = Context.getStrict('client');
   const store = Context.getStrict('auth');
 
-  let categoryList:EntityCategory[] = $state([]);
+  let categoryList:Category[] = $state([]);
   let search = $state('');
   async function reloadData() {
     if (!$store || !$store.loggedIn) return;
     const params = new URLSearchParams({
       search,
     });
+    if (includeEmpty) {
+      params.append('includeEmpty', includeEmpty);
+    }
     if (parentName) {
       if (Array.isArray(parentName)) {
         parentName.forEach((name) => {
@@ -46,7 +51,7 @@
         params.append('parentName', parentName);
       }
     }
-    const response = await client.get('/entity-category', { params });
+    const response = await client.get('/category', { params });
     if (response.status !== 200) return stringToast('Failed to get category list');
     categoryList = response.data.data ?? [];
   }
@@ -61,15 +66,6 @@
   });
 
   let categoryName = $state(name ?? placeholder);
-  /**
-  async function getAreaName() {
-    if (!value) return;
-    const response = await client.get(`/area/${value}`);
-    if (response.status !== 200) return stringToast('Failed to get area name');
-    const area:Area = response.data.data;
-    areaName = area.name;
-  }
-  */
   $effect(() => {
     if (!show) {
       if (value) {
@@ -91,7 +87,7 @@
     bind:show
     bind:search
     bind:value
-    options={categoryList.map((category) => [category.id, category.label])}
+    options={categoryList.map((category) => [category.id, category.name])}
     showvalue
     default={defaultValue}
     resetable
