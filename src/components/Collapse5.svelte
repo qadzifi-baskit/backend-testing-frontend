@@ -37,12 +37,14 @@
 
 <div class={cn('collapse bg-base-200', clazz)}>
   {#if alwaysshow}
-    <input disabled onclick={onClick} type="checkbox" checked />
+    <input class={cn(title === '' && 'hidden')} disabled onclick={onClick} type="checkbox" checked />
   {:else}
     <input onclick={onClick} type="checkbox" bind:checked={show} />
   {/if}
   {#if typeof title === 'string'}
-    <div class="collapse-title text-xl font-medium">{title}</div>
+    {#if title !== ''}
+      <div class="collapse-title text-xl font-medium">{title}</div>
+    {/if}
   {:else}
     {@render title()}
   {/if}

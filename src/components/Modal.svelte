@@ -7,7 +7,7 @@
   import FloatingBadge from './atoms/FloatingBadge.svelte';
 
   type Props = {
-    title?: string,
+    title?: string|null,
     dialog?: HTMLDialogElement,
     class?: string,
     onopen?: ToggleEventHandler<HTMLDialogElement>,

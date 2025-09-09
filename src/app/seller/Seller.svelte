@@ -1,6 +1,4 @@
 <script lang="ts">
-  import MultipleSelect from '@/components/atoms/MultipleSelect.svelte';
-  import Collapse5 from '@/components/Collapse5.svelte';
   import Auth from '@/components/molecules/Auth.svelte';
   import BuyerCart from '@/components/molecules/BuyerCart.svelte';
   import CartDraftManagement from '@/components/molecules/CartDraftManagement.svelte';
@@ -78,20 +76,9 @@
 </script>
 
 <div bind:this={element} class="p-6">
-  <Collapse5>
-  </Collapse5>
-  <MultipleSelect
-    options={[
-      [1, 'One'],
-      [2, 'Two'],
-      [3, 'Three'],
-      [4, 'Four'],
-      [5, 'Five'],
-    ]}
-  />
   <Config bind:clientType show={config} {client}/>
   <div class="divider"></div>
-  <SellerRegister {client}/>
+  <SellerRegister/>
   <div class="divider"></div>
   <Auth store={auth} {client} bind:username bind:password bind:element/>
   {#if companyId}
@@ -141,12 +128,9 @@
       </div>
     </div>
     <div class="divider"></div>
-    <CartDraftManagement
-      {client}
-      {companyId}
-    />
+    <CartDraftManagement {companyId}/>
     <div class="divider"></div>
-    <OrderList {companyId} orderType={orderTypeList}/>
+    <OrderList {companyId} orderType={orderTypeList} notCompletedBy={$auth.userId}/>
     <div class="divider"></div>
     <DocumentManagement/>
   {/if}

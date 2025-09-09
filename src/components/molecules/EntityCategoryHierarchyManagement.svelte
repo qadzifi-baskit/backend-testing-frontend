@@ -9,24 +9,35 @@
     parentofid: string;
   };
   type Props = {
+    tag?: boolean,
     path?: string,
     method?: RequestMethod,
     title?: string;
     subtitle?: string;
+    othersubtitle?: string;
     parentid?: string;
     parentofid?: string;
     show?: boolean;
   } & SubProps;
   let {
+    tag,
     path = 'parent',
     method = 'POST',
     title = 'Entity Category Hierarchy Management',
     subtitle = 'Related Entity Category Management',
+    othersubtitle = 'Other Entity Category Management',
     parentid,
     parentofid,
     show = $bindable(),
   }: Props = $props();
   const categoryid = $derived(parentid ?? parentofid);
+
+  $effect(() => {
+    if (tag) {
+      path = 'tag';
+      method = 'PATCH';
+    }
+  });
 
   $effect(() => {
     if (parentid) {
@@ -75,7 +86,7 @@
         {method}
         bind:this={otherCategoryComponent}
         class="bg-base-300"
-        title="Other Category"
+        title={othersubtitle}
         {categoryid}
         bind:alwaysshow={show}
         addchild={Boolean(parentid)}

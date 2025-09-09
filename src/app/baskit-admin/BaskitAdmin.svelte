@@ -10,6 +10,8 @@
   import ProductManagement from '@/components/molecules/ProductManagement.svelte';
   import SellerList from '@/components/molecules/SellerList.svelte';
   import TutorialManagement from '@/components/molecules/TutorialManagement.svelte';
+  import UomCategoryManagement from '@/components/molecules/UomCategoryManagement.svelte';
+  import UomManagement from '@/components/molecules/UomManagement.svelte';
   import { OrderTypeEnum } from '@/lib/enum';
   import { createAxiosInstance } from '@/lib/helper/axios.svelte';
   import { Context } from '@/lib/helper/context';
@@ -53,6 +55,10 @@
   {#if $auth.loggedIn}
     <div class="divider"></div>
     <CompanyUserManagement/>
+    <div class="divider"></div>
+    <UomManagement/>
+    <div class="divider"></div>
+    <UomCategoryManagement/>
     <div class="divider"></div>
     <CategoryManagement manage/>
     <div class="divider"></div>

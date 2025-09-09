@@ -177,91 +177,88 @@
   <th>Name</th>
 {/snippet}
 
-{#snippet brandContent(brand: Brand)}
-  <td><NoWrap>{brand.id}</NoWrap></td>
-  <td>
-    <button
-      class="btn btn-secondary"
-      onclick={() => assignBrand(brand.id)}
-    >
-      <Icon src={FaSolidPlus}/>
-    </button>
-  </td>
-  <td><NoWrap>{brand.code}</NoWrap></td>
-  <td><NoWrap>{brand.name}</NoWrap></td>
-{/snippet}
-
-{#snippet assignedBrandContent(brand: Brand)}
-  <td><NoWrap>{brand.id}</NoWrap></td>
-  <td>
-    <button
-      class="btn btn-secondary"
-      onclick={() => removeBrand(brand.id)}
-    >
-      <Icon src={FaSolidTrashCan}/>
-    </button>
-  </td>
-  <td><NoWrap>{brand.code}</NoWrap></td>
-  <td><NoWrap>{brand.name}</NoWrap></td>
-{/snippet}
-
-{#snippet content()}
-  <div class="w-full collapse-content">
-    <DropdownSelect
-      bind:search={principalSearch}
-      bind:value={selectedPrincipalId}
-      options={principalList.map((principal) => [principal.id, principal.name])}
-      showvalue
-      display="LABEL"
-      placeholder="principal"
-    />
-    <button class="btn btn-secondary"
-      onclick={() => selectedPrincipalId = ''}
-    >
-      <Icon src={FaSolidRotate}/>
-    </button>
-    <div class="flex">
-      <div class="card bg-base-300 rounded-box grid h-fit w-2/5 grow bg-inherit">
-        <div class="overflow-x-auto">
-          <PaginationNavigationPanel
-            bind:search
-            bind:max
-            bind:page
-            onreload={getBrandList}
-          />
-          {#if selectedPrincipalId !== ''}
-            <Table5
-              {header}
-              content={brandContent}
-              itemList={brandList}
+<Collapse5
+  title="Brand Management"
+>
+  {#snippet content()}
+    <div class="w-full collapse-content">
+      <DropdownSelect
+        bind:search={principalSearch}
+        bind:value={selectedPrincipalId}
+        options={principalList.map((principal) => [principal.id, principal.name])}
+        showvalue
+        display="LABEL"
+        placeholder="principal"
+      />
+      <button class="btn btn-secondary"
+        onclick={() => selectedPrincipalId = ''}
+      >
+        <Icon src={FaSolidRotate}/>
+      </button>
+      <div class="flex">
+        <div class="card bg-base-300 rounded-box grid h-fit w-2/5 grow">
+          <div class="overflow-x-auto">
+            <PaginationNavigationPanel
+              bind:search
+              bind:max
+              bind:page
+              onreload={getBrandList}
             />
-          {/if}
+            {#if selectedPrincipalId !== ''}
+              <Table5
+                {header}
+                itemList={brandList}
+              >
+                {#snippet content(brand: Brand)}
+                  <td><NoWrap>{brand.id}</NoWrap></td>
+                  <td>
+                    <button
+                      class="btn btn-secondary"
+                      onclick={() => assignBrand(brand.id)}
+                    >
+                      <Icon src={FaSolidPlus}/>
+                    </button>
+                  </td>
+                  <td><NoWrap>{brand.code}</NoWrap></td>
+                  <td><NoWrap>{brand.name}</NoWrap></td>
+                {/snippet}
+              </Table5>
+            {/if}
+          </div>
         </div>
-      </div>
-      <div class="divider divider-horizontal"></div>
-      <div class="card bg-base-300 rounded-box grid h-fit w-2/5 grow bg-inherit">
-        <div class="overflow-x-auto">
-          <PaginationNavigationPanel
-            bind:search
-            bind:max
-            bind:page
-            onreload={getAssignedBrandList}
-          />
-          {#if selectedPrincipalId !== ''}
-            <Table5
-              {header}
-              content={assignedBrandContent}
-              itemList={assignedBrandList}
+        <div class="divider divider-horizontal"></div>
+        <div class="card bg-base-300 rounded-box grid h-fit w-2/5 grow">
+          <div class="overflow-x-auto">
+            <PaginationNavigationPanel
+              bind:search
+              bind:max
+              bind:page
+              onreload={getAssignedBrandList}
             />
-          {/if}
+            {#if selectedPrincipalId !== ''}
+              <Table5
+                {header}
+                itemList={assignedBrandList}
+              >
+
+                {#snippet content(brand: Brand)}
+                  <td><NoWrap>{brand.id}</NoWrap></td>
+                  <td>
+                    <button
+                      class="btn btn-secondary"
+                      onclick={() => removeBrand(brand.id)}
+                    >
+                      <Icon src={FaSolidTrashCan}/>
+                    </button>
+                  </td>
+                  <td><NoWrap>{brand.code}</NoWrap></td>
+                  <td><NoWrap>{brand.name}</NoWrap></td>
+                {/snippet}
+              </Table5>
+            {/if}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-{/snippet}
-
-<Collapse5
-  title="Brand Management"
-  {content}
->
+  {/snippet}
 </Collapse5>

@@ -1,30 +1,38 @@
 <script lang="ts" generics="T">
   import { cn } from '@/lib/helper/tailwind';
+  import type { Snippet } from 'svelte';
   // eslint-disable-next-line no-undef
   type ValueType = T;
 
-  export let title = '';
-  export let showvalue = false;
-  export let options: [ValueType, string, boolean?][] = [];
-  export let value:ValueType;
-  export let containerClass = '';
-  export let labelClass = '';
-  let clazz = '';
-  export { clazz as class };
+  type Props = {
+    showvalue?: boolean;
+    options: [ValueType, string, boolean?][],
+    value?: ValueType;
+    class?: string,
+    label?: string|Snippet,
+  };
+
+  let {
+    showvalue = false,
+    options = [],
+    value = $bindable(),
+    label,
+    class: clazz = '',
+  }:Props = $props();
 </script>
 
-<label class={cn('form-control w-full max-w-xs', containerClass)}>
+{#if typeof label === 'string'}
   <div class="label">
-    <span class={cn('label-text', labelClass)}>{title}</span>
+    <span class="label-text-alt">{label}</span>
   </div>
-  <select bind:value class={cn('select select-bordered', clazz)}>
-    {#each options as [optionValue, optionLabel, disabled]}
-      <option value={optionValue} {disabled}>{optionLabel}</option>
-    {/each}
-  </select>
-  {#if showvalue}
-    <div class="label">
-      <span class="label-text-alt">{value}</span>
-    </div>
-  {/if}
-</label>
+{:else}
+  {@render label?.()}
+{/if}
+<select bind:value class={cn('select select-bordered', clazz)}>
+  {#each options as [optionValue, optionLabel, disabled]}
+    <option value={optionValue} {disabled}>{optionLabel}</option>
+  {/each}
+</select>
+{#if showvalue}
+  <span class="label">{value}</span>
+{/if}

@@ -1,20 +1,19 @@
 <script lang="ts">
   import { debounce } from '@/lib/helper/util';
-  import type { AxiosInstance } from 'axios';
   import Collapse5 from '../Collapse5.svelte';
   import DropdownSelect from '../atoms/DropdownSelect.svelte';
   import FormWrapper from '../atoms/FormWrapper.svelte';
   import FormInput from '../atoms/FormInput.svelte';
   import SubmitButton from '../atoms/SubmitButton.svelte';
   import { stringToast } from '@/lib/helper/toast';
+  import IconButton from '../atoms/IconButton.svelte';
+  import { AiOutlineReload } from 'svelte-icons-pack/ai';
 
   type Props = {
-    client: AxiosInstance,
     showEmail?: boolean,
     helpGenerateEmail?: boolean,
   };
   let {
-    client,
     showEmail = $bindable(false),
     helpGenerateEmail = false,
   }:Props = $props();
@@ -28,12 +27,13 @@
     companyName: '',
     subscriptionType: 'ENTERPRISE',
     companyTypeId: <string|undefined>undefined,
+    roleName: <string|undefined>undefined,
   });
   let showDetail = $state(false);
 
   function generateEmail() {
     payload.email = `${payload.firstName.replace(/\s+/g, '-').toLowerCase()}.` +
-      `${payload.lastName.replace(/\s+/g, '-').toLowerCase()}@testing.com`;
+      `${payload.lastName.replace(/\s+/g, '-').toLowerCase()}@yopmail.com`;
   }
 
   const debounceGenerateEmail = debounce(generateEmail);
@@ -69,6 +69,9 @@
     if (!payload.companyTypeId) {
       data.companyTypeId = undefined;
     }
+    if (!payload.roleName) {
+      data.roleName = undefined;
+    }
     return data;
   }
 </script>
@@ -76,7 +79,7 @@
 {#snippet content()}
   <div class="collapse-content">
     <FormWrapper
-      {client}
+      noauth
       {payload}
       {prehook}
       path="/auth/register"
@@ -86,7 +89,8 @@
       <FormInput label="Phone" placeholder="phone" bind:value={payload.phone}/>
       <FormInput label="Show E-Mail" type="checkbox" bind:checked={showEmail}/>
       {#if showEmail}
-        <FormInput label="E-Mail" placeholder="email" type="email" bind:value={payload.email}/>
+        <FormInput class="inline-flex" label="E-Mail" placeholder="email" type="email" bind:value={payload.email}/>
+        <IconButton class="mb-2" type="button" icon={AiOutlineReload} onclick={generateEmail}/>
       {/if}
       <FormInput label="Password" type="password" placeholder="password" bind:value={payload.password} toggle/>
       <FormInput label="Company Name" placeholder="company name" bind:value={payload.companyName}/>
@@ -100,6 +104,7 @@
       <FormInput label="Details" type="checkbox" bind:checked={showDetail}/>
       {#if showDetail}
         <FormInput label="Company Type ID" placeholder="company type id" bind:value={payload.companyTypeId}/>
+        <FormInput label="Company Type ID" placeholder="company type id" bind:value={payload.roleName}/>
       {/if}
       <SubmitButton/>
     </FormWrapper>

@@ -14,19 +14,21 @@
   import UpdateStatusModal from './UpdateStatusModal.svelte';
 
   type Props = {
+    show?: boolean,
     endpoint?: string,
     userId?: string,
     orderType?: string|string[],
     companyId?: string,
-    show?: boolean,
+    notCompletedBy?: string|string[],
   };
 
   let {
+    show = $bindable(false),
     endpoint = 'list-order',
     userId = undefined,
     orderType = 'SHOP',
     companyId,
-    show = $bindable(false),
+    notCompletedBy = $bindable(),
   }:Props = $props();
 
   const store = Context.auth;
@@ -62,6 +64,11 @@
     }
     if (linkedOrderId) {
       params.append('linkedOrderId', linkedOrderId);
+    }
+    if (Array.isArray(notCompletedBy)) {
+      notCompletedBy.forEach((item) => params.append('notCompletedBy', item));
+    } else if (notCompletedBy) {
+      params.append('tutorialNotCompletedBy', notCompletedBy);
     }
     const response = await client.get(
       `/order/${endpoint}`,

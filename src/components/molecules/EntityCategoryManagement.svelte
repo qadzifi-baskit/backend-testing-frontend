@@ -13,12 +13,14 @@
   import AddButton from '../atoms/AddButton.svelte';
   import DeleteButton from '../atoms/DeleteButton.svelte';
   import type { RequestMethod } from '@/types/http';
+  import { untrack, type Snippet } from 'svelte';
+  import { getPaginationParams } from '@/lib/helper/pagination';
 
   type Props = {
     path?: string,
     method?: RequestMethod,
     class?: string,
-    categoryid?: string,
+    categoryid?: string|null,
     modify?: boolean,
     addcategory?: boolean,
     addchild?: boolean,
@@ -34,9 +36,11 @@
     parentid?: string,
     excludeparentid?: string,
     excludeparentofid?: string,
+    parentname?: string|string[],
     show?: boolean,
     alwaysshow?: boolean,
     title?: string,
+    action?: Snippet<[EntityCategory, number]>,
   };
   let {
     path = 'parent',
@@ -58,18 +62,29 @@
     parentid: parentId = $bindable(),
     excludeparentid: excludeParentId = $bindable(),
     excludeparentofid: excludeParentOfId = $bindable(),
+    parentname,
     show = $bindable(false),
     alwaysshow = $bindable(),
     title = 'Entity Category Management',
+    action,
   }: Props = $props();
 
   const authStore = Context.getStrict('auth');
   const client = Context.getStrict('client');
 
-  let search = $state('');
-  let page = $state(1);
-  let max = $state(1);
+  let {
+    search,
+    page,
+    max,
+  } = $state(getPaginationParams());
+
+  $effect(() => {
+    search;
+    page = 1;
+  });
+
   let entityCategoryList = $state<EntityCategory[]>([]);
+
 
   async function reloadData() {
     if (!show && !alwaysshow) return;
@@ -81,6 +96,11 @@
       search,
       $page: `${page}`,
     });
+    if (Array.isArray(parentname)) {
+      parentname.forEach(name => params.append('parentName', name));
+    } else if (parentname) {
+      params.append('parentName', parentname);
+    }
     if (parentId) {
       params.append('parentId', parentId);
     }
@@ -103,7 +123,6 @@
       return stringToast('Failed to load data');
     }
     entityCategoryList = response.data?.data ?? [];
-    page = 1;
     max = response.data?.totalPage ?? 1;
     return stringToast('Data loaded successfully');
   }
@@ -116,7 +135,7 @@
   $effect(() => {
     if (show || alwaysshow) {
       entityCategoryList = [];
-      setTimeout(cancelAndReload);
+      untrack(cancelAndReload);
     }
   });
 
@@ -125,7 +144,7 @@
       parentId;
       parentOfId;
       entityCategoryList = [];
-      setTimeout(cancelAndReload);
+      untrack(cancelAndReload);
     }
   });
 
@@ -133,7 +152,7 @@
     if (show || alwaysshow) {
       page;
       search;
-      setTimeout(debounceReloadData);
+      untrack(debounceReloadData);
     }
   });
 
@@ -259,8 +278,36 @@
     onadd={addCategory ? showAddModal : undefined}
   />
   <Table5 itemList={entityCategoryList}>
+    {#snippet colgroup()}
+      <col/>
+      {#if action}
+        <col/>
+      {/if}
+      <col/>
+      {#if modify}
+        <col/>
+      {/if}
+      {#if addChild}
+        <col/>
+      {/if}
+      {#if removeChild}
+        <col/>
+      {/if}
+      {#if addParent}
+        <col/>
+      {/if}
+      {#if removeParent}
+        <col/>
+      {/if}
+      <col/>
+      <col class="w-full"/>
+    {/snippet}
+
     {#snippet header()}
       <td>Id</td>
+      {#if action}
+        <td></td>
+      {/if}
       <td>Name</td>
       {#if modify}
         <td></td>
@@ -281,8 +328,11 @@
       <td>Description</td>
     {/snippet}
 
-    {#snippet content(category)}
+    {#snippet content(category, idx)}
       <td><NoWrap class="font-mono">{category.id}</NoWrap></td>
+      {#if action}
+        <td>{@render action(category, idx)}</td>
+      {/if}
       <td><NoWrap>{category.name}</NoWrap></td>
       {#if modify}
         <td><EditButton onclick={showModifyModal(category.id, category.name)}/></td>

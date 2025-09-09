@@ -132,7 +132,7 @@
     if (selectedOrderType) {
       params.append('orderType', selectedOrderType);
     }
-    if ($auth.userId) {
+    if (!cartCode && $auth.userId) {
       params.append('createdBy', $auth.userId);
     }
     if (cartCode) {

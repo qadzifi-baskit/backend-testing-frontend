@@ -22,6 +22,7 @@
     onsuccess?: (data: ResponseType) => void,
     params?: URLSearchParams,
     validateStatus?: boolean|null|((status: number) => boolean),
+    noauth?: boolean,
   };
   let {
     payload,
@@ -33,18 +34,19 @@
     onsuccess,
     params = $bindable(),
     validateStatus,
+    noauth: noAuth,
   }:Props = $props();
 
   export function trigger() {
     console.log('trigger');
   }
 
-  const { auth: store } = Context;
+  const { auth } = Context;
   const { client } = Context.strict;
 
   async function onsubmit(e: SubmitEvent) {
     e.preventDefault();
-    if ($store && !$store.loggedIn) {
+    if (!noAuth && $auth && !$auth.loggedIn) {
       return stringToast('Not logged in');
     }
     let processedPayload = payload;

@@ -13,6 +13,7 @@
   import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
   import AddInventory2Modal from './AddInventory2Modal.svelte';
+  import FormInput from '../atoms/FormInput.svelte';
 
   type Props = {
     companyId?: string,
@@ -40,9 +41,10 @@
   let draft:string|null = $state(null);
   let active:string|null = $state(null);
   let isLow:string|null = $state(null);
+  let orderId = $state('');
 
   async function reloadData() {
-    if (!$auth.loggedIn) return;
+    if (!$auth.loggedIn) return stringToast('Not logged in');
     const params = new URLSearchParams({
       search,
       $page: `${page}`,
@@ -64,25 +66,29 @@
     if (isLow) {
       params.append('isLow', isLow);
     }
+    if (orderId) {
+      params.append('orderId', orderId);
+    }
+    stringToast('Loading data...');
     const response = await client.get(
       '/inventory-2/variant',
       {
         params,
       },
     );
-    if (response.status === 200) {
-      productList = response.data?.data ?? [];
-      max = response.data?.totalPage ?? 1;
-      for (const key in payloadMap) {
-        delete payloadMap[key];
-      }
-      productList.forEach((item) => {
-        payloadMap[item.id] = {
-          qty: 1,
-          unitId: item.stockCount?.[0]?.unitId ?? '',
-        };
-      });
+    if (response.status !== 200) return stringToast('Failed to load data');
+    productList = response.data?.data ?? [];
+    max = response.data?.totalPage ?? 1;
+    for (const key in payloadMap) {
+      delete payloadMap[key];
     }
+    productList.forEach((item) => {
+      payloadMap[item.id] = {
+        qty: 1,
+        unitId: item.stockCount?.[0]?.unitId ?? '',
+      };
+    });
+    stringToast('Data loaded');
   };
 
   function addItem(item: InventoryVariant) {
@@ -116,6 +122,7 @@
       active;
       draft;
       isLow;
+      orderId;
       page = 1;
     }
   });
@@ -130,6 +137,7 @@
       active;
       draft;
       isLow;
+      orderId;
       untrack(debounceGetProduct);
     }
   });
@@ -157,6 +165,7 @@
   class="w-full"
   bind:show
 >
+  <FormInput label="Order Id" bind:value={orderId}/>
   <PaginationNavigationPanel
     bind:search
     bind:max

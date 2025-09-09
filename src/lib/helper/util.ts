@@ -18,6 +18,36 @@ export function debounce<
   };
 }
 
+/**
+ * Creates a cancelable debounce wrapper for a given callback function.
+ *
+ * The returned debounced function delays the execution of the callback until after
+ * the specified `delay` in milliseconds has passed since the last time the debounced
+ * function was called. You can also cancel a pending callback execution using the
+ * cancel function.
+ *
+ * @template ArgType - The argument types of the callback function as a tuple.
+ * @template ReturnType - The return type of the callback function.
+ * 
+ * @param callback - The function to debounce.
+ * @param delay - The debounce delay in milliseconds.
+ * 
+ *   A tuple containing:
+ *   1. `debouncedCallback` - The debounced function that can be called with arguments of type `ArgType`.
+ *   2. `cancelCallback` - A function to cancel the currently scheduled callback execution.
+ *   3. `data` - An object containing internal state for the debounce mechanism:
+ *      - `timeoutId`: The ID of the active timeout or `null` if none.
+ *      - `cancelCallback`: Reference to the cancel function.
+ *      - `debouncedCallback`: Reference to the debounced function.
+ *
+ * @example
+ * const [debounceLog, cancelLog] = cancelableDebounce((msg: string) => {
+ *   console.log(msg);
+ * }, 300);
+ *
+ * debounceLog("Hello"); // Will log "Hello" after 300ms
+ * cancelLog(); // Cancels the pending log
+ */
 export function cancelableDebounce<
   ArgType extends unknown[],
   ReturnType,

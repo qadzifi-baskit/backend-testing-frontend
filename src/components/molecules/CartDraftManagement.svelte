@@ -1,35 +1,29 @@
 <script lang="ts">
+  import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
-  import { SellerAdminStore } from '@/store/store';
-  import type { AuthStore } from '@/types';
   import type { CartParent } from '@/types/cart';
-  import type { AxiosInstance } from 'axios';
-  import type { Writable } from 'svelte/store';
   import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
+  import DeleteButton from '../atoms/DeleteButton.svelte';
+  import EditButton from '../atoms/EditButton.svelte';
   import NoWrap from '../atoms/NoWrap.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
-  import EditButton from '../atoms/EditButton.svelte';
   import CartDraftDetail from './CartDraftDetail.svelte';
-  import DeleteButton from '../atoms/DeleteButton.svelte';
 
   type Props = {
-    client: AxiosInstance,
-    store?: Writable<AuthStore>,
     companyId?: string,
     show?: boolean,
   };
   let {
-    client,
-    store = SellerAdminStore,
     companyId = $bindable(),
     show = $bindable(false),
   }: Props = $props();
+  const { client, auth } = Context.strict;
 
   let draftList:CartParent[] = $state([]);
 
   async function reloadData() {
-    if (!$store.loggedIn) {
+    if (!$auth.loggedIn) {
       return;
     }
     const params = new URLSearchParams({

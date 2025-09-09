@@ -1,10 +1,10 @@
 <script lang="ts">
   import { listenAuthSuccess } from '@/event';
   import { Context } from '@/lib/helper/context';
-  import { debounce } from '@/lib/helper/util';
+  import { cancelableDebounce, debounce } from '@/lib/helper/util';
   import type { DropdownReturnType } from '@/types/component';
   import type { Role, User } from '@/types/user';
-  import type { Snippet } from 'svelte';
+  import { untrack, type Snippet } from 'svelte';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPlus, FaSolidXmark } from 'svelte-icons-pack/fa';
   import DropdownSelect from '../atoms/DropdownSelect.svelte';
@@ -13,6 +13,8 @@
   import Collapse5 from '../Collapse5.svelte';
   import Table5 from '../Table5.svelte';
   import RoleDropdownSelect from './RoleDropdownSelect.svelte';
+  import { getPaginationParams } from '@/lib/helper/pagination';
+  import { stringToast } from '@/lib/helper/toast';
 
   type Props = {
     show?: boolean,
@@ -21,17 +23,20 @@
     show = $bindable(),
   }: Props = $props();
 
-  const { client, auth: store } = Context.strict;
+  const { client, auth } = Context.strict;
 
+  let {
+    page,
+    max,
+    search,
+  } = $state(getPaginationParams());
   let userList:User[] = $state([]);
-  let page = $state(1);
-  let max = $state(1);
-  let search = $state('');
   let roleList:Role[] = $state([]);
   let roleSearch = $state('');
 
   async function getUserList() {
-    if (!$store.loggedIn) return;
+    if (!$auth.loggedIn) return stringToast('You are not logged in');
+    stringToast('Fetching user list');
     const params = new URLSearchParams({
       search,
       $page: `${page}`,
@@ -40,14 +45,19 @@
       '/users',
       { params },
     );
-    if (response.status !== 200) return;
+    if (response.status !== 200) return stringToast('Failed to fetch user list');
     userList = response.data?.data ?? [];
+    max = response.data?.totalPage ?? 1;
+    stringToast('User list fetched');
   }
+
+  const [debounceGetData] = cancelableDebounce(getUserList);
 
   $effect(() => {
     if (!show) return;
     search;
-    getUserList();
+    page;
+    untrack(debounceGetData);
   });
 
   let excludeRoleId:string[] = $state([]);
@@ -67,7 +77,7 @@
   }
 
   async function getRoleList() {
-    if (!$store.loggedIn) return;
+    if (!$auth.loggedIn) return;
     const params = new URLSearchParams({
       search: roleSearch,
     });
@@ -206,6 +216,7 @@
 <Collapse5
   title="User Management"
   class="w-full"
+  bind:show
 >
   <PaginationNavigationPanel
     bind:search

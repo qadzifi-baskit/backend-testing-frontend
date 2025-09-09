@@ -87,29 +87,30 @@
   bind:dialog
   onopen={getCancelReason}
   {onclose}
+  class="flex-col"
 >
-  <Select
-    title='Status'
-    showvalue
-    options={Object.entries(OrderStatusEnum)
-      .filter(([, status]) => !excludedStatus.includes(status))
-    }
-    bind:value={orderStatus}
-  />
-  <DatePicker
-    on:select-date={onSelectDate}
-  />
-  <div class="inline">
+  <div class="modal-content-container">
     <Select
-      title="Reason"
+      label='Status'
+      showvalue
+      options={Object.entries(OrderStatusEnum)
+        .filter(([, status]) => !excludedStatus.includes(status))
+      }
+      bind:value={orderStatus}
+    />
+    <DatePicker
+      on:select-date={onSelectDate}
+    />
+    <Select
+      label="Reason"
       showvalue
       options={cancelReasonList.map((val) => [val.id, val.name])}
       bind:value={selectedReasonId}
     />
+    <button
+      class="btn btn-secondary"
+      onclick={updateStatus}>
+      Update
+    </button>
   </div>
-  <button
-    class="btn btn-secondary"
-    onclick={updateStatus}>
-    Update
-  </button>
 </Modal>

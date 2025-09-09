@@ -3,15 +3,47 @@ import type { Cart } from './cart';
 import type { Role } from './user';
 import type { EntityCategory } from './entityCategory';
 
+export type CompanyStatus = 'APPROVED'|'INACTIVE';
+
 export type AuthStore = {
   userId: string,
   loggedIn: boolean,
 };
 
-export type PaymentType = {
+export type NamedEntity = {
   id: string,
   name: string,
 };
+
+export type ContentEntity = NamedEntity & {
+  code: string,
+};
+
+export type PaymentType = NamedEntity;
+
+export type WarehouseDetail = NamedEntity;
+
+export type Warehouse = NamedEntity & {
+  wareHouse: WarehouseDetail,
+};
+
+export type CompanyType = NamedEntity & {
+  type: string,
+  parentId: string|null,
+};
+
+export type ProductMaster = NamedEntity & {
+  sku: string,
+  fullName: string,
+  image: string,
+  isAdded: boolean,
+};
+
+export type OrderReason = NamedEntity;
+
+export type Brand = ContentEntity;
+
+export type Principal = ContentEntity;
 
 export type CompanyDetail = {
   id: string,
@@ -19,50 +51,11 @@ export type CompanyDetail = {
   personInCharge: string,
 };
 
-export type CompanyStatus = 'APPROVED'|'INACTIVE';
-
 export type Company = {
   id: string,
   companyName: string,
   status: CompanyStatus,
   detail: CompanyDetail,
-};
-
-export type CompanyType = {
-  id: string,
-  name: string,
-  type: string,
-  parentId: string|null,
-};
-
-export type WarehouseDetail = {
-  id: string,
-  name: number,
-};
-
-export type Warehouse = {
-  id: string,
-  name: string,
-  wareHouse: WarehouseDetail,
-};
-
-export type ContentEntity = {
-  id: string,
-  code: string,
-  name: string,
-};
-
-export type Brand = ContentEntity;
-
-export type Principal = ContentEntity;
-
-export type ProductMaster = {
-  id: string,
-  sku: string,
-  name: string,
-  fullName: string,
-  image: string,
-  isAdded: boolean,
 };
 
 export type Order = {
@@ -111,11 +104,6 @@ export type UpdateOrderData = {
 export type UpdateOrderDetailPayload = {
   qty: number,
   price: number,
-};
-
-export type OrderReason = {
-  id: string,
-  name: string,
 };
 
 export type APIItem = {
