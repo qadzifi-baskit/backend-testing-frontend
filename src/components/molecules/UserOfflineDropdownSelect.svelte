@@ -1,12 +1,11 @@
 <script lang="ts">
+  import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
   import type { UserOffline } from '@/types/user';
-  import type { AxiosInstance } from 'axios';
   import type { Snippet } from 'svelte';
   import DropdownSelect from '../atoms/DropdownSelect.svelte';
 
   type Props = {
-    client: AxiosInstance,
     value?: string,
     search?: string,
     companyId?: string,
@@ -17,7 +16,6 @@
   };
 
   let {
-    client,
     value = $bindable(),
     companyId = $bindable(),
     search = $bindable(''),
@@ -26,6 +24,8 @@
     placeholder = $bindable('User Offline'),
     label = placeholder,
   }: Props = $props();
+
+  const { client } = Context.strict;
 
   let show = $state(false);
   let userList:UserOffline[] = $state([]);

@@ -61,6 +61,10 @@
   @apply flex flex-col items-start w-full min-h-full h-fit overflow-y-scroll;
 }
 
+@utility textarea-input {
+  @apply textarea input block resize;
+}
+
 html {
   height: 100%;
   scrollbar-gutter: auto;

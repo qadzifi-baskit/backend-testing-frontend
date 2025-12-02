@@ -12,3 +12,8 @@ export const SellerSalesOrderTypeMap = DefaultMap<OrderTypeEnum,boolean>(() => f
   [OrderTypeEnum.SELLER_SALES_ORDER]: true,
   [OrderTypeEnum.BSC_SELLER_SALES_ORDER]: true,
 });
+
+export const BSCOrderType: OrderTypeEnum[] = [
+  OrderTypeEnum.BSC_SELLER_SALES_ORDER,
+  OrderTypeEnum.BSC_SELLER_PURCHASE_ORDER,
+];

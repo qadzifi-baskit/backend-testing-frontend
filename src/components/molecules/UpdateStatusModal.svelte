@@ -61,6 +61,9 @@
         break;
       case OrderStatusEnum.ORDER_CREATED:
       case OrderStatusEnum.ORDER_PICKED_UP:
+      case OrderStatusEnum.ORDER_PICKED:
+      case OrderStatusEnum.ORDER_PACKED:
+      case OrderStatusEnum.ORDER_SHIP:
       case OrderStatusEnum.ORDER_RECEIVED:
         await client.patch(`/order/status/${id}`, {
           orderStatus,

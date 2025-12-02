@@ -22,7 +22,6 @@
     name: '',
     typeId: '',
     smallestUnit: '',
-    inventoryUnits: [{}],
     images: [{ name: '' }],
   });
 

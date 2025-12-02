@@ -21,7 +21,7 @@ export type ContentEntity = NamedEntity & {
 
 export type PaymentType = NamedEntity;
 
-export type WarehouseDetail = NamedEntity;
+export type WarehouseDetail = NamedEntity & { name: number };
 
 export type Warehouse = NamedEntity & {
   wareHouse: WarehouseDetail,
@@ -84,6 +84,8 @@ export type OrderDetail = {
   orderedQty: number,
   basePrice: number,
   startPrice: number,
+  discount: number,
+  discountedPrice: number,
   sellingPrice: number,
   margin: number,
   marginValue: number,

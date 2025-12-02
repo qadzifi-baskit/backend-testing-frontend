@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { BSCOrderType } from '@/consts/order';
   import { DeliveryTypeEnum, OrderTypeEnum } from '@/lib/enum';
   import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
@@ -10,17 +11,21 @@
   import SubmitButton from '../atoms/SubmitButton.svelte';
   import DatePicker from '../DatePicker.svelte';
   import Modal from '../Modal.svelte';
+  import AreaDropdownSelect from './AreaDropdownSelect.svelte';
   import BuyerCart from './BuyerCart.svelte';
+  import CompanyDropdownSelect from './CompanyDropdownSelect.svelte';
+  import CompanyUserDropdownSelect from './CompanyUserDropdownSelect.svelte';
   import DocumentManagement from './DocumentManagement.svelte';
   import InventoryList from './InventoryList.svelte';
   import UserOfflineDropdownSelect from './UserOfflineDropdownSelect.svelte';
-  import CompanyUserDropdownSelect from './CompanyUserDropdownSelect.svelte';
-  import AreaDropdownSelect from './AreaDropdownSelect.svelte';
+  import Inventory2Management from './Inventory2Management.svelte';
+  import DropdownSelect from '../atoms/DropdownSelect.svelte';
 
   type Props = {
     dialog: HTMLDialogElement | undefined,
     item?: CartParent,
     companyId?: string,
+    ordertype?: OrderTypeEnum|OrderTypeEnum[],
     onsuccess?: (data: CartParent) => void
     ondelete?: (data: CartParent) => void
   };
@@ -28,6 +33,7 @@
     dialog = $bindable(),
     item = $bindable(),
     companyId = $bindable(),
+    ordertype: orderTypeOptions = OrderTypeEnum.SELLER_SALES_ORDER,
     onsuccess: onSuccessParent,
     ondelete,
   }: Props = $props();
@@ -38,12 +44,14 @@
   const defaultData = {
     customerId: '',
     salesId: '',
-    refCode: '',
     creationDate: null,
     paymentTypeId: '',
     shippingCost: 0,
     tax: 0,
     deliveryType: DeliveryTypeEnum.SELLER_DELIVERY,
+    orderType: OrderTypeEnum.BSC_SELLER_SALES_ORDER,
+    deliveryNotes: null,
+    supplierNotes: null,
     customerData: {
       picName: '',
       email: '',
@@ -135,7 +143,9 @@
   });
   async function getCustomerData() {
     if (!newData.customerId) return;
-    const response = await client.get(`/user-offline/${newData.customerId}`);
+    if (!newData.orderType) return;
+    const path = BSCOrderType.includes(newData.orderType) ? 'company/seller' : 'user-offline';
+    const response = await client.get(`/${path}/${newData.customerId}`);
     if (response.status !== 200) {
       return stringToast('Failed to load customer data');
     }
@@ -189,6 +199,9 @@
     if (payload.customerId) {
       newPayload.customerId = payload.customerId;
     }
+    if (payload.orderType) {
+      newPayload.orderType = payload.orderType;
+    }
     if (payload.refCode) {
       newPayload.refCode = payload.refCode;
     }
@@ -206,6 +219,15 @@
     }
     if (!isNil(payload.tax)) {
       newPayload.tax = payload.tax;
+    }
+    if (payload.deliveryNotes) {
+      newPayload.deliveryNotes = payload.deliveryNotes;
+    }
+    if (payload.supplierNotes) {
+      newPayload.supplierNotes = payload.supplierNotes;
+    }
+    if (payload.thirdPartyDelivery) {
+      newPayload.thirdPartyDelivery = payload.thirdPartyDelivery;
     }
     if (payload.customerData) {
       newPayload.customerData = customerDataPrehook(payload.customerData);
@@ -291,7 +313,7 @@
 <Modal bind:dialog onopen={() => show = true}>
   <div class="flex flex-col items-start w-full min-h-full h-fit overflow-y-scroll">
     <FormWrapper
-      class="mb-2"
+      class="mb-2 *:mb-2"
       path={'/cart/draft' + (item?.id ? `/${item.id}` : '')}
       method={item?.id ? 'PATCH' : 'POST'}
       payload={newData}
@@ -315,18 +337,25 @@
         bind:sellerId={companyId}
       />
       <FormInput readonly type="text" placeholder="sales id" label="Sales Id" bind:value={newData.salesId}/>
-      <UserOfflineDropdownSelect
-        {client}
-        label="Customer"
-        bind:placeholder={customerName}
-        bind:value={newData.customerId!}
-        bind:companyId
-      />
+      {#if newData.orderType && BSCOrderType.includes(newData.orderType) || item?.orderType && BSCOrderType.includes(item.orderType)}
+        <CompanyDropdownSelect
+          label="Customer"
+          bind:placeholder={customerName}
+          bind:value={newData.customerId!}
+        />
+      {:else}
+        <UserOfflineDropdownSelect
+          label="Customer"
+          bind:placeholder={customerName}
+          bind:value={newData.customerId!}
+          bind:companyId
+        />
+      {/if}
       <FormInput readonly type="text" placeholder="customer id" label="Customer Id" bind:value={newData.customerId}/>
       {#if newData.orderCode}
         <FormInput readonly type="text" label="Order Code" bind:value={newData.orderCode}/>
       {/if}
-      <FormInput type="text" placeholder="ref code" label="Ref Code" bind:value={newData.refCode}/>
+      <!-- <FormInput type="text" placeholder="ref code" label="Ref Code" bind:value={newData.refCode}/> -->
       {#if newData.customerData}
         <FormInput type="text" placeholder="e-mail" label="E-Mail" bind:value={newData.customerData.email}/>
         <span class="fieldset-label font-bold mb-2">Billing Address</span>
@@ -339,7 +368,14 @@
         {@render addressForm(newData.customerData.deliveryAddress!, sameAddress)}
       {/if}
       <FormInput type="number" placeholder="shipping cost" label="Shipping Cost" bind:value={newData.shippingCost}/>
-      <FormInput type="number" placeholder="tax" label="Tax" bind:value={newData.tax}/>
+      <FormInput type="number" placeholder="tax" label="Tax" step="any" bind:value={newData.tax}/>
+      <DropdownSelect
+        options={[
+          ['FLEXO', 'Flexo'],
+          ['BRAND', 'Brand'],
+        ]}
+        bind:value={newData.thirdPartyDelivery}
+      />
       <SubmitButton/>
       {#if item?.id}
         <button class="btn btn-secondary" onclick={deleteDraft}>Delete</button>
@@ -347,31 +383,61 @@
     </FormWrapper>
 
     {#if item?.id}
-      <InventoryList
-        order
-        cartCode={item.id}
-        bind:companyId
-      />
+      <!-- <InventoryList -->
+      <!--   order -->
+      <!--   cartCode={item.id} -->
+      <!--   bind:companyId -->
+      <!-- /> -->
+      <div class="card bg-base-300 rounded-box grow w-full h-fit">
+        <!-- name of each tab group should be unique -->
+        <div class="tabs tabs-box">
+          <input type="radio" name="order-tab" class="tab" aria-label="Old" checked/>
+          <div class="tab-content bg-base-100 border-base-300 h-fit">
+            <InventoryList
+              order
+              bind:companyId
+              cartCode={item.id}
+            />
+          </div>
+
+          <input type="radio" name="order-tab" class="tab" aria-label="New"/>
+          <div class="tab-content bg-base-100 border-base-300 h-fit">
+            <Inventory2Management
+              isorder
+              bind:companyId
+              cartCode={item.id}
+            />
+          </div>
+        </div>
+      </div>
       <div class="mb-2"></div>
       <BuyerCart
         bind:show
         draft
-        ordertype={OrderTypeEnum.SELLER_PURCHASE_ORDER}
+        ordertype={orderTypeOptions}
         prehook={saveDraft}
         bind:cartCode={item.id}
         bind:companyId
         bind:paymentTypeId={newData.paymentTypeId!}
         bind:deliveryType={newData.deliveryType!}
+        bind:selectedOrderType={newData.orderType}
+        bind:deliveryNotes={newData.deliveryNotes}
+        bind:supplierNotes={newData.supplierNotes}
+        bind:refCode={newData.refCode}
       />
     {:else}
       <BuyerCart
         bind:show
         draft
-        ordertype={OrderTypeEnum.SELLER_PURCHASE_ORDER}
+        ordertype={orderTypeOptions}
         {onordercreated}
         bind:companyId
         bind:paymentTypeId={newData.paymentTypeId!}
         bind:deliveryType={newData.deliveryType!}
+        bind:selectedOrderType={newData.orderType}
+        bind:deliveryNotes={newData.deliveryNotes}
+        bind:supplierNotes={newData.supplierNotes}
+        bind:refCode={newData.refCode}
       />
     {/if}
     {#if $user?.id && dialog?.open}

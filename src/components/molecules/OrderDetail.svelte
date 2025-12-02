@@ -137,17 +137,19 @@
   </div>
   <Table5 itemList={detailList}>
     {#snippet header()}
-      <th>Name</th>
-      <th>Qty</th>
+      <td>Name</td>
+      <td>Qty</td>
       {#if SellerSalesOrderTypeMap[orderType]}
-        <th>Needed Qty</th>
-        <th>Ordered Qty</th>
+        <td>Needed Qty</td>
+        <td>Ordered Qty</td>
       {/if}
-      <th>Base Price</th>
-      <th>Start Price</th>
-      <th>Selling Price</th>
-      <th>Status</th>
-      <th></th>
+      <td>Base Price</td>
+      <td>Start Price</td>
+      <td>Discount Amount</td>
+      <td>Discounted Price</td>
+      <td>Selling Price</td>
+      <td>Status</td>
+      <td></td>
     {/snippet}
     {#snippet content(item)}
       <td>{item.fullName}</td>
@@ -162,6 +164,8 @@
       {/if}
       <td>{item.basePrice}</td>
       <td>{item.startPrice}</td>
+      <td>{item.discount}</td>
+      <td>{item.discountedPrice}</td>
       <td>{item.sellingPrice}</td>
       <td>{item.status}</td>
       <th>

@@ -25,6 +25,7 @@
     checked?: boolean,
     toggle?: boolean,
     show?: boolean,
+    step?: string,
   };
   let {
     type: inputType,
@@ -43,6 +44,7 @@
     checked = $bindable(),
     toggle = false,
     show = $bindable(false),
+    step,
   }: Props = $props();
 
   const isError = Boolean(error);
@@ -82,6 +84,7 @@
       />
     {:else}
       <input
+        {step}
         {disabled}
         {required}
         {readonly}

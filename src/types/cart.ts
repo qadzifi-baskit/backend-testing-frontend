@@ -62,6 +62,7 @@ export type CartParent = {
   customer: CartCustomerData|null,
   estimatedPickupDate: string|null,
   orderCode: string|null,
+  orderType: OrderTypeEnum,
   refCode: string|null,
   address: string|null,
   provinceId: number|null,
@@ -78,4 +79,7 @@ export type CartParent = {
   companyId?: string,
   salesName: string|null,
   total?: string|null,
+  deliveryNotes: string|null,
+  supplierNotes: string|null,
+  thirdPartyDelivery: string|null,
 };

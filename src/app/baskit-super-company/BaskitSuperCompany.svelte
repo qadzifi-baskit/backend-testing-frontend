@@ -1,6 +1,7 @@
 <script lang="ts">
   import Auth from '@/components/molecules/Auth.svelte';
   import BuyerCart from '@/components/molecules/BuyerCart.svelte';
+  import CartDraftManagement from '@/components/molecules/CartDraftManagement.svelte';
   import Config from '@/components/molecules/Config.svelte';
   import FieldTeamManagement from '@/components/molecules/FieldTeamManagement.svelte';
   import Inventory2Management from '@/components/molecules/Inventory2Management.svelte';
@@ -98,13 +99,13 @@
     {client}
   />
   <div class="divider"></div>
-  <SellerRegister {client}/>
+  <SellerRegister/>
   <div class="divider"></div>
   <Auth {store} {client}
     bind:username
     bind:password
   />
-  {#if $store.loggedIn}
+  {#if $store.loggedIn && companyId}
     <div class="divider"></div>
     <FieldTeamManagement
       role={[
@@ -120,18 +121,29 @@
     <div class="divider"></div>
     <ProductManagement {companyId}/>
     <div class="divider"></div>
-    <InventoryList {companyId}/>
+    <InventoryList bind:companyId/>
     <div class="divider"></div>
     <Inventory2Management {companyId}/>
     <div class="divider"></div>
     <div class="flex w-full rounded-box">
       <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
-        <InventoryList
-          order
-          ordertype={orderTypeList}
-          {companyId}
-          bind:selectedOrderType
-        />
+        <!-- name of each tab group should be unique -->
+        <div class="tabs tabs-box">
+          <input type="radio" name="order-tab" class="tab" aria-label="Old" checked/>
+          <div class="tab-content bg-base-100 border-base-300 h-fit">
+            <InventoryList
+              order
+              ordertype={orderTypeList}
+              {companyId}
+              bind:selectedOrderType
+            />
+          </div>
+
+          <input type="radio" name="order-tab" class="tab" aria-label="New"/>
+          <div class="tab-content bg-base-100 border-base-300 h-fit">
+            <Inventory2Management {companyId} isorder/>
+          </div>
+        </div>
       </div>
       <div class="divider divider-horizontal"></div>
       <div class="card bg-base-300 rounded-box grid grow w-2/5 h-fit">
@@ -144,6 +156,14 @@
       </div>
     </div>
     <div class="divider"></div>
+    <CartDraftManagement {companyId}/>
+    <div class="divider"></div>
     <OrderList {companyId} orderType={orderTypeList}/>
   {/if}
 </div>
+
+<style>
+  div.tab-content {
+    @apply h-fit;
+  }
+</style>

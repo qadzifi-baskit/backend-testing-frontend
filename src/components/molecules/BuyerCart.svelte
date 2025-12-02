@@ -3,6 +3,7 @@
   import { DeliveryTypeEnum, OrderStatusEnum, OrderTypeEnum } from '@/lib/enum';
   import { Context } from '@/lib/helper/context';
   import { stringToast } from '@/lib/helper/toast';
+  import { isNil } from '@/lib/helper/util';
   import type { PaymentType, WarehouseDetail } from '@/types';
   import type { Cart, CartParent, CartUpdatePayload } from '@/types/cart';
   import type { CreateOrderPayload } from '@/types/order';
@@ -10,13 +11,12 @@
   import { Icon } from 'svelte-icons-pack';
   import { FaFloppyDisk, FaSolidPlus, FaTrashCan } from 'svelte-icons-pack/fa';
   import { TiCancel } from 'svelte-icons-pack/ti';
+  import AddButton from '../atoms/AddButton.svelte';
   import FormInput from '../atoms/FormInput.svelte';
+  import IconButton from '../atoms/IconButton.svelte';
   import Collapse from '../Collapse.svelte';
   import Table5 from '../Table5.svelte';
   import CartDraftDetail from './CartDraftDetail.svelte';
-  import { isNil } from '@/lib/helper/util';
-  import AddButton from '../atoms/AddButton.svelte';
-  import IconButton from '../atoms/IconButton.svelte';
 
   type Props = {
     userId?: string,
@@ -33,6 +33,9 @@
     onordercreated?: () => unknown,
     paymentTypeId?: string,
     deliveryType?: DeliveryTypeEnum,
+    deliveryNotes?: string|null,
+    supplierNotes?: string|null,
+    refCode?: string|null,
   };
   let {
     userId = $bindable(),
@@ -48,6 +51,9 @@
     paymentTypeId = $bindable(''),
     deliveryType = $bindable(DeliveryTypeEnum.SELLER_DELIVERY),
     clientType = $bindable(),
+    deliveryNotes = $bindable(),
+    supplierNotes = $bindable(),
+    refCode = $bindable(),
   }:Props = $props();
 
   const cartData:Record<string, Partial<Cart>> = {};
@@ -60,6 +66,7 @@
   let totalSellingPrice = $state(0);
   let totalDiscount = $state(0);
   let totalDiscountedPrice = $state(0);
+  let totalTax = $state(0);
   let total = $state(0);
   let linkedOrderId = $state<string>();
 
@@ -69,11 +76,13 @@
     selectedOrderType = orderTypeOptions;
   }
 
-  const createOrder = async () => {
+  async function createOrder() {
     if (!$auth || !$auth.loggedIn) return;
     stringToast('Creating order...');
     const processedCart = prehook ? await prehook(cartList) : cartList;
-    const addedData:CreateOrderPayload = {};
+    const addedData:CreateOrderPayload = {
+      userId,
+    };
     if (selectedOrderType === OrderTypeEnum.SELLER_PURCHASE_ORDER) {
       addedData.status = OrderStatusEnum.WAITING_FOR_CONFIRMATION;
 
@@ -89,6 +98,9 @@
       if (totalNeededQty > 0) {
         addedData.status = OrderStatusEnum.WAITING_FOR_CONFIRMATION;
       }
+    }
+    if (!addedData.userId && selectedOrderType?.startsWith('BSC_')) {
+      addedData.userId = companyId;
     }
     const totalQty = processedCart.reduce(
       (acc, curr) => acc + (curr.neededQty ?? 0),
@@ -107,6 +119,9 @@
       orderType: selectedOrderType,
       status,
       ...addedData,
+      deliveryNotes: deliveryNotes || null,
+      supplierNotes: supplierNotes || null,
+      refCode: refCode || null,
       product: processedCart.map((value) => ({
         cartId: value.id,
         inventoryId: value.inventoryId,
@@ -118,7 +133,6 @@
         memberLevel: value.memberLevel,
         memberDiscountAmount: value.memberDiscountAmount,
       })),
-      userId,
     });
     if (response.status !== 200) return stringToast('Failed to create order');
     onOrderCreated();
@@ -149,6 +163,7 @@
       totalSellingPrice: number,
       totalDiscount: number,
       totalDiscountedPrice: number,
+      totalTax: number,
       total: number,
       wareHouse: WarehouseDetail,
       product: Cart[],
@@ -156,13 +171,24 @@
     for (const key in cartData) {
       delete cartData[key];
     }
-    type Summary = [number, number, number, number, number, number, Cart[]];
+    // eslint-disable-next-line @stylistic/comma-dangle
+    type Summary = [
+      number,
+      number,
+      number,
+      number,
+      number,
+      number,
+      number,
+      Cart[]
+    ];
     [
       subTotal,
       totalTierPrice,
       totalSellingPrice,
       totalDiscount,
       totalDiscountedPrice,
+      totalTax,
       total,
       cartList,
     ] = cartOrderList.reduce(
@@ -173,6 +199,7 @@
           accTotalSellingPrice,
           accTotalDiscount,
           accTotalDiscountedPrice,
+          accTotalTax,
           accTotal,
           accCartList,
         ],
@@ -185,6 +212,7 @@
           accTotalSellingPrice + curr.totalSellingPrice,
           accTotalDiscount + curr.totalDiscount,
           accTotalDiscountedPrice + curr.totalDiscountedPrice,
+          accTotalTax + curr.totalTax,
           accTotal + curr.total,
           [
             ...accCartList, ...(curr.product.map(
@@ -196,7 +224,7 @@
           ],
         ];
       },
-      <Summary>[0, 0, 0, 0, 0, 0, []],
+      <Summary>[0, 0, 0, 0, 0, 0, 0, []],
     );
     stringToast('Cart loaded');
   };
@@ -219,10 +247,7 @@
         payload.neededQty = data.neededQty;
       }
     }
-    if (
-      selectedOrderType === OrderTypeEnum.SELLER_SALES_ORDER ||
-      selectedOrderType === OrderTypeEnum.SELLER_PURCHASE_ORDER
-    ) {
+    if (OverStockOrderTypeList.includes(selectedOrderType)) {
       if (data.tierPrice) {
         payload.startPrice = data.tierPrice;
       }
@@ -337,6 +362,7 @@
   <CartDraftDetail
     bind:dialog={saveDraftDialog}
     bind:companyId
+    ordertype={orderTypeOptions}
     ondelete={saveCartSuccess}
   />
 {/if}
@@ -489,7 +515,7 @@
             <strong>Total Selling Price</strong>
           </td>
           <td>{totalSellingPrice}</td>
-          <td>{totalSellingPrice - totalDiscountedPrice}</td>
+          <td>{totalTax}</td>
         </tr>
         <tr>
           <td>
@@ -530,6 +556,15 @@
   {#if selectedOrderType === OrderTypeEnum.SELLER_PURCHASE_ORDER}
     <FormInput label="Linked Order Id" bind:value={linkedOrderId}/>
   {/if}
+  <FormInput type="text" placeholder="ref code" label="Ref Code" bind:value={refCode}/>
+  <div>
+    <span class="label mb-2">Delivery Notes</span>
+    <textarea bind:value={deliveryNotes} class="textarea-input" placeholder="delivery notes"></textarea>
+  </div>
+  <div>
+    <span class="label mb-2">Supplier Notes</span>
+    <textarea bind:value={supplierNotes} class="textarea-input" placeholder="supplier notes"></textarea>
+  </div>
   <button class="btn btn-secondary" onclick={createOrder} disabled={paymentTypeId === ''}>Create Order</button>
   {#if !draft}
     <button class="btn not-hover:bg-slate-600" onclick={saveCart}>Save Cart</button>

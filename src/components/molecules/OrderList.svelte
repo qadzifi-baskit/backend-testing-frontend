@@ -158,15 +158,15 @@
         <td>Linked</td>
         <td>Salesname</td>
         <td>Delivery Type</td>
-        <td>Status</td>
+        <th>Status</th>
         <td>Payment</td>
         <td>Payment Status</td>
         <td>Payment Link Status</td>
-        <th>Total</th>
+        <td>Total</td>
       {/snippet}
 
       {#snippet content(order)}
-        <td><NoWrap>{order.id}</NoWrap></td>
+        <td><NoWrap class="font-mono">{order.id}</NoWrap></td>
         <td><NoWrap>
           {(new Date(order.createdAt)).toLocaleString('ja-JP', {
             year: 'numeric',
@@ -199,11 +199,11 @@
         <td>{order.linkedOrder.length}</td>
         <td><NoWrap>{order.salesName}</NoWrap></td>
         <td>{order.deliveryType}</td>
-        <td>{order.status}</td>
+        <th>{order.status}</th>
         <td><NoWrap>{order.paymentTerm}</NoWrap></td>
         <td><NoWrap>{order.paymentStatus}</NoWrap></td>
         <td><NoWrap>{order.paymentLinkStatus}</NoWrap></td>
-        <th>{order.grandTotal}</th>
+        <td>{order.grandTotal}</td>
       {/snippet}
     </Table5>
   {/if}

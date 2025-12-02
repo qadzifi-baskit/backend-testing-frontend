@@ -9,6 +9,7 @@
   import NoWrap from '../atoms/NoWrap.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import CartDraftDetail from './CartDraftDetail.svelte';
+  import { getPaginationParams } from '@/lib/helper/pagination';
 
   type Props = {
     companyId?: string,
@@ -18,7 +19,9 @@
     companyId = $bindable(),
     show = $bindable(false),
   }: Props = $props();
+
   const { client, auth } = Context.strict;
+  let { search } = $state(getPaginationParams());
 
   let draftList:CartParent[] = $state([]);
 
@@ -29,6 +32,7 @@
     const params = new URLSearchParams({
       $sort: 'DESC',
       $order: 'createdAt',
+      search,
     });
     if (companyId) {
       params.append('companyId', companyId);
@@ -98,6 +102,7 @@
 />
 <Collapse5 title="Cart Draft Management" bind:show>
   <PaginationNavigationPanel
+    bind:search
     onreload={reloadData}
   />
   {#if draftList.length > 0}
