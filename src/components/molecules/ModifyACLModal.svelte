@@ -145,7 +145,7 @@
           <span>Post</span>
           <span>Patch</span>
           <span>Delete</span>
-          <RoleDropdownSelect bind:value={newACL.roleId}/>
+          <RoleDropdownSelect no-label bind:value={newACL.roleId}/>
           <FeatureDropdownSelect bind:value={newACL.featureId}/>
           <button
             class="btn btn-secondary w-fit"

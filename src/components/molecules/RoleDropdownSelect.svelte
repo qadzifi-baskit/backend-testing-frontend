@@ -11,6 +11,7 @@
     name?: string|null,
     excludeId?: string|string[]|null,
     'display-name'?: boolean,
+    'no-label'?: boolean,
   };
   let {
     label = 'Role',
@@ -21,6 +22,7 @@
     excludeId = $bindable(null),
     onselect,
     'display-name': displayName,
+    'no-label': noLabel,
   }:Props = $props();
 
   const { client, auth } = Context.strict;
@@ -58,10 +60,12 @@
 </script>
 
 <label>
-  {#if typeof label === 'string'}
-    <span class="fieldset-label mb-2 capitalize">{label}</span>
-  {:else}
-    {@render label?.()}
+  {#if !noLabel}
+    {#if typeof label === 'string'}
+      <span class="fieldset-label mb-2 capitalize">{label}</span>
+    {:else}
+      {@render label?.()}
+    {/if}
   {/if}
   <DropdownSelect
     bind:value
