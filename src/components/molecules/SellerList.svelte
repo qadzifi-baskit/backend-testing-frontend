@@ -1,21 +1,15 @@
 <script lang="ts">
-  import type { AxiosInstance, AxiosRequestConfig } from 'axios';
+  import { Context } from '@/lib/helper/context';
+  import { debounce, toURLStringEntries } from '@/lib/helper/util';
+  import { BaskitAdminStore } from '@/store/store';
+  import type { AxiosRequestConfig } from 'axios';
+  import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import Collapse from '../Collapse.svelte';
   import Table from '../Table.svelte';
-  import PaginationFancyButton from '../atoms/PaginationFancyButton.svelte';
-  import SearchField from '../atoms/SearchField.svelte';
-  import { debounce, toURLStringEntries } from '@/lib/helper/util';
-  //import BulkCreateInventoryWorker from '@/worker/BulkCreateInventoryWorker?worker';
-  import { BaskitAdminStore } from '@/store/store';
-
-  type Props = {
-    client: AxiosInstance,
-  };
-  let {
-    client,
-  }:Props = $props();
 
   //const worker = new BulkCreateInventoryWorker();
+
+  const { client, auth } = Context.strict;
 
   let companyList:object[] = $state([]);
   let page = $state(1);
@@ -46,7 +40,7 @@
   });
 
   $effect(() => {
-    if ($BaskitAdminStore.loggedIn) {
+    if ($auth.loggedIn) {
       page;
       search;
       debounceGetCompany();
@@ -70,12 +64,11 @@
   class="w-full"
   onclick={getCompanyList}
 >
-  <SearchField
-    bind:value={search}
-  />
-  <PaginationFancyButton
+  <PaginationNavigationPanel
     bind:max
-    bind:value={page}
+    bind:page
+    bind:search
+    onreload={getCompanyList}
   />
   <button class="btn bordered input-bordered"
     onclick={onBulkAddInventory}

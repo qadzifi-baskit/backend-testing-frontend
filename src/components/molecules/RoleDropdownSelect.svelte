@@ -3,23 +3,23 @@
   import { stringToast } from '@/lib/helper/toast';
   import { debounce } from '@/lib/helper/util';
   import type { Role } from '@/types/user';
-  import type { Snippet } from 'svelte';
+  import type { ComponentProps, Snippet } from 'svelte';
   import DropdownSelect from '../atoms/DropdownSelect.svelte';
 
-  type Props = {
-    label?: string|Snippet,
-    placeholder?: string|Snippet,
-    show?: boolean,
-    value?: string|string[]|null,
+  type Props = Partial<ComponentProps<typeof DropdownSelect<string, string, string>>> & {
+    label?: string|Snippet|null,
     name?: string|null,
+    excludeId?: string|string[]|null,
     'display-name'?: boolean,
   };
   let {
-    label,
+    label = 'Role',
     placeholder = $bindable('Select a role'),
     show = $bindable(false),
     value = $bindable(),
     name = $bindable(),
+    excludeId = $bindable(null),
+    onselect,
     'display-name': displayName,
   }:Props = $props();
 
@@ -32,6 +32,13 @@
     const params = new URLSearchParams({
       search,
     });
+
+    if (Array.isArray(excludeId)) {
+      excludeId.forEach((id) => params.append('excludeId', id));
+    } else if (excludeId) {
+      params.append('excludeId', excludeId);
+    }
+
     const response = await client.get('/role', { params });
     if (response.status !== 200) return stringToast('Failed to get role list');
     roleList = response.data.data ?? [];
@@ -63,5 +70,6 @@
     bind:placeholder
     display={displayName ? 'LABEL' : 'VALUE'}
     options={roleList.map((role) => [role.id, role.roleName])}
+    {onselect}
   />
 </label>

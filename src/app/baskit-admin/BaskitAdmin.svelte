@@ -68,7 +68,7 @@
     <div class="divider"></div>
     <InventoryList/>
     <div class="divider"></div>
-    <SellerList {client}/>
+    <SellerList/>
     <div class="divider"></div>
     <CompanyTypeManagement {client}/>
     <div class="divider"></div>

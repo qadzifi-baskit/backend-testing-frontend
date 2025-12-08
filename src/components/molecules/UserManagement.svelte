@@ -1,13 +1,12 @@
 <script lang="ts">
   import { listenAuthSuccess } from '@/event';
   import { Context } from '@/lib/helper/context';
-  import { cancelableDebounce, debounce } from '@/lib/helper/util';
+  import { cancelableDebounce } from '@/lib/helper/util';
   import type { DropdownReturnType } from '@/types/component';
-  import type { Role, User } from '@/types/user';
-  import { untrack, type Snippet } from 'svelte';
+  import type { User } from '@/types/user';
+  import { untrack } from 'svelte';
   import { Icon } from 'svelte-icons-pack';
   import { FaSolidPlus, FaSolidXmark } from 'svelte-icons-pack/fa';
-  import DropdownSelect from '../atoms/DropdownSelect.svelte';
   import NoWrap from '../atoms/NoWrap.svelte';
   import PaginationNavigationPanel from '../atoms/PaginationNavigationPanel.svelte';
   import Collapse5 from '../Collapse5.svelte';
@@ -31,8 +30,6 @@
     search,
   } = $state(getPaginationParams());
   let userList:User[] = $state([]);
-  let roleList:Role[] = $state([]);
-  let roleSearch = $state('');
 
   async function getUserList() {
     if (!$auth.loggedIn) return stringToast('You are not logged in');
@@ -60,49 +57,8 @@
     untrack(debounceGetData);
   });
 
-  let excludeRoleId:string[] = $state([]);
-
-  $effect(() => {
-    if (!show) return;
-    excludeRoleId;
-    getRoleList();
-  });
-
-  function excludeRole(userRoleList: Role[]) {
-    return () => {
-      roleSearch = '';
-      roleList = [];
-      excludeRoleId = userRoleList.map((role) => role.id);
-    };
-  }
-
-  async function getRoleList() {
-    if (!$auth.loggedIn) return;
-    const params = new URLSearchParams({
-      search: roleSearch,
-    });
-    excludeRoleId.forEach((roleId) => {
-      params.append('excludeId', roleId);
-    });
-    const response = await client.get(
-      '/role',
-      { params },
-    );
-    if (response.status !== 200) return;
-    roleList = response.data?.data ?? [];
-  }
-
-  const debounceGetRoleList = debounce(getRoleList);
-
-  $effect(() => {
-    if (!show) return;
-    roleSearch;
-    debounceGetRoleList();
-  });
-
   function reloadData() {
     getUserList();
-    getRoleList();
   }
 
   listenAuthSuccess(() => {
@@ -166,12 +122,6 @@
   <th>Role</th>
 {/snippet}
 
-{#snippet dropdownContainer(content: Snippet)}
-  <ul class="menu input-bordered border dropdown-content bg-base-100 rounded-box z-1000 w-fit p-0 shadow-sm right-0">
-    {@render content()}
-  </ul>
-{/snippet}
-
 {#snippet content(item: User)}
   <td><NoWrap>{item.id}</NoWrap></td>
   <td><NoWrap>{item.profile?.firstName ?? '-'}</NoWrap></td>
@@ -194,17 +144,12 @@
           <button class="btn btn-secondary">{role.roleName}</button>
         </div>
       {/each}
-      <DropdownSelect
-        bind:search={roleSearch}
-        display="LABEL"
-        class="w-fit"
-        options={roleList.map((role) => [role.id, role.roleName])}
-        onclick={excludeRole(item.roles)}
-        onselect={addRole(item.id)}
+      <RoleDropdownSelect
+        label={null}
         {placeholder}
-        {dropdownContainer}
+        excludeId={item.roles.map((role) => role.id)}
+        onselect={addRole(item.id)}
       />
-      <RoleDropdownSelect/>
     </div>
   </td>
 {/snippet}
